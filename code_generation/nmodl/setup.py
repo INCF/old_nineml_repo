@@ -1,18 +1,20 @@
 #!/usr/bin/env python
 
-from distutils.core import setup
-from nineml2nmodl import __version__
+from distribute_setup import use_setuptools
+use_setuptools()
+from setuptools import setup
 
 setup(
     name = "9ml2nmodl",
-    version = __version__,
+    version = "0.1.0",
     packages = ['nineml2nmodl', 'nineml2nmodl.test'],
-    package_data = {'nineml2nmodl': ['nmodl_template.jinja']},
+    #package_data = {'nineml2nmodl': ['nmodl_template.jinja']},
     scripts = ['bin/9ml2nmodl'],
-    author = "Andrew P. Davison", # add your name here if you contribute to the code
-    author_email = "andrewpdavison@gmail.com",
+    author = "Andrew P. Davison, Michael Hull", # add your name here if you contribute to the code
+    author_email = "nineml-users@incf.org",
     description = "A tool for generating NMODL mechanisms for the NEURON simulator (http://www.neuron.yale.edu) from model descriptions in NineML (http://www.nineml.org/)",
-    license = "CeCILL http://www.cecill.info",
+    long_description = open("README").read(),
+    license = "BSD 3 License",
     keywords = "computational neuroscience modeling interoperability XML NEURON NMODL",
     url = "http://nineml.incf.org",
     classifiers = ['Development Status :: 2 - Pre-Alpha',
@@ -23,6 +25,7 @@ setup(
                    'Operating System :: OS Independent',
                    'Programming Language :: Python :: 2',
                    'Topic :: Scientific/Engineering'],
-    requires = ['nineml'],
+    install_requires = ['nineml', 'Cheetah'],
+    tests_require = ['matplotlib']
 )
 

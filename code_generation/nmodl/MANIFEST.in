@@ -1,1 +1,4 @@
-include nineml2nmodl/*.jinja
+include distribute_setup.py
+include LICENSE
+include AUTHORS
+exclude lib/ninemlnrn/.gitignore
