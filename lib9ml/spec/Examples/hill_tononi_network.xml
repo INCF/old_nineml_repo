@@ -45,7 +45,7 @@
 					</equal>
 				</any>
 			</select>
-		<set>
+		</set>
 		<projection name="TpInter to TpRelay">
 			<source><reference>InterPop</reference></source>
 			<target><reference>All Tp</reference></target>
@@ -126,7 +126,7 @@
 					</equal>
 				</any>
 			</select>
-		<set>
+		</set>
 		<set name="All L4">
 			<select>
 				<any>
@@ -140,7 +140,7 @@
 					</equal>
 				</any>
 			</select>
-		<set>
+		</set>
 		<set name="All L56">
 			<select>
 				<any>
@@ -154,7 +154,7 @@
 					</equal>
 				</any>
 			</select>
-		<set>
+		</set>
 		<set name="All L234">
 			<select>
 				<any>
@@ -168,7 +168,7 @@
 					</equal>
 				</any>
 			</select>
-		<set>
+		</set>
 		<projection name="L23 intralaminar">
 			<source><reference>ExPop L23</reference></source>
 			<target><reference>All L23</reference></target>
@@ -238,6 +238,34 @@
 			<prototype><reference>Cortical</reference></prototype>
 			<layout><reference>PointLayout</reference></layout>
 		</population>
+		<set name="ExPop L56 HV">
+			<select>
+				<any>
+					<equal>
+						<string>set[@name]</string>
+						<string>Cortex Vertical.ExPop L56</string>
+					</equal>
+					<equal>
+						<string>set[@name]</string>
+						<string>Cortex Horizontal.ExPop L56</string>
+					</equal>
+				</any>
+			</select>
+		</set>
+		<set name="ExPop L4 HV">
+			<select>
+				<any>
+					<equal>
+						<string>set[@name]</string>
+						<string>Cortex Vertical.ExPop L4</string>
+					</equal>
+					<equal>
+						<string>set[@name]</string>
+						<string>Cortex Horizontal.ExPop L4</string>
+					</equal>
+				</any>
+			</select>
+		</set>
 		<projection name="L23 crossHV intralaminar">
 			<source><reference>Cortex Horizontal.InPop L23</reference></source>
 			<target><reference>Cortex Vertical.All L23</reference></target>
@@ -280,29 +308,15 @@
 			<response><reference>GABA_A</reference></response>
 			<plasticity><reference>Inhibitory weight</reference></plasticity>
 		</projection>
-		<projection name="Cortico thalamic V">
-			<source><reference>Cortex Vertical.ExPop L56</reference></source>
+		<projection name="Cortico thalamic">
+			<source><reference>ExPop L56 HV</reference></source>
 			<target><reference>ThalamusP.All Tp</reference></target>
 			<rule><reference>Cortico thalamic random Gaussian fan-out</reference></rule>
 			<response><reference>AMPA</reference></response>
 			<plasticity><reference>Cortical weight</reference></plasticity>
 		</projection>
-		<projection name="Cortico thalamic H">
-			<source><reference>Cortex Horizontal.ExPop L56</reference></source>
-			<target><reference>ThalamusP.All Tp</reference></target>
-			<rule><reference>Cortico thalamic random Gaussian fan-out</reference></rule>
-			<response><reference>AMPA</reference></response>
-			<plasticity><reference>Cortical weight</reference></plasticity>
-		</projection>
-		<projection name="Cortico reticular V">
-			<source><reference>Cortex Vertical.ExPop L56</reference></source>
-			<target><reference>ReticularP.ReticularPop</reference></target>
-			<rule><reference>Cortico thalamic random Gaussian fan-out</reference></rule>
-			<response><reference>AMPA</reference></response>
-			<plasticity><reference>CorticoReticular weight</reference></plasticity>
-		</projection>
-		<projection name="Cortico reticular H">
-			<source><reference>Cortex Horizontal.ExPop L56</reference></source>
+		<projection name="Cortico reticular">
+			<source><reference>ExPop L56 HV</reference></source>
 			<target><reference>ReticularP.ReticularPop</reference></target>
 			<rule><reference>Cortico thalamic random Gaussian fan-out</reference></rule>
 			<response><reference>AMPA</reference></response>
@@ -336,30 +350,16 @@
 			<response><reference>AMPA</reference></response>
 			<plasticity><reference>Thalamo cortical weight</reference></plasticity>
 		</projection>
-		<projection name="Thalamo cortical L4 H Diffuse">
+		<projection name="Thalamo cortical L4 Diffuse">
 			<source><reference>ThalamusP.RelayPop</reference></source>
-			<target><reference>Cortex Horizontal.ExPop L4</reference></target>
+			<target><reference>ExPop L4 HV</reference></target>
 			<rule><reference>Thalamo Cortical Gaussian fan-in</reference></rule>
 			<response><reference>AMPA</reference></response>
 			<plasticity><reference>Thalamo cortical weight</reference></plasticity>
 		</projection>
-		<projection name="Thalamo cortical L4 V Diffuse">
+		<projection name="Thalamo cortical L56 Diffuse">
 			<source><reference>ThalamusP.RelayPop</reference></source>
-			<target><reference>Cortex Vertical.ExPop L4</reference></target>
-			<rule><reference>Thalamo Cortical Gaussian fan-in</reference></rule>
-			<response><reference>AMPA</reference></response>
-			<plasticity><reference>Thalamo cortical weight</reference></plasticity>
-		</projection>
-		<projection name="Thalamo cortical L56 H Diffuse">
-			<source><reference>ThalamusP.RelayPop</reference></source>
-			<target><reference>Cortex Horizontal.ExPop L56</reference></target>
-			<rule><reference>Thalamo Cortical Gaussian fan-in</reference></rule>
-			<response><reference>AMPA</reference></response>
-			<plasticity><reference>Thalamo cortical weight</reference></plasticity>
-		</projection>
-		<projection name="Thalamo cortical L56 V Diffuse">
-			<source><reference>ThalamusP.RelayPop</reference></source>
-			<target><reference>Cortex Vertical.ExPop L56</reference></target>
+			<target><reference>ExPop L56 HV</reference></target>
 			<rule><reference>Thalamo Cortical Gaussian fan-in</reference></rule>
 			<response><reference>AMPA</reference></response>
 			<plasticity><reference>Thalamo cortical weight</reference></plasticity>
