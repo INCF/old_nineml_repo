@@ -2,5 +2,17 @@
 <nineml xmlns="http://nineml.org/9ML/0.1">
   <component name="Fixed probability connector">
     <parameter name="p_connect"/>
+    <connection-generator>
+      <CSA xmlns="http://software.incf.org/software/csa/1.0">
+	<bind>
+	  <closure/>
+	  <bvar><ci>p</ci></bvar>
+	  <apply>
+	    <randomMask/>
+	    <ci>p</ci>
+	  </apply>
+	</bind>
+      </CSA>
+    </connection-generator>
   </component>
 </nineml>
