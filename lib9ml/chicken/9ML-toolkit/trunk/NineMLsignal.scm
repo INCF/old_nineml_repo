@@ -4,16 +4,16 @@
 
   (define ident-sigfun   (ident-create "sigfun"))
   (define path-sigfun    (Pident ident-sigfun))
-  (define sigfun-type    (Tcon path-sigfun '()))
+  (define sigfun-type    (Tcon (Tpath path-sigfun) '()))
 
   (define path-label   (Pident (ident-create "label")))
-  (define label-type   (Tcon path-label '()))
+  (define label-type   (Tcon (Tpath path-label) '()))
 
   (define path-real   (Pident (ident-create "real")))
-  (define real-type   (Tcon path-real '()))
+  (define real-type   (Tcon (Tpath path-real) '()))
 
   (define path-bool   (Pident (ident-create "bool")))
-  (define bool-type   (Tcon path-bool '()))
+  (define bool-type   (Tcon (Tpath path-bool) '()))
 
   (define-values (type-variables reset-type-variables
 				 find-type-variable 
@@ -70,7 +70,7 @@
 	  (list 
 	   
 	   (Type_def ident-sigfun (make-kind 0) 
-		     (make-deftype '() (Tcon path-sigfun '()) ))
+		     (make-deftype '() (Tcon (Tpath path-sigfun) '()) ))
 
 	   (datacon 'sigfun 'signal 1)
 	   (datacon 'sigfun 'relation 2)

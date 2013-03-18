@@ -24,6 +24,10 @@
 (define (sxml:kid node)
   (let ((v ((select-first-kid (lambda (x) (not (eq? (car x) '@)))) node)))
     (if (not v)  (error 'sxml:kid "node does not have children" node)  v)))
+
+;; obtain the first non-attribute child / return #f if there are no children
+(define (sxml:kid* node)
+  ((select-first-kid (lambda (x) (not (eq? (car x) '@)))) node))
   
 ;; obtain the cadr of the first non-attribute child 
 (define (sxml:kid-cadr node)

@@ -2,7 +2,7 @@
 ;;  NineML user layer processor.
 ;;
 ;;
-;; Copyright 2010-2011 Ivan Raikov and the Okinawa Institute of
+;; Copyright 2010-2012 Ivan Raikov and the Okinawa Institute of
 ;; Science and Technology.
 ;;
 ;; This program is free software: you can redistribute it and/or
@@ -20,10 +20,27 @@
 ;;
 
 
-(require-extension setup-api extras regex posix utils files data-structures tcp srfi-1 srfi-13)
+(require-extension extras posix utils files data-structures tcp srfi-1 srfi-13 irregex)
 (require-extension datatype matchable static-modules miniML miniMLsyntax miniMLvalue miniMLeval)
 (require-extension signal-diagram ssax sxml-transforms sxpath sxpath-lolevel object-graph uri-generic getopt-long )
-(require-extension 9ML-parse 9ML-repr )
+(require-extension 9ML-parse 9ML-eval )
+
+(define (string-match rx str)
+  (and-let* ((m (irregex-match rx str)))
+    (let loop ((i (irregex-match-num-submatches m))
+               (res '()))
+      (if (fx<= i 0)
+          (cons str res)
+          (loop (fx- i 1) (cons (irregex-match-substring m i) res))))))
+
+
+(define lookup-def 
+  (lambda (k lst . rest)
+    (let-optionals rest ((default #f))
+      (alist-ref k lst eq? default))))
+
+(define (safe-car x) (and (pair? x) (car x)))
+
 	
 (include "SXML.scm")
 (include "SXML-to-XML.scm")
@@ -39,6 +56,8 @@
   (make-mod-typing core-syntax core-typing))
 
 (include "NineMLcore.scm")
+(include "NineMLreal.scm")
+(include "NineMLrandom.scm")
 (include "NineMLsignal.scm")
 (include "NineMLdiagram.scm")
 (include "NineMLinterval.scm")
@@ -46,31 +65,31 @@
 (include "NineMLivp.scm")
 
 
-(define init-scope      (make-parameter st-empty))
-(define init-type-env   (make-parameter env-empty))
-(define init-eval-env   (make-parameter env-empty))
+(define current-scope      (make-parameter st-empty))
+(define current-type-env   (make-parameter env-empty))
+(define current-eval-env   (make-parameter env-empty))
 
 
 (define (enter-typedecl id decl)
-  (init-scope (st-enter-type id (init-scope)))
-  (init-type-env   (env-add-type id decl (init-type-env))))
+  (current-scope (st-enter-type id (current-scope)))
+  (current-type-env   (env-add-type id decl (current-type-env))))
 
 (define (enter-valtype name ty)
   (let ((id (ident-create name)))
-    (init-scope (st-enter-value id (init-scope)))
-    (init-type-env   (env-add-value id ty (init-type-env)))))
+    (current-scope (st-enter-value id (current-scope)))
+    (current-type-env   (env-add-value id ty (current-type-env)))))
 
 (define (enter-val name val)
   (let ((id (or (and (ident? name) name) (ident-create name))))
-    (init-eval-env (ident-add id val (init-eval-env)))))
+    (current-eval-env (ident-add id val (current-eval-env)))))
 
 (core-initialize enter-typedecl enter-valtype)
 (eval-cbv-initialize enter-val)
 
 
 (define (enter-module id mty)
-  (init-scope (st-enter-module id (init-scope)))
-  (init-type-env (env-add-module id mty (init-type-env))))
+  (current-scope (st-enter-module id (current-scope)))
+  (current-type-env (env-add-module id mty (current-type-env))))
 
 
 
@@ -110,13 +129,13 @@
 
     (output-xml         "sets output format to XML")
 
-    (platform        "simulation platform (one of chicken, mlton, octave, octave/mlton)"
+    (platform        "simulation platform (one of chicken, chicken/cvode, mlton, octave, octave/mlton)"
 		     (value (required PLATFORM)
 			    (predicate 
 			     ,(lambda (x) 
 				(let ((s (string->symbol (string-downcase x))))
 				  (case s
-				    ((chicken mlton octave octave/ml) s)
+				    ((chicken chicken/cvode mlton octave octave/mlton) s)
 				    (else (error 'ivp "unrecognized platform" x))))))
 			    (transformer ,string->symbol)
 			     ))
@@ -133,7 +152,7 @@
 ;; Use args:usage to generate a formatted list of options (from OPTS),
 ;; suitable for embedding into help text.
 (define (ulp:usage)
-  (print "Usage: " (car (argv)) " [options...] operands ")
+  (print "Usage: " (car (argv)) " file1... [options...] ")
   (newline)
   (print "Where operands are NineML user layer files")
   (newline)
@@ -155,11 +174,17 @@
 (define data-dir (make-parameter #f))
 (define simulation-platform (make-parameter #f))
 
+
 (define (d fstr . args)
   (let ([port (current-error-port)])
     (if (positive? (ulp-verbose)) 
 	(begin (apply fprintf port fstr args)
 	       (flush-output port) ) )))
+
+
+(define (sxml-string->uri s) 
+  (let ((ss (string-trim-both s)))
+    (uri-reference ss)))
 
 
 (define (get-data-dir)
@@ -267,7 +292,7 @@
 	  (let-values ([(in out) (tcp-connect host port)])
 		      (d "requesting ~s ...~%" locn)
 		      (display
-		       (make-HTTP-GET/1.1 locn *user-agent* host port: port accept: "*/*")
+		       (make-HTTP-GET/1.1 locn "NineML" host port: port accept: "*/*")
 		       out)
 		      (flush-output out)
 		      (d "reading response ...~%")
@@ -294,7 +319,7 @@
 				    (d "reading chunks ...~%")
 				    (let ([data (read-chunks in)])
 				      (close-input-port in)
-				      (close-input-port out)
+				      (close-output-port out)
 				      (if (not (file-exists? dest)) (mkdir dest))
 				      (d "writing to ~s~%" filepath)
 				      (with-output-to-file filepath (cut display data) )
@@ -304,7 +329,7 @@
 				    (d "reading data ...~%")
 				    (let ([data (read-string #f in)])
 				      (close-input-port in)
-				      (close-input-port out)
+				      (close-output-port out)
 				      (if (not (file-exists? dest)) (mkdir dest))
 				      (d "writing to ~s~%" filepath)
 				      (with-output-to-file filepath (cut display data) binary:)
@@ -322,15 +347,82 @@
 	      (get-chunks (cons chunk data)) ) ) ) ) )
 
 
-
-(define (parse-xml fpath)
-  (with-input-from-file fpath
-    (lambda () (cons '*TOP* (ssax:xml->sxml (current-input-port) `())))
+(define (fetch uri)
+  (case (uri-scheme uri)
+    ((http)
+     (let-values (((fd temp-path) (file-mkstemp "/tmp/9ML.XXXXXX")))
+       (let ((data (and (http-fetch uri temp-path) (read-all temp-path))))
+	 (file-close fd)
+	 data)))
+    ((file)
+     (let ((data (read-all (string-concatenate (map ->string (uri-path uri))))))
+       data))
+    (else (error 'fetch "unknown scheme" (uri-scheme uri)))
     ))
 
 
-(define rule-user-layer-component
-  `( 
+
+(define (parse-xml str)
+  (call-with-input-string str
+      (lambda (in)
+	(ssax:xml->sxml in `((nml . ,nineml-xmlns))))
+      ))
+
+
+(define (eval-source def current-scope current-type-env current-eval-env)
+  (let* ((scoped-defs      (scope-moddef (current-scope) defs))
+	 (mty              (type-moddef (current-type-env) '() scoped-defs))
+	 (type-env         (map (lambda (x) (cases modspec x
+						   (Value_sig (id vty) (cons id x))
+						   (Type_sig (id decl) (cons id x))
+						   (Module_sig (id mty) (cons id x))
+						   )) mty))
+	 (eval-env         (mod-eval-cbv (current-eval-env) scoped-defs))
+	 (unified-env      (list scoped-defs
+				 (filter (lambda (x) (not (assoc (car x) (current-type-env)))) type-env) 
+				 (filter (lambda (x) (not (assoc (car x) (current-eval-env)))) eval-env) ))
+	 
+	 )
+    unified-env
+    ))
+
+
+(define (parse-ul-component x) 
+
+  (let ((definition ((sxpath `(// nml:definition))  x))
+	(properties ((sxpath `(// nml:properties nml:quantity nml:value))  x)))
+
+    (if (null? definition)
+	(error 'parse-ul-component "component without definition" x))
+
+    (let* ((uri  (sxml-string->uri (sxml:text (safe-car definition))))
+	   (src  (fetch uri))
+	   (uenv (if (not src)
+		     (error 'parse-ul-component "resource not found" (uri->string uri))
+		     (eval-source (parse 'parse-ul-component src) 
+				  current-scope current-type-env current-eval-env)))
+	   )
+      
+      (current-scope (car uenv))
+      (current-type-env (append (cadr uenv) (current-type-env)))
+      (current-eval-env (append (caddr uenv) (current-eval-env)))
+
+      (if (null? eval-env)
+	  (error 'parse-ul-component "empty definition" definition))
+
+      (let ((last-entry-name  (car (last (caddr uenv))))
+	    (property-values (map (compose string->number sxml:text) properties)))
+	
+	(eval-source (list (apply-terms (Longid last-entry-name) property-values))
+		     current-scope current-type-env current-eval-env)	
+
+	))
+    ))
+
+
+#|
+
+TODO: use the following term rewriting rules for parse-ul-component
 
      ( (M component (definition $url) $properties) =>
        (M component (eval-env (M eval-definition $url)) $properties) )
@@ -351,85 +443,82 @@
        (M apply-terms (Apply $operator $term) $rest) )
        
      ( (M apply-terms $operator (seq-empty)) => $operator )
-       
-     ))
+|#
 
-
-(define (eval-source def current-scope current-type-env current-eval-env)
-  (let* ((scoped-defs      (scope-moddef (current-scope) defs))
-	 (mty              (type-moddef (current-type-env) '() scoped-defs))
-	 (type-env         (map (lambda (x) (cases modspec x
-						   (Value_sig (id vty) (cons id x))
-						   (Type_sig (id decl) (cons id x))
-						   (Module_sig (id mty) (cons id x))
-						   )) mty))
-	 (eval-env         (mod-eval-cbv (current-eval-env) scoped-defs))
-	 (unified-env      (list scoped-defs
-				 (filter (lambda (x) (not (assoc (car x) (init-type-env)))) type-env) 
-				 (filter (lambda (x) (not (assoc (car x) (init-eval-env)))) eval-env) ))
-	 
-	 )
-    unified-env
-    ))
-
-
-(define rewrite-ul-components identity) ;;(rewrite-map-tree rule-user-layer-component))
+  
 
 (define (main options operands)
 
-  (if (options 'help) (ivp:usage))
+  (if (options 'help) (ulp:usage))
 
 
-  (let ((find-module (lambda (x) (env-find-module x (init-type-env)))))
-    (for-each (lambda (init name) (init name enter-module find-module init-eval-env))
-	      (list Signal:module-initialize   
+  (let ((find-module (lambda (x) (env-find-module x (current-type-env)))))
+    (for-each (lambda (init name) (init name enter-module find-module current-eval-env))
+	      (list Real:module-initialize   
+		    Random:module-initialize   
+		    Signal:module-initialize   
 		    Diagram:module-initialize  
 		    Interval:module-initialize 
 		    Graph:module-initialize
 		    IVP:module-initialize )
-	      (list "Signal" "Diagram" "Interval" "Graph" "IVP" )) )
+	      (list "Real" "Random" "Signal" "Diagram" "Interval" "Graph" "IVP" )) )
 
   (if (null? operands)
       (ulp:usage)
       (let ((output-type (cond ((options 'output-xml)  'xml)
 			       ((options 'output-sxml) 'sxml)
 			       (else #f))))
-	(if (options 'verbose) (begin (repr-verbose 1) (ivp-verbose 1)))
+	(if (options 'verbose) (begin (eval-verbose 1) (ivp-verbose 1)))
 	(simulation-platform (or (options 'platform) (defopt 'platform) ))
 	(for-each
 	 (lambda (operand)
 
-	   (let* ((ul-sxml (parse-xml operand))
-		  (ul-components ((sxpath `(// component))  ul-sxml))
-		  (ul-terms (rewrite-ul-components ul-components)))
+	   (let* ((ul-sxml (parse-xml (read-all operand)))
+		  (ul-imports ((sxpath `(// nml:nineml nml:import))  ul-sxml))
+		  (ul-import-sxmls (map (lambda (x) (parse-xml (fetch (sxml-string->uri (sxml:text x))))) ul-imports)))
 
-	     
+	     (let* ((ul-sxml (fold append ul-sxml ul-import-sxmls))
+		    (ul-parameters ((sxpath `(// nml:nineml nml:quantity))  ul-sxml))
+		    (ul-groups ((sxpath `(// nml:nineml nml:group))  ul-sxml))
+		    (dd (begin (print "ul-groups = ") (pp ul-groups)))
+		    
+		    (ul-components ((sxpath `(// nml:nineml nml:component))  ul-sxml))
+		    (ul-component-uenvs (map parse-ul-component ul-components))
 
-	     (let ((source-defs (car uenv))
-		   (mty         (cadr uenv))
-		   (eval-env    (caddr uenv)))
+		    )
+
+
+	       (for-each
+		(lambda (uenv) 
 	       
-	       (let ((type-env-opt (options 'print-type-env)))
-		 (if type-env-opt
-		     (if (and (string? type-env-opt) (string=?  type-env-opt "all"))
-			 (print-type-env mty output-type)
-			 (let ((fc (lambda (x) (and (member (ident-name (car x)) type-env-opt) x))))
-			   (print-type-env mty output-type fc)))
-		     ))
-	       
-	       (let ((eval-env-opt (options 'print-eval-env)))
-		 (if eval-env-opt
-		     (if (and (string? eval-env-opt) (string=? eval-env-opt "all"))
-			 (print-eval-env eval-env output-eval)
-			 (let ((fc (lambda (x) (and (member (ident-name (car x)) eval-env-opt) x))))
-			   (print-eval-env eval-env output-type fc)))
-		     ))
-	       
-	       (if (options 'print-source-defs)
-		   (print-source-defs source-defs output-type))
-	       
-	       
-	       )))
+		  (let ((source-defs (car uenv))
+			(mty         (cadr uenv))
+			(eval-env    (caddr uenv)))
+		    
+		    (let ((type-env-opt (options 'print-type-env)))
+		      (if type-env-opt
+			  (if (and (string? type-env-opt) (string=?  type-env-opt "all"))
+			      (print-type-env mty output-type)
+			      (let ((fc (lambda (x) (and (member (ident-name (car x)) type-env-opt) x))))
+				(print-type-env mty output-type fc)))
+			  ))
+		    
+		    (let ((eval-env-opt (options 'print-eval-env)))
+		      (if eval-env-opt
+			  (if (and (string? eval-env-opt) (string=? eval-env-opt "all"))
+			      (print-eval-env eval-env output-eval)
+			      (let ((fc (lambda (x) (and (member (ident-name (car x)) eval-env-opt) x))))
+				(print-eval-env eval-env output-type fc)))
+			  ))
+		    
+		    (if (options 'print-source-defs)
+			(print-source-defs source-defs output-type))
+		    
+		    ))
+		 ul-component-uenvs
+
+		))
+	     ))
 
 	 operands))))
 

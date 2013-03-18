@@ -6,7 +6,7 @@
 ;;  doi:10.1017/S0956796800003683
 ;;
 ;;
-;; Copyright 2010-2011 Ivan Raikov and the Okinawa Institute of
+;; Copyright 2010-2012 Ivan Raikov and the Okinawa Institute of
 ;; Science and Technology.
 ;;
 ;; This program is free software: you can redistribute it and/or
@@ -26,15 +26,27 @@
 
 (module 9ML-parse
 
-	(parse parse-sexpr-macro parse-string-expr parse-sym-expr nineml-xmlns parse-al-sxml-component parse-al-sxml)
+	(parse parse-sexpr-macro parse-string-expr parse-sym-expr 
+	 nineml-xmlns parse-al-sxml-component parse-al-sxml)
 
-	(import scheme chicken 
-		(only srfi-1 fold combine every unzip2 filter-map partition delete-duplicates cons*)
-		(only srfi-13 string-null?)
-		(only data-structures conc ->string)
-		(only extras fprintf))
-	(require-extension extras matchable static-modules miniML miniMLsyntax 
-			   ssax sxml-transforms sxpath sxpath-lolevel)
+	(import scheme chicken)
+	(require-library srfi-1 srfi-13 data-structures extras)
+	(import
+	 (only srfi-1 fold combine every unzip2 filter-map partition delete-duplicates cons*)
+	 (only srfi-13 string-null?)
+	 (only data-structures conc ->string)
+	 (only extras fprintf))
+
+	(require-extension matchable)
+	(require-extension sxpath sxpath-lolevel)
+	(require-extension static-modules miniML miniMLsyntax)
+
+	
+	(require-library sxml-transforms)
+	(import (prefix sxml-transforms sxml:))
+
+	(include "SXML.scm")
+
 
   (define-values (type-variables reset-type-variables
 				 find-type-variable 
@@ -48,44 +60,20 @@
 
 (define (safe-car x) (and (pair? x) (car x)))
 
-(include "SXML.scm")
-
-(define-record token symbol value line)
-
-(define-record-printer (token x out)
-  (fprintf out "#(token  ~S ~S)"
-	   (token-symbol x)
-	   (token-value x) ))
-
-
-(define (token p line)
-  (cons (car p)
-	(cond  [(pair? (cdr p))  (make-token (car p) (cadr p) line)]
-	       [else (make-token (car p) #f line)])))
-
 
 (define-syntax tok
   (syntax-rules ()
-    ((tok t)   (token (quasiquote t) 0))
-    ((tok t l) (token (quasiquote t) l))))
+    ((tok loc t) (make-lexical-token (quasiquote t) loc #f))
+    ((tok loc t l) (make-lexical-token (quasiquote t) loc l))))
 
 
-(define (make-parse-error loc)
-  (lambda (msg #!optional arg)
-    (let ((loc-str (or (and loc (if (list? loc) (conc " " loc " ") (conc " (" loc ") "))) "")))
-      (cond  [(not arg) (error loc-str msg)]
-	     [(token? arg)
-	      (error (conc "line " (token-line arg) ": " msg) loc-str
-		     (conc (token-symbol arg) 
-			   (if (token-value arg) (conc " " (token-value arg)) "")))]
-	     [else (error loc-str (conc msg arg))]
-	     ))))
 
-(define lexer-error error)
+(define-record-type sexpr-macro
+  (make-sexpr-macro label text)
+  sexpr-macro? 
+  (label sexpr-macro-label)
+  (text sexpr-macro-text))
 
-(include "NineML.l.scm")
-(include "NineML.grm.scm")
-(include "expr-parser.scm")
 
 
 (define-record-type algebraic-eqn
@@ -115,6 +103,67 @@
 (define (ode-eqn-or-relation? x)
   (or (ode-eqn? x) (relation? x)))
 
+
+
+(define sexpr-macro-hooks (make-parameter '()))
+
+
+(define (register-macro-hook label hook)
+  (assert (procedure? hook))
+  (if (not (symbol? label))
+      (error 'register-macro-hook "hook label must be a symbol" label))
+  (if (assoc label (sexpr-macro-hooks))
+      (error 'register-macro-hook "hook already exists" label))
+  (sexpr-macro-hooks (cons (cons label hook) (sexpr-macro-hooks)))
+  )
+
+
+(define (parse-sexpr-macro x)
+  (if (sexpr-macro? x)
+      (let ((label (sexpr-macro-label x)))
+	(if (not label)
+	    (let ((default-handler (cdr (assoc 'default (sexpr-macro-hooks)))))
+	      (default-handler x))
+	    (cond ((assoc label (sexpr-macro-hooks)) =>
+		   (lambda (v) ((cdr v) (sexpr-macro-text x))))
+		  (else
+		   (error 'parse-sexpr-macro "cannot find handler for macro" label))
+		  )))
+	))
+
+
+
+(include "NineML.grm.scm")
+(include "NineML.l.scm")
+(include "expr-parser.scm")
+
+
+(define (make-parse-error loc)
+  (lambda (msg #!optional arg)
+    (let ((loc-str (or (and loc (if (list? loc) (conc " " loc " ") (conc " (" loc ") "))) "")))
+      (cond  [(not arg) (error loc-str msg)]
+	     [(lexical-token? arg)
+	      (error (conc "line " (let ((src (lexical-token-source arg)))
+				     (if (source-location? src) 
+					 (source-location-line (lexical-token-source arg))
+					 src)) ": " msg)
+		     loc-str
+		     (conc (lexical-token-category arg) 
+			   (if (lexical-token-value arg) (conc " " (lexical-token-value arg)) "")))]
+	     [else (error loc-str (conc msg arg))]
+	     ))))
+
+(define lexer-error error)
+
+
+(define (parse loc s)
+  (cond ((port? s)   (lexer-init 'port s))
+	((string? s) (lexer-init 'string s))
+	(else (error 'parse "bad argument type; not a string or port" s)) )
+   (parser lexer (make-parse-error loc)))
+
+(define list-cons         (Pident (ident-create "cons")))
+(define list-null         (Pident (ident-create "null")))
 
 (define diagram-pure         (Longid (Pdot (Pident (ident-create "Diagram")) "PURE")))
 (define diagram-group        (Longid (Pdot (Pident (ident-create "Diagram")) "GROUP")))
@@ -302,7 +351,7 @@
 	       (Longid (Pident (ident-create (->string indep)))))
 	      (Longid (Pident (ident-create (->string tstep)))))
 	     (make-group (map make-pure (map ode-eqn-rhs eqlst)))))
-	   (else (error 'parse-sexpr-macro "invalid system of ODE equations" eqlst)))))
+	   (else (error 'parse-NineML-equation-sexpr-macro "invalid system of ODE equations" eqlst)))))
 
 
 (define (make-dae-eqn-lst-expr eqlst)
@@ -320,11 +369,15 @@
 		(Longid (Pident (ident-create (->string tstep)))))
 	       (make-relations relations (make-group (map make-pure (map ode-eqn-rhs ode-eqs))))))
 	     
-	     (else (error 'parse-sexpr-macro "invalid system of DAE equations" eqlst))
+	     (else (error 'parse-NineML-equation-sexpr-macro "invalid system of DAE equations" eqlst))
 	     ))))
 
-(define (parse-sexpr-macro lst)
-  (match lst
+(define (parse-NineML-equation-sexpr-macro mac)
+  (if (not (sexpr-macro? mac))
+      (error 'parse-NineML-equation-sexpr-macro "invalid macro expression" mac))
+  
+  (let ((lst (sexpr-macro-text mac)))
+    (match lst
 
 	 (((? symbol?) . rest)
 	  (let ((eqn (parse-sexpr-eqn lst)))
@@ -351,21 +404,23 @@
 		  (make-dae-eqn-lst-expr eqlst))
 			  
 		 (else
-		  (error 'parse-sexpr-macro "invalid system of equations" eqlst)))))
+		  (error 'parse-NineML-equation-sexpr-macro "invalid system of equations" eqlst)))))
 		
-	(else (error 'parse-sexpr-macro "invalid equational expression" lst))
+	(else (error 'parse-NineML-equation-sexpr-macro "invalid equational expression" lst))
 	))
+  )
+
+(define (parse-list-sexpr-macro text)
+  (let recur ((text (reverse text)) 
+	      (lst list-null))
+    (if (null? text) lst
+	(recur (cdr lst) (Apply list-cons (parse (->string (car text))) lst)))
+    ))
 
 
-(define (parse loc s)
-  (cond ((port? s)   (lexer-init 'port s))
-	((string? s) (lexer-init 'string s))
-	(else (error 'parse "bad argument type; not a string or port" s)) )
-   (parser lexer (make-parse-error loc)))
 
 
-
-(define nineml-xmlns "http://nineml.org/9ML/0.1")
+(define nineml-xmlns "http://www.NineML.org/9ML/1.0")
 
 (define (parse-al-sxml-dynamics sxml)
   (let ((state-variables  ((sxpath `(// nml:StateVariable)) sxml))
@@ -502,6 +557,7 @@
 
     ))
 
-
+(register-macro-hook 'default parse-NineML-equation-sexpr-macro)
+(register-macro-hook 'list parse-list-sexpr-macro)
 
 )

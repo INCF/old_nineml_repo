@@ -3,11 +3,9 @@
 (define (dynld-name fn)		
   (make-pathname #f fn ##sys#load-dynamic-extension))	
 
-(required-extension-version 'getopt-long 1.9)
-(required-extension-version 'miniML 1.4)
-(required-extension-version 'signal-diagram 1.5)
+(define version 1.16)
 
-(define version 1.1)
+(use make)
 
 (make (
        ("NineML.grm.scm" ("NineML.grm")
@@ -26,11 +24,23 @@
        ((dynld-name "9ML-parse.import") ("9ML-parse.import.scm")
 	(compile  -s 9ML-parse.import.scm))
 
-       ((dynld-name "9ML-repr") ("repr.scm" "SXML.scm" "SXML-to-XML.scm" (dynld-name "9ML-parse") )
-	(compile -O -d2 -S -s repr.scm -o ,(dynld-name "9ML-repr") -j 9ML-repr))
+       ((dynld-name "9ML-eval") ("eval.scm" "SXML.scm" "SXML-to-XML.scm" (dynld-name "9ML-parse") )
+	(compile -O -d2 -S -s eval.scm -o ,(dynld-name "9ML-eval") -j 9ML-eval))
 
-       ((dynld-name "9ML-repr.import") ("9ML-repr.import.scm")
-	(compile  -s 9ML-repr.import.scm))
+       ((dynld-name "9ML-eval.import") ("9ML-eval.import.scm")
+	(compile  -s 9ML-eval.import.scm))
+
+       ((dynld-name "9ML-plot") ("plot.scm" (dynld-name "9ML-eval") )
+	(compile -O -d2 -S -s plot.scm -o ,(dynld-name "9ML-plot") -j 9ML-plot))
+
+       ((dynld-name "9ML-plot.import") ("9ML-plot.import.scm")
+	(compile  -s 9ML-plot.import.scm))
+
+       ((dynld-name "9ML-ivp-octave") ("ivp-octave.scm" )
+	(compile -O -d2 -S -s ivp-octave.scm -o ,(dynld-name "9ML-ivp-octave") -j 9ML-ivp-octave))
+
+       ((dynld-name "9ML-ivp-octave.import") ( "9ML-ivp-octave.import.scm" )
+	(compile  -s 9ML-ivp-octave.import.scm))
 
        ((dynld-name "9ML-ivp-chicken") ("ivp-chicken.scm" )
 	(compile -O -d2 -S -s ivp-chicken.scm -o ,(dynld-name "9ML-ivp-chicken") -j 9ML-ivp-chicken))
@@ -38,57 +48,72 @@
        ((dynld-name "9ML-ivp-chicken.import") ( "9ML-ivp-chicken.import.scm" )
 	(compile  -s 9ML-ivp-chicken.import.scm))
 
-       ((dynld-name "9ML-ivp-mlton") ( "9ML-ivp-chicken.import.scm" )
+       ((dynld-name "9ML-ivp-mlton") ( "ivp-mlton.scm" )
 	(compile -O -d2 -S -s ivp-mlton.scm -o ,(dynld-name "9ML-ivp-mlton") -j 9ML-ivp-mlton))
 
        ((dynld-name "9ML-ivp-mlton.import") ( "9ML-ivp-mlton.import.scm" )
 	(compile  -s 9ML-ivp-mlton.import.scm))
 
-       ((dynld-name "9ML-ivp-octave-mlton") ( "ivp-octave-mlton.scm" (dynld-name "9ML-ivp-mlton") )
+       ((dynld-name "9ML-ivp-octave-mlton") ( "ivp-octave-mlton.scm" )
 	(compile -O -d2 -S -s ivp-octave-mlton.scm -o ,(dynld-name "9ML-ivp-octave-mlton") -j 9ML-ivp-octave-mlton))
 
        ((dynld-name "9ML-ivp-octave-mlton.import") ("9ML-ivp-octave-mlton.import.scm")
 	(compile  -s 9ML-ivp-octave-mlton.import.scm))
 
        ((dynld-name "9ML-toolkit") 
-	("9ML-toolkit.scm" "NineMLcore.scm" "NineMLsignal.scm" "NineMLdiagram.scm" "NineMLinterval.scm" "NineMLgraph.scm" "NineMLivp.scm"  )
+	("9ML-toolkit.scm" "NineMLcore.scm" "NineMLreal.scm" "NineMLsignal.scm" "NineMLdiagram.scm" "NineMLinterval.scm" "NineMLgraph.scm" "NineMLivp.scm"  )
 	(compile -O -d2 -S -s 9ML-toolkit.scm -o ,(dynld-name "9ML-toolkit") -j 9ML-toolkit))
 
        ((dynld-name "9ML-toolkit.import") ("9ML-toolkit.import.scm")
 	(compile  -s 9ML-toolkit.import.scm))
 
        ("9ML-report" 
-	("NineMLcore.scm" "NineMLsignal.scm" "NineMLdiagram.scm" "NineMLinterval.scm"  "NineMLgraph.scm" 
+	("NineMLcore.scm" "NineMLreal.scm" "NineMLrandom.scm" "NineMLsignal.scm" "NineMLdiagram.scm" "NineMLinterval.scm"  "NineMLgraph.scm" 
 	 "report.scm" )
 	(compile -O -d2 -S report.scm -o 9ML-report ))
 
        ("9ML-ivp" 
-	("NineMLcore.scm" "NineMLsignal.scm" "NineMLdiagram.scm" "NineMLinterval.scm" "NineMLgraph.scm" "NineMLivp.scm"  
+	("NineMLcore.scm" "NineMLreal.scm" "NineMLrandom.scm" "NineMLsignal.scm" "NineMLdiagram.scm" "NineMLinterval.scm" "NineMLgraph.scm" 
+	 "NineMLivp.scm"  
 	 "ivp.scm" )
 	(compile -O -d2 -S ivp.scm -o 9ML-ivp ))
 
        ("9ML-shell" 
-	("NineMLcore.scm" "NineMLsignal.scm" "NineMLdiagram.scm" "NineMLinterval.scm" "NineMLgraph.scm"  
+	("NineMLcore.scm" "NineMLreal.scm" "NineMLrandom.scm" "NineMLsignal.scm" "NineMLdiagram.scm" "NineMLinterval.scm" "NineMLgraph.scm"  
 	 "shell.scm" )
 	(compile -O -d2 -S shell.scm -o 9ML-shell ))
 
        ("9ML-ulp" 
-	("NineMLcore.scm" "NineMLsignal.scm" "NineMLdiagram.scm" "NineMLinterval.scm" "NineMLgraph.scm"  
+	("NineMLcore.scm" "NineMLreal.scm" "NineMLrandom.scm" "NineMLsignal.scm" "NineMLdiagram.scm" "NineMLinterval.scm" "NineMLgraph.scm"  
 	 "ulp.scm" )
 	(compile -O -d2 -S ulp.scm -o 9ML-ulp ))
 
        )
 
-  (list (dynld-name "9ML-toolkit") (dynld-name "9ML-toolkit.import") 
-	(dynld-name "9ML-repr") (dynld-name "9ML-repr.import") 
-	(dynld-name "9ML-parse") (dynld-name "9ML-parse.import") 
+  (list (dynld-name "9ML-toolkit")     (dynld-name "9ML-toolkit.import") 
+	(dynld-name "9ML-plot")        (dynld-name "9ML-plot.import") 
+	(dynld-name "9ML-eval")        (dynld-name "9ML-eval.import") 
+	(dynld-name "9ML-parse")       (dynld-name "9ML-parse.import") 
+	(dynld-name "9ML-ivp-octave")  (dynld-name "9ML-ivp-octave.import") 
 	(dynld-name "9ML-ivp-chicken") (dynld-name "9ML-ivp-chicken.import") 
-	(dynld-name "9ML-ivp-mlton") (dynld-name "9ML-ivp-mlton.import") 
+	(dynld-name "9ML-ivp-mlton")   (dynld-name "9ML-ivp-mlton.import") 
 	(dynld-name "9ML-ivp-octave-mlton") (dynld-name "9ML-ivp-octave-mlton.import") 
 	"9ML-report" "9ML-ivp" "9ML-shell" "9ML-ulp" )
 
   )
 
+
+(install-extension
+
+  ; Name of your extension:
+  '9ML-ivp-octave
+
+  ; Files to install for your extension:
+  `(,(dynld-name "9ML-ivp-octave") ,(dynld-name "9ML-ivp-octave.import") )
+
+  ; Assoc list with properties for your extension:
+  `((version ,version)
+    ))
 
 (install-extension
 
@@ -141,10 +166,10 @@
 (install-extension
 
   ; Name of your extension:
-  '9ML-repr
+  '9ML-eval
 
   ; Files to install for your extension:
-  `(,(dynld-name "9ML-repr") ,(dynld-name "9ML-repr.import") )
+  `(,(dynld-name "9ML-eval") ,(dynld-name "9ML-eval.import") )
 
   ; Assoc list with properties for your extension:
   `((version ,version)
@@ -158,6 +183,18 @@
 
   ; Files to install for your extension:
   `(,(dynld-name "9ML-parse") ,(dynld-name "9ML-parse.import") )
+
+  ; Assoc list with properties for your extension:
+  `((version ,version)
+    ))
+
+(install-extension
+
+  ; Name of your extension:
+  '9ML-plot
+
+  ; Files to install for your extension:
+  `(,(dynld-name "9ML-plot") ,(dynld-name "9ML-plot.import") )
 
   ; Assoc list with properties for your extension:
   `((version ,version)

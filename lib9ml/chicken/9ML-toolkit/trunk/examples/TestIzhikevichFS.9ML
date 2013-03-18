@@ -1,0 +1,84 @@
+
+(*
+   Simple Model of Spiking Neurons, Izhikevich  E
+
+   IEEE Transactions on Neural Networks (2003) 14:1569- 1572
+ 
+*) 
+
+
+component Izhikevich03 =
+struct
+
+  binding construct t V U k Vr Vt Vb Cm Vpeak a b c spike tspike Isyn Iext h =
+
+    binding subthreshold_eq = [ 
+                                [ d (V t h) =  ((k * (V - Vr) * (V - Vt) - U + Isyn + Iext) / Cm) ]
+                                [ d (U t h) =  a * (UU(V) - U) ]
+                                [ UU (V) = (if (V < Vb) then 0 else (b * (V - Vb) * (V - Vb) * (V - Vb))) ]
+                              ]
+
+    binding threshold_detect  =  [ spike = (V >= Vpeak) ]
+
+    binding tspike_set        =  [ tspike = (if spike then t else tspike) ]
+
+    binding subthreshold_regime  = Diagram.SEQUENCE subthreshold_eq (Diagram.SEQUENCE threshold_detect tspike_set)
+		 
+    binding refractory_eq        = [ 
+                                     [ t      =  t+h ]
+				     [ spike  = false ]
+				     [ tspike = tspike ]
+				     [ V      = c ]
+				     [ U      =  U + h * a * ((b * (V - Vb) * (V - Vb) * (V - Vb)) - U) ]
+                                    ]
+
+    return   Diagram.TRANSIENT subthreshold_regime refractory_eq spike 
+
+end
+
+component S = Signal 
+
+component TestIzhikevich03 =
+struct
+
+
+  val h = S.realsig `h (S.realconst 0.001)
+
+  (* Parameters common to all spiking regimes *)
+  val k     =    S.realsig `k (S.realconst 1.0)
+  val Vpeak =    S.realsig `Vpeak (S.realconst 25.0)
+  val Vt    =    S.realsig `Vr (S.realconst -55.0)
+  val Vr    =    S.realsig `Vt (S.realconst -40.0)
+  val Vb    =    S.realsig `Vb (S.realconst -55.0)
+  val Cm    =    S.realsig `Cm (S.realconst 20.0)
+  val Isyn  =    S.realsig `Isyn (S.realconst 0.0)
+
+  (* State initial values *)
+  val t      = S.realsig `t (S.realconst 0.0)
+  val V      = S.realsig `V (S.realconst -65.0)
+  val tspike = S.realsig `tspike (S.realconst 0.0)
+  val spike  = S.boolsig `spike (S.boolconst false)
+	     
+  (* Fast-spiking (FS) parameters *)
+  val FS_a = S.realsig `a (S.realconst 0.2)
+  val FS_b = S.realsig `b (S.realconst 0.025)
+  val FS_c = S.realsig `c (S.realconst -45.0)
+  val FS_U = S.realsig `U (S.mul FS_b V)
+
+  (* Iext = 400 pA *)
+  val Iext400          =  S.realsig `Iext  (S.realconst 400.0)
+  val FS_Iext400       =  Izhikevich03.construct t V FS_U k Vr Vt Vb Cm Vpeak FS_a FS_b FS_c spike tspike Isyn Iext400 h
+  val FS_ivp_Iext400   =  IVP.construct FS_Iext400 `t `h 0.0 80.0 
+
+  (* Iext = 200 pA *)
+  val Iext200          =  S.realsig `Iext  (S.realconst 200.0)
+  val FS_Iext200       =  Izhikevich03.construct t V FS_U k Vr Vt Vb Cm Vpeak FS_a FS_b FS_c spike tspike Isyn Iext200 h
+  val FS_ivp_Iext200   =  IVP.construct FS_Iext200 `t `h 0.0 80.0 
+
+  (* Iext = 100 pA *)
+  val Iext100          =  S.realsig `Iext  (S.realconst 100.0)
+  val FS_Iext100       =  Izhikevich03.construct t V FS_U k Vr Vt Vb Cm Vpeak FS_a FS_b FS_c spike tspike Isyn Iext100 h
+  val FS_ivp_Iext100   =  IVP.construct FS_Iext100 `t `h 0.0 80.0 
+
+end
+

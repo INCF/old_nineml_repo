@@ -3,16 +3,16 @@
 
   (define ident-graph   (ident-create "graph"))
   (define path-graph    (Pident ident-graph))
-  (define (graph-type n e)   (Tcon path-graph `(,n ,e)))
+  (define (graph-type n e)   (Tcon (Tpath path-graph) `(,n ,e)))
 
   (define path-nat   (Pident (ident-create "nat")))
-  (define nat-type   (Tcon path-nat '()))
+  (define nat-type   (Tcon (Tpath path-nat) '()))
 
   (define path-interval   (Pdot (Pident (ident-create "Interval")) "interval"))
-  (define interval-type   (Tcon path-interval '()))
+  (define interval-type   (Tcon (Tpath path-interval) '()))
 
   (define path-real   (Pident (ident-create "real")))
-  (define real-type   (Tcon path-real '()))
+  (define real-type   (Tcon (Tpath path-real) '()))
 
   (define-values (type-variables reset-type-variables
 				 find-type-variable 
@@ -147,7 +147,7 @@
 	  (list 
 	   
 	   (Type_def ident-graph (make-kind 2) 
-		     (make-deftype `(,alpha ,beta) (Tcon path-graph '()) ))
+		     (make-deftype `(,alpha ,beta) (Tcon (Tpath path-graph) '()) ))
 
 	   (datacon 'graph 'empty 0)
 	   (datacon 'graph 'add_node 2)
