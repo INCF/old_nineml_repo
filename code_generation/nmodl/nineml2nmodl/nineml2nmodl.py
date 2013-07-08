@@ -585,7 +585,7 @@ def write_nmodldirect(component, mod_filename, weight_variables={},hierarchical_
     print "Writing Mod-File %s" % mod_filename
     with open(mod_filename, "w") as f:
         context = build_context(component, weight_variables,hierarchical_mode=hierarchical_mode) 
-        f.write( Template( tmpl_contents, context).respond() )
+        f.write(Template(tmpl_contents, context).respond().replace("**", "^"))  # this filtering of '**' should happen in the template, in case of double pointers in VERBATIM blocks
      
     
 
