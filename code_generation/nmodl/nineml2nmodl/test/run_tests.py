@@ -14,7 +14,8 @@ from subprocess import Popen, PIPE
 #models = ["izhikevich", "morris_lecar", "leaky_iaf", "if_cond_exp"]
 models = ["izhikevich",] 
 
-import nineml
+from nineml.abstraction_layer.component_modifiers import ComponentModifier
+from nineml.abstraction_layer.testing_utils import TestableComponent
 
 
 test_dir = 'test_files'
@@ -30,11 +31,11 @@ os.makedirs(output_dir)
 # generate NMODL files
 for model in models:
     # run the example script, saving the XML to file
-    tc = nineml.abstraction_layer.testing_utils.TestableComponent(model)
+    tc = TestableComponent(model)
 
     component = tc()
-    #nineml.al.component_modifiers.ComponentModifier.close_all_reduce_ports(component)
-    nineml.al.component_modifiers.ComponentModifier.remap_port_to_parameter(component, 'Isyn')
+    #ComponentModifier.close_all_reduce_ports(component)
+    ComponentModifier.remap_port_to_parameter(component, 'Isyn')
 
     nineml2nmodl.write_nmodldirect(component=component,
                                   mod_filename='%s/%s.mod'%(test_dir, model) )
@@ -68,48 +69,3 @@ for model, test in tests.items():
     test.plot("test_%s.png" % model)
 
 os.chdir(cwd)    
-
-#from __future__ import with_statement
-#import os
-#import nineml2nmodl
-#from subprocess import Popen, PIPE
-#
-#models = ["izhikevich", "morris-lecar", "leaky_iaf", "if_cond_exp"]
-#models = ["izhikevich",] #"morris-lecar", "leaky_iaf", "if_cond_exp"]
-#
-#output_dir = "test_files"
-#if not os.path.exists(output_dir):
-#    os.makedirs(output_dir)
-#
-## generate NMODL files
-#for model in models:
-#    # run the example script, saving the XML to file
-#    xml_file = os.path.join(output_dir, "%s.xml" % model)
-#    with open(xml_file, 'w') as f:
-#        execfile('../../../../lib9ml/python/nineml/examples/AL/%s.py' % model, {'f': f})
-#    # parse the XML and convert to NMODL
-#    nineml2nmodl.write_nmodl(xml_file)
-#
-## run nrnivmodl
-#p = Popen("nrnivmodl", shell=True, stdout=None, stderr=None, cwd=output_dir)
-#result = p.wait()
-#assert result == 0, "nrnivmodl failed"
-#
-## run test scripts
-#cwd = os.getcwd()
-#os.chdir(output_dir)
-##from single_cell_current_injection import TestCase, configure, run
-#from util import configure, run
-#configure()
-#tests = {}
-#for model in models:
-#    test = __import__("test_%s" % model)
-#    tests[model] = test.TestCase(test.mechanism, test.parameters, test.initial_values, test.expected_output)
-#run(100.0)
-#
-#print "\n" + "="*26
-#for model, test in tests.items():
-#    print "%-20s %s" % (model, test.success and " OK " or "FAIL")
-#    test.plot("test_%s.png" % model)
-#
-#os.chdir(cwd)    
