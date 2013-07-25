@@ -10,3 +10,5 @@ x86_64
 *.komodoproject
 cover
 build
+nest_model
+test_files
