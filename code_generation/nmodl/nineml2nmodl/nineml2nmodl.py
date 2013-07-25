@@ -13,11 +13,11 @@ from textwrap import dedent
 import itertools
 import subprocess
 
-import nineml.abstraction_layer as al
+import nineml.abstraction_layer.dynamics as al
 from nineml.exceptions import NineMLRuntimeError
 import nineml
 from nineml.utility import filter_expect_single, expect_single
-from nineml.abstraction_layer.component import MathUtil
+from nineml.maths import MathUtil
 
 #from jinja2 import Template 
 from Cheetah.Template import Template
@@ -453,7 +453,7 @@ def build_context(component, weight_variables,
 
     context = {
         "input_filename": input_filename,
-        "version": al.__version__,
+        "version": nineml.__version__,
         "component": component,
         "channels": build_channels(component),
         "weight_variables": weight_variables,

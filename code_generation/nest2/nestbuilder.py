@@ -3,6 +3,7 @@ import nineml.abstraction_layer as nineml
 import os, shutil
 from Cheetah.Template import Template
 from os.path import join as Join
+from nineml.maths import MathUtil
 
 
 
@@ -48,7 +49,6 @@ class NestODE(object):
         name_map = parent_component.name_map
         self.dependent_variable = ode.dependent_variable
 
-        from nineml.abstraction_layer.component import MathUtil
         rhs = MathUtil.get_rhs_substituted( ode, name_map )
         self.CODE = name_map[ode.dependent_variable] + " += (" + rhs  + ")*h;"
 
@@ -61,7 +61,6 @@ class NestCondition(object):
         name_map = parent_component.name_map
         # code to evaluate the condition
         
-        from nineml.abstraction_layer.component import MathUtil
         condition_expr = MathUtil.get_rhs_substituted( condition, name_map )
 
         self.CODE = "transPendingTmp[%d] = (%s)" % (parent_trans.index, condition_expr)
@@ -111,7 +110,6 @@ class NestAssignment(object):
         parent_component = parent_trans.parent_component
         name_map = parent_component.name_map
 
-        from nineml.abstraction_layer.component import MathUtil
         rhs = MathUtil.get_rhs_substituted( assignment, name_map )
         self.CODE = name_map[assignment.lhs]+" = "+rhs+";"
 

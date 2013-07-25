@@ -1,4 +1,4 @@
-import nineml.abstraction_layer as nineml
+import nineml.abstraction_layer.dynamics as nineml
 
 # 9ML description of iaf_cond_exp
 regimes = [
@@ -9,14 +9,14 @@ regimes = [
         transitions = [
             nineml.On("V_m>V_th",
                       do=["t_spike = t","V_m = V_reset",
-                          nineml.SpikeOutputEvent],
-                      to="refractory-regime"),
-            nineml.On(nineml.EventPort('excitatory', mode='recv'),
+                          nineml.SpikeOutputEvent()],
+                      to="refractory_regime"),
+            nineml.On('excitatory',
                       do="g_ex=g_ex+q_ex"),
-            nineml.On(nineml.EventPort('inhibitory', mode='recv'),
+            nineml.On('inhibitory',
                       do="g_in=g_in+q_in")
             ],
-        name = "sub-threshold-regime"
+        name = "sub_threshold_regime"
     ),
 
     nineml.Regime(
@@ -24,22 +24,22 @@ regimes = [
         "dg_in/dt = -g_in/tau_syn_in",
         transitions = [
             nineml.On("t >= t_spike + t_ref",
-                      to="sub-threshold-regime"),
-            nineml.On(nineml.EventPort('excitatory', mode='recv'),
+                      to="sub_threshold_regime"),
+            nineml.On('excitatory',
                       do="g_ex=g_ex+q_ex"),
-            nineml.On(nineml.EventPort('inhibitory', mode='recv'),
+            nineml.On('inhibitory',
                       do="g_in=g_in+q_in")
             ],
-        name = "refractory-regime"
+        name = "refractory_regime"
     )]
 
 
 ports = [nineml.SendPort("V_m"),
-         nineml.ReducePort("Isyn",op="+")]
+         nineml.ReducePort("Isyn", reduce_op="+")]
 
-iaf_cond_exp_9ML = nineml.Component("iaf_cond_exp",
-                                    regimes = regimes,
-                                    ports = ports)
+iaf_cond_exp_9ML = nineml.ComponentClass("iaf_cond_exp",
+                                         regimes=regimes,
+                                         analog_ports=ports)
 
 if __name__=="__main__":
     import os
