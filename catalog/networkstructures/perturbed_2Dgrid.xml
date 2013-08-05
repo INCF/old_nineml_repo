@@ -9,5 +9,6 @@
     <parameter name="y0"/>
     <parameter name="xPertubation"/>
     <parameter name="yPertubation"/>
+    <parameter name="zPertubation"/>
   </component>
 </nineml>

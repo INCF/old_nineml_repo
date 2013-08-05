@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<nineml xmlns="http://nineml.org/9ML/0.1">
+    <component name="Displacement-based probability connection rule">
+        <parameter name="sourceSegment" />
+        <parameter name="targetSegment" />
+        <parameter name="maskExpression" />
+        <parameter name="probabilityOfConnection" />
+        <parameter name="unit" />
+    </component>
+</nineml>
