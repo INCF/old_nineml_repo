@@ -3,7 +3,7 @@
     <component name="A uniform probability region connector">
         <parameter name="sourceStructure" />
         <parameter name="targetStructure" />
-        <parameter name="regionGreaterThanZero" />
+        <parameter name="region" />
         <parameter name="probabilityOfConnection" />
         <parameter name="distanceUnit" />
     </component>
