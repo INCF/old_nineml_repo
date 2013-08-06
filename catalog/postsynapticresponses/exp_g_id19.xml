@@ -1,12 +1,12 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<NineML xmlns="http://nineml.incf.org/9ML/0.3">
-  <Component name="CondExpSynapse">
+<NineML xmlns="http://nineml.net/9ML/1.0">
+  <ComponentClass name="CondExpSynapse">
     <Parameter name="g_bar"/>
     <Parameter name="tau"/>
     <Parameter name="E"/>
     <Parameter name="W"/>
     <AnalogSendPort name="t"/>
-    <analog-port symbol="Isyn" expression="g_bar*g*(V-E)" mode="send"/>
+    <AnalogSendPort symbol="Isyn"/>
     <AnalogReceivePort name="V"/>
     <AnalogSendPort name="g"/>
     <Regime name="Regime0">
@@ -22,5 +22,6 @@
         <MathInline>W</MathInline>
       </inplace>
     </transition>
-  </Component>
+    <Alias name="Isyn"><MathInline>g_bar*g*(V-E)</MathInline></Alias>
+  </ComponentClass>
 </NineML>

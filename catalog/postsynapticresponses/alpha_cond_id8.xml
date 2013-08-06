@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<NineML xmlns="http://nineml.incf.org/9ML/0.1">
-  <Component name="alpha_cond_id8">
+<NineML xmlns="http://nineml.net/9ML/1.0">
+  <ComponentClass name="alpha_cond_id8">
     <Parameter name="E"/>
     <Parameter name="tau_a"/>
     <AnalogReceivePort name="W"/>
@@ -25,5 +25,5 @@
         <MathInline>W</MathInline>
       </inplace>
     </transition>
-  </Component>
+  </ComponentClass>
 </NineML>

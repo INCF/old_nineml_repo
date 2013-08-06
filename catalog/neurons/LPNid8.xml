@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <NineML xmlns="http://nineml.incf.org/9ML/0.1">
-  <Component name="LPNid8">
+  <ComponentClass name="LPNid8">
     <Parameter name="W"/>
     <Parameter name="N"/>
     <AnalogSendPort name="pfire"/>
@@ -22,5 +22,5 @@
       <event-port symbol="spike_output" mode="send"/>
     </transition>
     <transition to="inter_event_regime" from="firing_regime" name="Transition2" condition="pfire &lt; p"/>
-  </Component>
+  </ComponentClass>
 </NineML>

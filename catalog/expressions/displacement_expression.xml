@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <nineml xmlns="http://nineml.org/9ML/0.1">
-  <component name="Displacement-based expression">
-    <parameter name="sourceSegment"/>
-    <parameter name="targetSegment"/>
-    <parameter name="expression"/>
-    <parameter name="distanceUnit"/>
-  </component>
+  <ComponentClass name="Displacement-based expression">
+    <Parameter name="sourceSegment"/>
+    <Parameter name="targetSegment"/>
+    <Parameter name="expression"/>
+    <Parameter name="distanceUnit"/>
+  </ComponentClass>
 </nineml>

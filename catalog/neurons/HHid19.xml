@@ -1,11 +1,11 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<NineML xmlns="http://nineml.incf.org/9ML/0.1">
-  <Component name="HHid19">
+<NineML xmlns="http://nineml.net/9ML/1.0">
+  <ComponentClass name="HHid19">
     <Parameter name="theta"/>
     <AnalogSendPort name="n_kn"/>
     <AnalogSendPort name="t"/>
     <AnalogSendPort name="n_kd"/>
-    <analog-port symbol="Isyn" mode="reduce" op="+"/>
+    <AnalogReducePort symbol="Isyn" operator="+"/>
     <AnalogSendPort name="m"/>
     <AnalogSendPort name="h"/>
     <AnalogSendPort name="V"/>
@@ -92,5 +92,5 @@
     <transition to="hhid19_regime" from="hhid19_regime" name="Transition0" condition="V &gt; theta">
       <event-port symbol="spike_output" mode="send"/>
     </transition>
-  </Component>
+  </ComponentClass>
 </NineML>

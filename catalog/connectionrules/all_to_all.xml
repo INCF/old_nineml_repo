@@ -1,4 +1,3 @@
-<<<<<<< Upstream, based on origin/master
 <NineML xmlns="http://nineml.net/9ML/1.0">
   <ComponentClass name="AllToAll">
     <ConnectionRule>
@@ -6,9 +5,3 @@
     </ConnectionRule>
   </ComponentClass>
 </NineML>
-=======
-<?xml version='1.0' encoding='UTF-8'?>
-<nineml xmlns="http://nineml.org/9ML/0.1">
-    <component name="All-to-all connectivity rule"/>
-</nineml>
->>>>>>> 1a695cf Added more components to the catalog, required to implement our test network.

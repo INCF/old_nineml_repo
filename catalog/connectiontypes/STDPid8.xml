@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <NineML xmlns="http://nineml.incf.org/9ML/0.1">
-  <Component name="GuetigSTDP">
+  <ComponentClass name="GuetigSTDP">
     <Parameter name="mu"/>
     <Parameter name="alpha"/>
     <Parameter name="tau_minus"/>
@@ -46,5 +46,5 @@
         <MathInline>1.0</MathInline>
       </inplace>
     </transition>
-  </Component>
+  </ComponentClass>
 </NineML>
