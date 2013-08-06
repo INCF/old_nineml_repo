@@ -1,11 +1,11 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <nineml xmlns="http://nineml.org/9ML/0.1">
-  <component name="CondDoubleExpSynapse">
-    <parameter name="tau2"/>
-    <parameter name="g_bar"/>
-    <parameter name="tau1"/>
-    <parameter name="E"/>
-    <parameter name="W"/>
+  <ComponentClass name="CondDoubleExpSynapse">
+    <Parameter name="tau2"/>
+    <Parameter name="g_bar"/>
+    <Parameter name="tau1"/>
+    <Parameter name="E"/>
+    <Parameter name="W"/>
     <analog-port symbol="Isyn" expression="g_bar*(g1-g2)/(tau1-tau2)*(V-E)" mode="send"/>
     <analog-port symbol="g2" mode="send"/>
     <analog-port symbol="t" mode="send"/>
@@ -30,5 +30,5 @@
         <math-inline>W</math-inline>
       </inplace>
     </transition>
-  </component>
+  </ComponentClass>
 </nineml>

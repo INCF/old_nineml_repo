@@ -1,10 +1,10 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <nineml xmlns="http://nineml.org/9ML/0.1">
-    <component name="A uniform probability region connector">
-        <parameter name="sourceStructure" />
-        <parameter name="targetStructure" />
-        <parameter name="region" />
-        <parameter name="probabilityOfConnection" />
-        <parameter name="distanceUnit" />
-    </component>
+    <ComponentClass name="A uniform probability region connector">
+        <Parameter name="sourceStructure" />
+        <Parameter name="targetStructure" />
+        <Parameter name="region" />
+        <Parameter name="probabilityOfConnection" />
+        <Parameter name="distanceUnit" />
+    </ComponentClass>
 </nineml>

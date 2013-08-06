@@ -1,8 +1,8 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <nineml xmlns="http://nineml.org/9ML/0.1">
-  <component name="alpha_cond_id8">
-    <parameter name="E"/>
-    <parameter name="tau_a"/>
+  <ComponentClass name="alpha_cond_id8">
+    <Parameter name="E"/>
+    <Parameter name="tau_a"/>
     <analog-port symbol="W" mode="recv"/>
     <analog-port symbol="g" mode="send"/>
     <analog-port symbol="g_a" mode="send"/>
@@ -25,5 +25,5 @@
         <math-inline>W</math-inline>
       </inplace>
     </transition>
-  </component>
+  </ComponentClass>
 </nineml>
