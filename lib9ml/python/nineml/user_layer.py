@@ -29,7 +29,7 @@ Classes
 Copyright   Andrew P. Davison, 2010 
             Thomas G. Close 2013 # if you edit this file, add your name here
 """
-
+from copy import copy
 from itertools import chain
 import urllib
 from lxml import etree
@@ -39,7 +39,7 @@ from nineml.abstraction_layer import ComponentClass, csa, parse as al_parse
 
 nineml_namespace = 'http://nineml.org/9ML/0.1'
 NINEML = "{%s}" % nineml_namespace
-PARAMETER_NAME_AS_TAG_NAME = True
+PARAMETER_NAME_AS_TAG_NAME = False #True
 
 
 def parse(url):
@@ -458,12 +458,13 @@ class Parameter(object):
     Numerical values may either be numbers, or a component that generates
     numbers, e.g. a RandomDistribution instance.
     """
-    element_name = "value" # only used if PARAMETER_NAME_AS_TAG_NAME is False
+    element_name = "property" # only used if PARAMETER_NAME_AS_TAG_NAME is False
     
-    def __init__(self, name, value, unit=None):
+    def __init__(self, name, value, unit=None, scope=[]):
         self.name = name
         self.value = value
         self.unit = unit
+        self.scope = scope
     
     def __repr__(self):
         return "Parameter(name=%s, value=%s, unit=%s)" % (self.name, self.value, self.unit)
@@ -527,18 +528,19 @@ class Parameter(object):
                          unit=unit)
     
     @classmethod
-    def _from_xml_generic_tag(cls, element, components):
+    def _from_xml_generic_tag(cls, element, components, scope=[]):
         assert element.tag == NINEML+cls.element_name, "Found <%s>, expected <%s>" % (element.tag, cls.element_name)
-        return Parameter(name=element.attrib["parameter"],
+        return Parameter(name=element.attrib["name"],
                          value = Value.from_xml(element, components),
-                         unit = element.get("unit"))
+                         unit = element.get("unit"),
+                         scope=scope)
     
     @classmethod
-    def from_xml(cls, element, components):
+    def from_xml(cls, element, components, scope=[]):
         if PARAMETER_NAME_AS_TAG_NAME:
             return cls._from_xml_name_as_tag(element, components)
         else:
-            return cls._from_xml_generic_tag(element, components)
+            return cls._from_xml_generic_tag(element, components, scope)
 
 
 class ParameterSet(dict):
@@ -584,9 +586,47 @@ class ParameterSet(dict):
         assert element.tag == NINEML+cls.element_name
         parameters = []
         for parameter_element in element.getchildren():
-            parameters.append(Parameter.from_xml(parameter_element, components))
+            if parameter_element.tag == NINEML+ParameterScope.element_name:
+                parameters.extend(ParameterScope.from_xml(parameter_element, components))
+            else:
+                parameters.append(Parameter.from_xml(parameter_element, components))
         return cls(*parameters)
 
+
+class ParameterScope(object):
+    """
+    Used to provide the scoping of parameters into groups
+    """
+    element_name = "propertyScope"
+    
+    def __init__(self, name, parameters):
+        self.name = name
+        self._parameters = parameters
+    
+    def __repr__(self):
+        return "ParameterScope(%s)" % self.name
+    
+    def to_xml(self):
+        pass
+    
+    def __iter__(self):
+        return self._parameters.__iter__()
+    
+    @classmethod
+    def from_xml(cls, element, components, scope=[]):
+        assert element.tag == NINEML+cls.element_name
+        name = element.attrib['name']
+        new_scope = copy(scope)
+        new_scope.append(name) 
+        parameters = []
+        for parameter_element in element.getchildren():
+            if parameter_element.tag == NINEML+ParameterScope.element_name:
+                parameters.extend(ParameterScope.from_xml(parameter_element, components, new_scope))
+            else:
+                parameters.append(Parameter.from_xml(parameter_element, components, new_scope))
+        return cls(name, parameters)
+     
+    
 
 class Value(object):
     """
