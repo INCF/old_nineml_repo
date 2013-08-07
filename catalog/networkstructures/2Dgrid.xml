@@ -1,11 +1,11 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <nineml xmlns="http://nineml.org/9ML/0.1">
-  <ComponentClass name="Layout on a two-dimensional grid">
+  <ComponentClassStub name="Layout on a two-dimensional grid">
     <Parameter name="fillOrder"/>
     <Parameter name="aspectRatioXY"/>
     <Parameter name="dx"/>
     <Parameter name="dy"/>
     <Parameter name="x0"/>
     <Parameter name="y0"/>
-  </ComponentClass>
+  </ComponentClassStub>
 </nineml>

@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <nineml xmlns="http://nineml.org/9ML/0.1">
-  <ComponentClass name="Fixed probability connector">
+  <ComponentClassStub name="Fixed probability connector">
     <Parameter name="p_connect"/>
-  </ComponentClass>
+  </ComponentClassStub>
 </nineml>

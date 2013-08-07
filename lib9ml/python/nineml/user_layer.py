@@ -26,7 +26,8 @@ Classes
     PositionList
     Projection
 
-Copyright Andrew P. Davison, 2010 # if you edit this file, add your name here
+Copyright   Andrew P. Davison, 2010 
+            Thomas G. Close 2013 # if you edit this file, add your name here
 """
 
 from itertools import chain
@@ -355,9 +356,9 @@ class BaseComponent(object):
     
     @classmethod
     def from_xml(cls, element, components):
-        if element.tag != NINEML+cls.element_name:
-            raise Exception("Expecting tag name %s%s, actual tag name %s" % (
-                NINEML, cls.element_name, element.tag))
+#         if element.tag != NINEML+cls.element_name:
+#             raise Exception("Expecting tag name %s%s, actual tag name %s" % (
+#                 NINEML, cls.element_name, element.tag))
         name = element.attrib.get("name", None)
         parameters = ParameterSet.from_xml(element.find(NINEML+ParameterSet.element_name), components)
         definition_element = element.find(NINEML+Definition.element_name)
@@ -703,7 +704,7 @@ class Group(object):
 
 
 
-def get_or_create_component(ref, cls, components):
+def get_or_create_global_component(ref, cls, global_components):
     """
     Each entry in `components` is either an instance of a BaseComponent subclass,
     or the XML (elementtree Element) defining such an instance.
@@ -711,16 +712,17 @@ def get_or_create_component(ref, cls, components):
     If given component does not exist, we create it and replace the XML in
     `components` with the actual component. We then return the component.
     """
-    assert ref in components, "%s not in %s" % (ref, components.keys())
-    if not isinstance(components[ref], BaseComponent):
-        components[ref] = cls.from_xml(components[ref], components)
-    return components[ref]
+    if ref not in global_components:
+        raise Exception("%s not in global components %s" % (ref, global_components.keys()))
+    if not isinstance(global_components[ref], BaseComponent):
+        global_components[ref] = cls.from_xml(global_components[ref], global_components)
+    return global_components[ref]
 
-def get_or_create_prototype(prototype_ref, components, groups):
+def get_or_create_global_prototype(prototype_ref, global_components, groups):
     if prototype_ref in groups:
         return groups[prototype_ref]
     else:
-        return get_or_create_component(prototype_ref, SpikingNodeType, components)
+        return get_or_create_global_component(prototype_ref, SpikingNodeType, global_components)
 
 
 class Population(object):
@@ -769,13 +771,20 @@ class Population(object):
                  name=self.name)
 
     @classmethod
-    def from_xml(cls, element, components, groups):
+    def from_xml(cls, element, global_components, groups):
         assert element.tag == NINEML+cls.element_name
-        prototype_ref = element.find(NINEML+'prototype').text
+        prototype_tag = element.find(NINEML+'prototype')
+        prototype_ref = prototype_tag.text.strip()
+        # If a reference to an outside node
+        if prototype_ref:
+            prototype = get_or_create_global_prototype(prototype_ref, global_components, groups)
+        else:
+            prototype = SpikingNodeType.from_xml(prototype_tag, global_components)
         return cls(name=element.attrib['name'],
                    number=int(element.find(NINEML+'number').text),
-                   prototype=get_or_create_prototype(prototype_ref, components, groups),
-                   positions=PositionList.from_xml(element.find(NINEML+PositionList.element_name), components))
+                   prototype=prototype,
+                   positions=PositionList.from_xml(element.find(NINEML+PositionList.element_name), 
+                                                   global_components))
 
 
 class PositionList(object):

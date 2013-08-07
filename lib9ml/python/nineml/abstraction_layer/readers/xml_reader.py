@@ -31,7 +31,11 @@ class XMLLoader(object):
 
             self.components.append(component)
             self.component_srcs[component] = xml_node_filename_map[comp_block]
+        for comp_block in xmlroot.findall(nineml.al.NINEML + "ComponentClassStub"):
+            component = self.load_componentclassstub( comp_block )
 
+            self.components.append(component)
+            self.component_srcs[component] = xml_node_filename_map[comp_block]
 
 
     def load_connectports(self, element ):
@@ -54,7 +58,7 @@ class XMLLoader(object):
     
         subnodes = self.loadBlocks( element, blocks=blocks)
     
-        dynamics = nineml.utility.expect_single(subnodes["Dynamics"])
+        dynamics = nineml.utility.expect_single(subnodes["Dynamics"], empty_okay=True)
         return nineml.al.ComponentClass(name=element.get('name'),
                               parameters = subnodes["Parameter" ] ,
                               analog_ports = subnodes["AnalogPort"] ,
@@ -63,7 +67,14 @@ class XMLLoader(object):
                               subnodes = dict(subnodes['Subnode'] ),
                               portconnections = subnodes["ConnectPorts"])
 
-
+    def load_componentclassstub(self, element):
+    
+        blocks = ('Parameter',) 
+    
+        subnodes = self.loadBlocks( element, blocks=blocks)
+    
+        return nineml.al.ComponentClassStub(name=element.get('name'),
+                              parameters = subnodes["Parameter" ])
        
     def load_parameter(self, element):
         return nineml.al.Parameter(name=element.get('name')) 

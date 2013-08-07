@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <nineml xmlns="http://nineml.org/9ML/0.1">
-  <ComponentClass name="HHid19">
+  <ComponentClassStub name="HHid19">
     <Parameter name="theta"/>
     <analog-port symbol="n_kn" mode="send"/>
     <analog-port symbol="t" mode="send"/>
@@ -92,5 +92,5 @@
     <transition to="hhid19_regime" from="hhid19_regime" name="Transition0" condition="V &gt; theta">
       <event-port symbol="spike_output" mode="send"/>
     </transition>
-  </ComponentClass>
+  </ComponentClassStub>
 </nineml>

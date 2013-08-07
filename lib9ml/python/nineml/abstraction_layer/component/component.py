@@ -548,6 +548,124 @@ class ComponentClass( ComponentClassMixinFlatStructure,
     def _validate_self(self):
         from nineml.abstraction_layer.validators import ComponentValidator
         ComponentValidator.validate_component(self)
+
+    @property
+    def query(self):
+        """ Returns the ``ComponentQuery`` object associated with this class"""
+        return self._query
+
+
+    def is_flat(self):
+        """Is this component flat or does it have subcomponents?
+        
+        Returns a ``Boolean`` specifying whether this component is flat; i.e.
+        has no subcomponent
+        """
+        
+        return len(self.subnodes) == 0
+
+    def accept_visitor(self, visitor, **kwargs):
+        """ |VISITATION| """
+        return visitor.visit_componentclass(self, **kwargs)
+
+    def _resolve_transition_regime_names(self):
+        # Check that the names of the regimes are unique:
+        names = [ r.name for r in self.regimes ]
+        nineml.utility.assert_no_duplicates(names)
+
+        #Create a map of regime names to regimes:
+        regime_map = dict( [ (r.name, r) for r in self.regimes] )
+
+        # We only worry about 'target' regimes, since source regimes are taken 
+        # care of for us by the Regime objects they are attached to.
+        for trans in self.transitions:
+            if not trans.target_regime_name in regime_map:
+                errmsg = "Can't find regime: %s" % trans.target_regime_name
+                raise NineMLRuntimeError(errmsg)
+            trans.set_target_regime( regime_map[trans.target_regime_name] )
+
+
+class ComponentClassStub( ComponentClassMixinFlatStructure, 
+                      ComponentClassMixinNamespaceStructure ):
+    """A ComponentClassStub object represents a *component* in NineML. 
+
+      .. todo::
+    
+         For more information, see
+
+    """
+    
+
+    def __init__(self, name, parameters=None):
+        """Constructs a ComponentClassStub
+        
+        :param name: The name of the component.
+        :param parameters: A list containing either |Parameter| objects 
+            or strings representing the parameter names. If ``None``, then the
+            parameters are automatically inferred from the |Dynamics| block.
+
+        Examples:
+
+        >>> a = ComponentClass(name='MyComponent1')
+        
+        .. todo::
+            
+            Point this towards and example of constructing ComponentClasses.
+            This can't be here, because we also need to know about dynamics.
+            For examples
+
+        """
+
+        # Turn any strings in the parameter list into Parameters:
+        from nineml.utility import filter_discrete_types
+        if parameters is not None:
+            param_types = (basestring, Parameter) 
+            param_td = filter_discrete_types(parameters, param_types)
+            params_from_strings = [Parameter(s) for s in param_td[basestring]]
+            parameters = param_td[Parameter] + params_from_strings
+
+
+        # Construct super-classes:
+        ComponentClassMixinFlatStructure.__init__(self, 
+                                                   name=name, 
+                                                   parameters = parameters)
+
+        ComponentClassMixinNamespaceStructure.__init__(self)
+
+        #Finalise initiation:
+        self._resolve_transition_regime_names()
+
+        # Store flattening Information:
+        self._flattener = None
+
+        # Is the finished component valid?:
+        self._validate_self()
+        
+    
+    @property
+    def flattener(self):
+        """If this component was made by flattening other components, return the
+        |ComponentFlattener| object. This is useful for finding initial-regimes"""
+        return self._flattener
+    
+    def set_flattener(self, flattener):
+        """Specifies the flattening object used to create this component, if
+        this component was flattened from a hierarchical component"""
+        if not flattener:
+            raise NineMLRuntimeError('Setting flattener to None??')
+        if self.flattener:
+            raise NineMLRuntimeError('Trying to change flattener')
+        self._flattener = flattener
+
+    def was_flattened(self):
+        """Returns ``True`` if this component was created by flattening another
+        component"""
+        return self.flattener != None
+
+
+    def _validate_self(self):
+        from nineml.abstraction_layer.validators import ComponentValidator
+        ComponentValidator.validate_component(self)
         
 
 

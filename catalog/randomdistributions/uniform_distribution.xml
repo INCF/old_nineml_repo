@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <nineml xmlns="http://nineml.org/9ML/0.1">
-  <ComponentClass name="Uniform random distribution">
+  <ComponentClassStub name="Uniform random distribution">
     <Parameter name="low"/>
     <Parameter name="high"/>
-  </ComponentClass>
+  </ComponentClassStub>
 </nineml>
