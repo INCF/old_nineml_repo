@@ -10,7 +10,10 @@ import nineml
 
 __all__ = ['XMLReader']
 
-
+class ForeignXMLFormatException(Exception):
+    
+    def __init__(self, name):
+        self.name = name
 
 class XMLLoader(object):
     """This class is used by XMLReader internally.
@@ -284,13 +287,16 @@ class XMLReader(object):
 
         
         root = doc.getroot()
-        assert root.nsmap[None] == nineml.al.nineml_namespace
-        
-        # Recursively Load Include Nodes:
-        for include_element in root.getiterator(tag=nineml.al.NINEML+'Include'):
-            cls._load_include( include_element=include_element, 
-                               basedir=os.path.dirname(filename),
-                               xml_node_filename_map=xml_node_filename_map ) 
+        if root.nsmap.has_key('ncml'):
+            raise ForeignXMLFormatException(root.attrib['name'])
+        else:
+            assert root.nsmap[None] == nineml.al.nineml_namespace
+            # Recursively Load Include Nodes:
+            for include_element in root.getiterator(tag=nineml.al.NINEML+'Include'):
+                cls._load_include( include_element=include_element, 
+                                   basedir=os.path.dirname(filename),
+                                   xml_node_filename_map=xml_node_filename_map )
+            
         return root
 
 

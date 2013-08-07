@@ -36,6 +36,7 @@ from lxml import etree
 from lxml.builder import E
 from operator import and_, or_
 from nineml.abstraction_layer import ComponentClass, csa, parse as al_parse
+from nineml.abstraction_layer.readers import ForeignXMLFormatException
 
 nineml_namespace = 'http://nineml.org/9ML/0.1'
 NINEML = "{%s}" % nineml_namespace
@@ -649,7 +650,7 @@ class Value(object):
         #    value = RandomDistribution.from_xml(rd_element)
         #elif ref_element is not None:
         if ref_element is not None:
-            value = get_or_create_component(ref_element.text, RandomDistribution, components)
+            value = get_or_create_global_component(ref_element.text, RandomDistribution, components)
         else:
             try:
                 value = float(element.text)
@@ -819,7 +820,10 @@ class Population(object):
         if prototype_ref:
             prototype = get_or_create_global_prototype(prototype_ref, global_components, groups)
         else:
-            prototype = SpikingNodeType.from_xml(prototype_tag, global_components)
+            try:
+                prototype = SpikingNodeType.from_xml(prototype_tag, global_components)
+            except ForeignXMLFormatException as e:
+                prototype = e.name
         return cls(name=element.attrib['name'],
                    number=int(element.find(NINEML+'number').text),
                    prototype=prototype,
@@ -1135,9 +1139,9 @@ class Projection(object):
         return cls(name=element.attrib["name"],
                    source=element.find(NINEML+"source").text,
                    target=element.find(NINEML+"target").text,
-                   rule=get_or_create_component(element.find(NINEML+"rule").text, ConnectionRule, components),
-                   synaptic_response=get_or_create_component(element.find(NINEML+"response").text, SynapseType, components),
-                   connection_type=get_or_create_component(element.find(NINEML+"synapse").text, ConnectionType, components))
+                   rule=get_or_create_global_component(element.find(NINEML+"rule").text, ConnectionRule, components),
+                   synaptic_response=get_or_create_global_component(element.find(NINEML+"response").text, SynapseType, components),
+                   connection_type=get_or_create_global_component(element.find(NINEML+"synapse").text, ConnectionType, components))
 
     def to_csa(self):
         if self.rule.is_csa:
