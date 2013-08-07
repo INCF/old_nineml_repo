@@ -5,7 +5,7 @@
     <Parameter name="N"/>
     <AnalogSendPort name="pfire"/>
     <AnalogSendPort name="p"/>
-    <Regime name="inter_event_regime"/>
+    <Regime name="inter_event_regime"/> 
     <Regime name="firing_regime"/>
     <transition to="firing_regime" from="inter_event_regime" name="Transition0">
       <condition-on-event-port>

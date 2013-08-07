@@ -10,7 +10,7 @@
     <Parameter name="b"/>
     <Parameter name="c"/>
     <Parameter name="d"/>
-    <Parameter name="theta"/>
+    <Parameter name="theta"/> 
     <sequence name="subthreshold_regime">
       <union name="Regime0">
         <ode bound_variable="t" name="V_equation" dependent_variable="V">

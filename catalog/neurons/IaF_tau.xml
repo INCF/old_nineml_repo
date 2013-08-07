@@ -5,7 +5,7 @@
     <Parameter name="membraneCapacitance"/>
     <Parameter name="membraneTimeConstant"/>
     <Parameter name="refractoryTime"/>
-    <Parameter name="threshold"/>
+    <Parameter name="threshold"/> 
     <Parameter name="restingPotential"/>
     <Parameter name="resetPotential"/>
   </ComponentClass>

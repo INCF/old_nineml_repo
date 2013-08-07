@@ -2,7 +2,7 @@
 <NineML xmlns="http://nineml.net/9ML/1.0">
   <ComponentClass name="HHid19">
     <Parameter name="theta"/>
-    <AnalogSendPort name="n_kn"/>
+    <AnalogSendPort name="n_kn"/> 
     <AnalogSendPort name="t"/>
     <AnalogSendPort name="n_kd"/>
     <AnalogReducePort symbol="Isyn" operator="+"/>

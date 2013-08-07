@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <nineml xmlns="http://nineml.org/9ML/0.1">
-  <ComponentClass name="CondDoubleExpSynapse">
+  <ComponentClassStub name="CondDoubleExpSynapse">
     <Parameter name="tau2"/>
     <Parameter name="g_bar"/>
     <Parameter name="tau1"/>
@@ -30,5 +30,5 @@
         <math-inline>W</math-inline>
       </inplace>
     </transition>
-  </ComponentClass>
+  </ComponentClassStub>
 </nineml>
