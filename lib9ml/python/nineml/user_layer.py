@@ -26,8 +26,9 @@ Classes
     PositionList
     Projection
 
-Copyright   Andrew P. Davison, 2010 
-            Thomas G. Close 2013 # if you edit this file, add your name here
+Copyright   Andrew P. Davison, 2010  
+            Thomas G. Close 2013 
+            # if you edit this file, add your name here
 """
 from copy import copy
 from itertools import chain
@@ -777,7 +778,7 @@ class Population(object):
     def __init__(self, name, number, prototype, positions):
         self.name = name
         self.number = number
-        assert isinstance(prototype, (SpikingNodeType, Group))
+        assert isinstance(prototype, (SpikingNodeType, Group)) or isinstance(prototype, str) # This is a temporary hack just to get it working with my old code TGC (7/8/2013)
         self.prototype = prototype
         assert isinstance(positions, PositionList)
         self.positions = positions
