@@ -17,7 +17,7 @@ from ports import ReducePort, RecvPort, SendPort, RecvEventPort, SendEventPort
 
 from events import OutputEvent
 from namespaceaddress import NamespaceAddress 
-from component import ComponentClass
+from component import ComponentClass, ComponentClassStub
 from component import ComponentClassMixinFlatStructure
 from component import ComponentClassMixinNamespaceStructure
 from componentqueryer import ComponentQueryer

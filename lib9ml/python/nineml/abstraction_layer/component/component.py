@@ -664,8 +664,8 @@ class ComponentClassStub( ComponentClassMixinFlatStructure,
 
 
     def _validate_self(self):
-        from nineml.abstraction_layer.validators import ComponentValidator
-        ComponentValidator.validate_component(self)
+        from nineml.abstraction_layer.validators import ComponentStubValidator
+        ComponentStubValidator.validate_component(self)
         
 
 
@@ -695,17 +695,17 @@ class ComponentClassStub( ComponentClassMixinFlatStructure,
 
     def _resolve_transition_regime_names(self):
         # Check that the names of the regimes are unique:
-        names = [ r.name for r in self.regimes ]
-        nineml.utility.assert_no_duplicates(names)
-
-        #Create a map of regime names to regimes:
-        regime_map = dict( [ (r.name, r) for r in self.regimes] )
-
-        # We only worry about 'target' regimes, since source regimes are taken 
-        # care of for us by the Regime objects they are attached to.
-        for trans in self.transitions:
-            if not trans.target_regime_name in regime_map:
-                errmsg = "Can't find regime: %s" % trans.target_regime_name
-                raise NineMLRuntimeError(errmsg)
-            trans.set_target_regime( regime_map[trans.target_regime_name] )
-
+#         names = [ r.name for r in self.regimes ]
+#         nineml.utility.assert_no_duplicates(names)
+# 
+#         #Create a map of regime names to regimes:
+#         regime_map = dict( [ (r.name, r) for r in self.regimes] )
+# 
+#         # We only worry about 'target' regimes, since source regimes are taken 
+#         # care of for us by the Regime objects they are attached to.
+#         for trans in self.transitions:
+#             if not trans.target_regime_name in regime_map:
+#                 errmsg = "Can't find regime: %s" % trans.target_regime_name
+#                 raise NineMLRuntimeError(errmsg)
+#             trans.set_target_regime( regime_map[trans.target_regime_name] )
+        pass

@@ -1,6 +1,0 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<nineML xmlns="http://nineml.org/9ML/0.1">
-    <ComponentClassStubClass name="Electrical synapse connection with fixed weight">
-        <Parameter name="weight"/>
-    </componentClass>
-</nineML>

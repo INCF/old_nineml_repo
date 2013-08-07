@@ -1,2 +1,2 @@
-from component_validator import ComponentValidator
+from component_validator import ComponentValidator, ComponentStubValidator
 from equality_checker import ComponentEqualityChecker

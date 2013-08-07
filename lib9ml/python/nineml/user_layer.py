@@ -862,15 +862,22 @@ class PositionList(object):
         return element
     
     @classmethod
-    def from_xml(cls, element, components):
+    def from_xml(cls, element, global_components):
         assert element.tag == NINEML+cls.element_name
         structure_element = element.find(NINEML+'structure')
         if structure_element is not None:
-            return cls(structure=get_or_create_component(structure_element.text, Structure, components))
+            if structure_element.text.strip():              
+                position_list = cls(structure=get_or_create_global_component(structure_element.text, 
+                                                                             Structure, 
+                                                                             global_components))
+            else:
+                position_list = cls(structure=Structure.from_xml(structure_element, 
+                                                                 global_components))
         else:
             positions = [(float(p.attrib['x']), float(p.attrib['y']), float(p.attrib['z']))
                          for p in element.findall(NINEML+'position')]
-            return cls(positions=positions)
+            position_list = cls(positions=positions)
+        return position_list
 
 # this approach is crying out for a class factory
 class Operator(object):

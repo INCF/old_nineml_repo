@@ -51,6 +51,41 @@ class ComponentValidator(object):
         ComponentValidatorRegimeGraph(component)
         ComponentValidatorRegimeOnlyHasOneHandlerPerEvent(component)
         ComponentValidatorCheckNoLHSAssignmentsToMathsNamespace(component)
+        
+        
+class ComponentStubValidator(object):
+    """Class for grouping all the component-validations tests together"""
+    
+    @classmethod
+    def validate_component(cls, component):
+        """ Tests a componentclass against a variety of tests, to verify its
+        internal structure
+        """
+
+
+        if not Settings.enable_component_validation :
+            import os
+            assert os.getlogin() == 'hull', """Checking only mike turns off component-validation :) """
+            print "  **** WARNING WARNIGN COMPONENT VALIDATION TURNRED OFF ****"
+            return 
+
+        #Check class structure:
+        ComponentValidatorTypes(component)
+        ComponentValidatorNoDuplicatedObjects(component)
+        
+#         ComponentValidatorDuplicateRegimeNames(component)
+        ComponentValidatorLocalNameConflicts(component)
+        
+        ComponentValidatorEventPorts(component)
+        ComponentValidatorOutputAnalogPorts(component)
+        ComponentValidatorTimeDerivativesAreDeclared(component)
+        ComponentValidatorStateAssignmentsAreOnStateVariables(component)
+#         ComponentValidatorAliasesAreNotRecursive(component)
+        ComponentValidatorAssignmentsAliasesAndStateVariablesHaveNoUnResolvedSymbols(component)
+        ComponentValidatorPortConnections(component)
+#         ComponentValidatorRegimeGraph(component)
+        ComponentValidatorRegimeOnlyHasOneHandlerPerEvent(component)
+        ComponentValidatorCheckNoLHSAssignmentsToMathsNamespace(component)        
 
         
         
