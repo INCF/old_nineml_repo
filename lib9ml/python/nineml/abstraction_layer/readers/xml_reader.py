@@ -58,7 +58,7 @@ class XMLLoader(object):
     
         subnodes = self.loadBlocks( element, blocks=blocks)
     
-        dynamics = nineml.utility.expect_single(subnodes["Dynamics"], empty_okay=True)
+        dynamics = nineml.utility.expect_single(subnodes["Dynamics"])
         return nineml.al.ComponentClass(name=element.get('name'),
                               parameters = subnodes["Parameter" ] ,
                               analog_ports = subnodes["AnalogPort"] ,

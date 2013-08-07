@@ -57,7 +57,7 @@ def _is_hashable(obj):
         return False
 
 
-def expect_single(lst, error_func = None, empty_okay=False):
+def expect_single(lst, error_func = None):
     """Retrieve a single element from an iterable.
 
     This function tests whether an iterable contains just a single element and
@@ -108,8 +108,6 @@ def expect_single(lst, error_func = None, empty_okay=False):
     # Good case:
     if len(lst) == 1:
         return lst[0]
-    elif empty_okay and not lst:
-        return None
 
     # Bad case: our list doesn't contain just one element
     errmsg  = 'expect_single() recieved an iterable of length: %d' % len(lst)
