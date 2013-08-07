@@ -7,8 +7,8 @@
     <Parameter name="dy"/>
     <Parameter name="x0"/>
     <Parameter name="y0"/>
-    <Parameter name="xPertubation"/>
-    <Parameter name="yPertubation"/>
-    <Parameter name="zPertubation"/>
+    <Parameter name="xPerturbation"/>
+    <Parameter name="yPerturbation"/>
+    <Parameter name="zPerturbation"/>
   </ComponentClassStub>
 </nineml>
