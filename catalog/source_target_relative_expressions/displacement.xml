@@ -4,6 +4,5 @@
     <Parameter name="sourceSegment"/>
     <Parameter name="targetSegment"/>
     <Parameter name="expression"/>
-    <Parameter name="distanceUnit"/>
   </ComponentClassStub>
 </nineml>
