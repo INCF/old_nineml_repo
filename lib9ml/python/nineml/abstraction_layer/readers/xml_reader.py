@@ -12,8 +12,9 @@ __all__ = ['XMLReader']
 
 class ForeignXMLFormatException(Exception):
     
-    def __init__(self, name):
+    def __init__(self, name, url):
         self.name = name
+        self.url = url
 
 class XMLLoader(object):
     """This class is used by XMLReader internally.
@@ -288,7 +289,7 @@ class XMLReader(object):
         
         root = doc.getroot()
         if root.nsmap.has_key('ncml'):
-            raise ForeignXMLFormatException(root.attrib['name'])
+            raise ForeignXMLFormatException(root.attrib['name'], filename.url)
         else:
             assert root.nsmap[None] == nineml.al.nineml_namespace
             # Recursively Load Include Nodes:
