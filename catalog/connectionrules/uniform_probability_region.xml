@@ -5,6 +5,5 @@
         <Parameter name="targetStructure" />
         <Parameter name="region" />
         <Parameter name="probabilityOfConnection" />
-        <Parameter name="distanceUnit" />
     </ComponentClassStub>
 </nineml>
