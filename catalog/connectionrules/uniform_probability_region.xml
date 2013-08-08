@@ -3,7 +3,7 @@
     <ComponentClassStub name="UniformProbabilityRegionConnector" >
         <Parameter name="sourceStructure" />
         <Parameter name="targetStructure" />
-        <Parameter name="region" />
+        <Parameter name="regionGreaterThanZero" />
         <Parameter name="probabilityOfConnection" />
     </ComponentClassStub>
 </nineml>
