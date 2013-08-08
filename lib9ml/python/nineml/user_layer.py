@@ -651,7 +651,7 @@ class Value(object):
         #    value = RandomDistribution.from_xml(rd_element)
         #elif ref_element is not None:
         if ref_element is not None:
-            value = get_or_create_global_component(ref_element.text, RandomDistribution, components)
+            value = get_or_create_component(ref_element, RandomDistribution, components)
         else:
             try:
                 value = float(element.text)
@@ -699,16 +699,16 @@ class Group(object):
 
     def _resolve_population_references(self):
         for prj in self.projections.values():
-            for name in ('source', 'target'):
-                if prj.references[name] in self.populations:
-                    obj = self.populations[prj.references[name]]
-                elif prj.references[name] in self.selections:
-                    obj = self.selections[prj.references[name]]
-                elif prj.references[name] == self.name:
+            for src_or_tgt in ('source', 'target'):
+                if prj.references[src_or_tgt] in self.populations:
+                    obj = self.populations[prj.references[src_or_tgt]]
+                elif prj.references[src_or_tgt] in self.selections:
+                    obj = self.selections[prj.references[src_or_tgt]]
+                elif prj.references[src_or_tgt] == self.src_or_tgt:
                     obj = self
                 else:
-                    raise Exception("Unable to resolve population/selection reference ('%s') for %s of %s" % (prj.references[name], name, prj))
-                setattr(prj, name, obj)
+                    raise Exception("Unable to resolve population/selection reference ('%s') for %s of %s" % (prj.references[src_or_tgt], src_or_tgt, prj))
+                setattr(getattr(prj, src_or_tgt), 'population', obj)
     
     def get_components(self):
         components = []
@@ -746,7 +746,7 @@ class Group(object):
 
 
 
-def get_or_create_global_component(ref, cls, global_components):
+def get_or_create_component(element, cls, components):
     """
     Each entry in `components` is either an instance of a BaseComponent subclass,
     or the XML (elementtree Element) defining such an instance.
@@ -754,17 +754,30 @@ def get_or_create_global_component(ref, cls, global_components):
     If given component does not exist, we create it and replace the XML in
     `components` with the actual component. We then return the component.
     """
-    if ref not in global_components:
-        raise Exception("%s not in global components %s" % (ref, global_components.keys()))
-    if not isinstance(global_components[ref], BaseComponent):
-        global_components[ref] = cls.from_xml(global_components[ref], global_components)
-    return global_components[ref]
-
-def get_or_create_global_prototype(prototype_ref, global_components, groups):
-    if prototype_ref in groups:
-        return groups[prototype_ref]
+    # If component is a string treat it as a reference to an external component (defined using a
+    # 'node' tag outside of the group
+    if element.text.strip():
+        if element.getchildren():
+            raise Exception("<{tag}> component '{name}' contains ambiguous references to an external"
+                            "node '{ref}' and children elements {children}"
+                            .format(tag=element.tag, ref=element.text, 
+                                    name=element.attrib.get('name', '<anonymous>'),
+                                    children=['<{}>'.format(c.tag) for c in element.getchildren()]))
+        ref = element.text # Plain text in the component tag is treated as a reference
+        if ref not in components:
+            raise Exception("%s not in global components %s" % (ref, components.keys()))
+        if not isinstance(components[ref], BaseComponent):
+            components[ref] = cls.from_xml(components[ref], components)
+        component = components[ref]
     else:
-        return get_or_create_global_component(prototype_ref, SpikingNodeType, global_components)
+        component = cls.from_xml(element, components)
+    return component
+
+def get_or_create_prototype(element, components, groups):
+    if element.text.strip() and element.text in groups:
+        return groups[element.text]
+    else:
+        return get_or_create_component(element, SpikingNodeType, components)
 
 
 class Population(object):
@@ -778,7 +791,7 @@ class Population(object):
     def __init__(self, name, number, prototype, positions):
         self.name = name
         self.number = number
-        assert isinstance(prototype, (SpikingNodeType, Group)) or isinstance(prototype, str) # This is a temporary hack just to get it working with my old code TGC (7/8/2013)
+        assert isinstance(prototype, (SpikingNodeType, Group))
         self.prototype = prototype
         assert isinstance(positions, PositionList)
         self.positions = positions
@@ -813,23 +826,17 @@ class Population(object):
                  name=self.name)
 
     @classmethod
-    def from_xml(cls, element, global_components, groups):
+    def from_xml(cls, element, components, groups):
         assert element.tag == NINEML+cls.element_name
-        prototype_tag = element.find(NINEML+'prototype')
-        prototype_ref = prototype_tag.text.strip()
-        # If a reference to an outside node
-        if prototype_ref:
-            prototype = get_or_create_global_prototype(prototype_ref, global_components, groups)
-        else:
-            try:
-                prototype = SpikingNodeType.from_xml(prototype_tag, global_components)
-            except ForeignXMLFormatException as e:
-                prototype = e.name
+        try:
+            prototype = get_or_create_prototype(element.find(NINEML+'prototype'), components, groups)
+        except ForeignXMLFormatException as e:
+            prototype = SpikingNodeType(e.name, reference=e.url)
         return cls(name=element.attrib['name'],
                    number=int(element.find(NINEML+'number').text),
                    prototype=prototype,
                    positions=PositionList.from_xml(element.find(NINEML+PositionList.element_name), 
-                                                   global_components))
+                                                   components))
 
 
 class PositionList(object):
@@ -907,17 +914,12 @@ class PositionList(object):
         return element
     
     @classmethod
-    def from_xml(cls, element, global_components):
+    def from_xml(cls, element, components):
         assert element.tag == NINEML+cls.element_name
         structure_element = element.find(NINEML+'structure')
-        if structure_element is not None:
-            if structure_element.text.strip():              
-                position_list = cls(structure=get_or_create_global_component(structure_element.text, 
-                                                                             Structure, 
-                                                                             global_components))
-            else:
-                position_list = cls(structure=Structure.from_xml(structure_element, 
-                                                                 global_components))
+        if structure_element is not None:             
+            position_list = cls(structure=get_or_create_component(structure_element, Structure, 
+                                                                  components))
         else:
             positions = [(float(p.attrib['x']), float(p.attrib['y']), float(p.attrib['z']))
                          for p in element.findall(NINEML+'position')]
@@ -1089,8 +1091,8 @@ class Projection(object):
         self.rule = rule
         self.synaptic_response = synaptic_response
         self.connection_type = connection_type
-        for name, cls_list in (('source', (Population, Selection, Group)),
-                               ('target', (Population, Selection, Group)),
+        for name, cls_list in (('source', (Population, Selection, Group, Source)),
+                               ('target', (Population, Selection, Group, Target)),
                                ('rule', (ConnectionRule,)),
                                ('synaptic_response', (SynapseType,)),
                                ('connection_type', (ConnectionType,))):
@@ -1138,11 +1140,11 @@ class Projection(object):
     def from_xml(cls, element, components):
         assert element.tag == NINEML+cls.element_name
         return cls(name=element.attrib["name"],
-                   source=element.find(NINEML+"source").text,
-                   target=element.find(NINEML+"target").text,
-                   rule=get_or_create_global_component(element.find(NINEML+"rule").text, ConnectionRule, components),
-                   synaptic_response=get_or_create_global_component(element.find(NINEML+"response").text, SynapseType, components),
-                   connection_type=get_or_create_global_component(element.find(NINEML+"synapse").text, ConnectionType, components))
+                   source=get_or_create_component(element.find(NINEML+"source"), Source, components),
+                   target=get_or_create_component(element.find(NINEML+"target"), Target, components),
+                   rule=get_or_create_component(element.find(NINEML+"rule"), ConnectionRule, components),
+                   synaptic_response=element.find(NINEML+"response").text, # get_or_create_component(element.find(NINEML+"response"), SynapseType, components) - it is too hard to be able to define this as part of the projection here as for both NEURON and NEST it needs to be included in the cell model
+                   connection_type=get_or_create_component(element.find(NINEML+"synapse"), ConnectionType, components))
 
     def to_csa(self):
         if self.rule.is_csa:
@@ -1153,3 +1155,45 @@ class Projection(object):
             _csa.cset(self.rule.to_csa() * distance_metric) 
         else:
             raise Exception("Connection rule does not use Connection Set Algebra")
+        
+        
+class Source(object):
+    """
+    Contains a reference to a population and the segment from the pre-synaptic terminal is located
+    (usually 'soma' unless a multi-compartmental model with gap junctions)
+    """
+    element_name = 'source'
+    
+    def __init__(self, name, segment):
+        self.name = name
+        self.population = None
+        self.segment = segment
+        
+    def to_xml(self):
+        return E(self.element_name, E.population(self.name), E.segment(self.segment))
+        
+    @classmethod
+    def from_xml(cls, element, components):  #@UnusedVariable
+        return cls(element.find(NINEML+"population").text, element.find(NINEML+"segment").text) 
+
+
+class Target(object):
+    """
+    Contains a reference to a population and the segment from which the post-synaptic receptor of 
+    the projection is located
+    """
+    element_name = 'target'
+    
+    def __init__(self, name, segment):
+        self.name = name
+        self.population = None
+        self.segment = segment
+        
+    def to_xml(self):
+        return E(self.element_name, E.population(self.name), E.segment(self.segment))
+        
+    @classmethod
+    def from_xml(cls, element, components): #@UnusedVariable
+        return cls(element.find(NINEML+"population").text, element.find(NINEML+"segment").text) 
+
+
