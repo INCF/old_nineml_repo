@@ -674,7 +674,7 @@ class ParameterScope(object):
     """
     Used to provide the scoping of parameters into groups
     """
-    element_name = "propertyScope"
+    element_name = "scope"
     
     def __init__(self, name, parameters):
         self.name = name
@@ -702,28 +702,6 @@ class ParameterScope(object):
             else:
                 parameters.append(Parameter.from_xml(parameter_element, components, new_scope))
         return cls(name, parameters)
-     
-
-class SimulationParameters(object):
-    """
-    A class to hold general simulation properties such as temperature, minimum delay etc...
-    """
-    element_name = "simulationProperties"
-    
-    def __init__(self, parameters):
-        self.parameters = parameters
-    
-    def to_xml(self):
-        return E(self.element_name,
-                 *[p.to_xml() for p in self.parameters])
-        
-    @classmethod
-    def from_xml(cls, element, components):
-        assert element.tag == NINEML+cls.element_name
-        parameters = []
-        for param in element:
-            parameters.append(Parameter.from_xml(param, components))
-        return cls(parameters)
     
 
 class Group(object):
@@ -739,7 +717,7 @@ class Group(object):
         self.populations = {}
         self.projections = {}
         self.selections = {}
-        self.simulation_parameters = None
+        self.parameters = None
     
     def __eq__(self, other):
         return reduce(and_, (self.name==other.name,
@@ -761,11 +739,11 @@ class Group(object):
                 self.projections[obj.name] = obj
             elif isinstance(obj, Selection):
                 self.selections[obj.name] = obj
-            elif isinstance(obj, SimulationParameters):
-                if self.simulation_parameters is not None:
+            elif isinstance(obj, ParameterSet):
+                if self.parameters is not None:
                     raise Exception("Group objects cannot contain multiple '<{}>' tags"
-                                    .format(SimulationParameters.element_name))
-                self.simulation_parameters = obj                
+                                    .format(ParameterSet.element_name))
+                self.parameters = obj                
             else:
                 raise Exception("Groups may only contain Populations, Projections, Selections or Groups")
 
@@ -810,8 +788,8 @@ class Group(object):
                 obj = Projection.from_xml(child, components)
             elif child.tag == NINEML+Selection.element_name:
                 obj = Selection.from_xml(child, components)
-            elif child.tag == NINEML+SimulationParameters.element_name:
-                obj = SimulationParameters.from_xml(child, components)                
+            elif child.tag == NINEML+ParameterSet.element_name:
+                obj = ParameterSet.from_xml(child, components)                
             else:
                 raise Exception("<%s> elements may not contain <%s> elements" % (cls.element_name, child.tag))
             group.add(obj)
