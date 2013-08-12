@@ -43,6 +43,8 @@ nineml_namespace = 'http://nineml.org/9ML/0.1'
 NINEML = "{%s}" % nineml_namespace
 PARAMETER_NAME_AS_TAG_NAME = False #True
 
+class NoUnitsProvidedError(Exception): pass
+class UnrecognisedChildrenTagError(Exception): pass
 
 def parse(url):
     """
@@ -447,7 +449,50 @@ class RandomDistribution(BaseComponent):
     Component representing a random number distribution, e.g. normal, gamma,
     binomial.
     """
+    element_name = 'randomDistribution'
     pass
+
+
+class StructureExpression(BaseComponent):
+    """
+    Component representing an anonymous function
+    """
+    element_name = 'structureExpression'
+    pass
+
+
+class Constant(object):
+    
+    def __init__(self, value, unit):
+        self.value = value
+        self.unit = unit
+
+
+class AnonymousFunction(object):
+    """
+    Component representing an anonymous function
+    """
+    element_name = 'function'
+    
+    def __init__(self, inline_function, arguments, constants):
+        self.inline_function = inline_function
+        self.arguments = arguments
+        self.constants = constants
+        self._check_inline_math()
+        
+    def _check_inline_math(self):
+        pass # TODO: Need to implement check of inline math similar to the abstraction layer checks
+    
+    @classmethod
+    def from_xml(cls, element, components): #@UnusedVariable
+        inline_function = element.find(NINEML+'math-inline').text
+        arguments = {}
+        for arg in element.findall(NINEML+'arg'):
+            arguments[arg.attrib['name']] = arg.text 
+        constants = {}
+        for const in element.findall(NINEML+'const'):
+            constants[const.attrib['name']] = Constant(float(const.find(NINEML+'value').text), const.find(NINEML+'unit').text) 
+        return cls(inline_function, arguments, constants)
 
 
 class Parameter(object):
@@ -532,10 +577,40 @@ class Parameter(object):
     @classmethod
     def _from_xml_generic_tag(cls, element, components, scope=[]):
         assert element.tag == NINEML+cls.element_name, "Found <%s>, expected <%s>" % (element.tag, cls.element_name)
-        return Parameter(name=element.attrib["name"],
-                         value = Value.from_xml(element, components),
-                         unit = element.get("unit"),
-                         scope=scope)
+        # Search for the different types of parameter tags
+        children = element.getchildren()
+        if not children: # Assumed to be a string
+            try:
+                float(element.text)
+                raise NoUnitsProvidedError("no units were provided for '{}' property but it appears"
+                                           "to be a number ({})".format(element.attrib['name'], 
+                                                                        element.text))
+            except ValueError:
+                value = element.text
+                unit = None
+        elif len(children) == 1: # Assumed to be a more complex structure such as a random distribution or function
+            rd_element = element.find(NINEML+RandomDistribution.element_name)
+            func_element = element.find(NINEML+AnonymousFunction.element_name)
+            struct_element = element.find(NINEML+StructureExpression.element_name)
+            if rd_element is not None:
+                value = RandomDistribution.from_xml(rd_element, components)
+            elif func_element is not None:
+                value = AnonymousFunction.from_xml(func_element, components)
+            elif struct_element is not None:
+                value = get_or_create_component(struct_element, StructureExpression, components)
+            else:
+                raise UnrecognisedChildrenTagError("Did not recognise '<{}>' tag when used inside a "
+                                                   "'<{}>' tag".format(element.getchildren()[0].tag,
+                                                               NINEML+cls.element_name))
+            unit = None
+        elif len(children) == 2: # Assumed to be a value/unit pair
+            value = float(element.find(NINEML+'value').text)
+            unit = element.find(NINEML+'unit').text
+        else:
+            raise UnrecognisedChildrenTagError("'{}' are not valid child tags for '<{}>' tags"
+                                               .format([c.tag for c in element.getchildren()], 
+                                                       cls.element_name))
+        return cls(name=element.attrib["name"], value=value, unit=unit, scope=scope)
     
     @classmethod
     def from_xml(cls, element, components, scope=[]):
@@ -609,7 +684,7 @@ class ParameterScope(object):
         return "ParameterScope(%s)" % self.name
     
     def to_xml(self):
-        pass
+        raise NotImplementedError
     
     def __iter__(self):
         return self._parameters.__iter__()
@@ -628,37 +703,28 @@ class ParameterScope(object):
                 parameters.append(Parameter.from_xml(parameter_element, components, new_scope))
         return cls(name, parameters)
      
-    
 
-class Value(object):
+class SimulationParameters(object):
     """
-    Not intended to be instantiated: just provides the from_xml() classmethod.
+    A class to hold general simulation properties such as temperature, minimum delay etc...
     """
-    element_name = "value"
+    element_name = "simulationProperties"
     
+    def __init__(self, parameters):
+        self.parameters = parameters
+    
+    def to_xml(self):
+        return E(self.element_name,
+                 *[p.to_xml() for p in self.parameters])
+        
     @classmethod
     def from_xml(cls, element, components):
-        """
-        Parse an XML ElementTree structure and return either a numerical or
-        string value or something that generates a numerical value, e.g. a
-        RandomDistribution instance.
-        
-        `element` - should be an ElementTree Element instance.
-        """
-        #rd_element = element.find(NINEML+RandomDistribution.element_name)
-        ref_element = element.find(NINEML+"reference")
-        #if rd_element is not None:
-        #    value = RandomDistribution.from_xml(rd_element)
-        #elif ref_element is not None:
-        if ref_element is not None:
-            value = get_or_create_component(ref_element, RandomDistribution, components)
-        else:
-            try:
-                value = float(element.text)
-            except ValueError:
-                value = element.text
-        return value
-
+        assert element.tag == NINEML+cls.element_name
+        parameters = []
+        for param in element:
+            parameters.append(Parameter.from_xml(param, components))
+        return cls(parameters)
+    
 
 class Group(object):
     """
@@ -673,6 +739,7 @@ class Group(object):
         self.populations = {}
         self.projections = {}
         self.selections = {}
+        self.simulation_parameters = None
     
     def __eq__(self, other):
         return reduce(and_, (self.name==other.name,
@@ -694,6 +761,11 @@ class Group(object):
                 self.projections[obj.name] = obj
             elif isinstance(obj, Selection):
                 self.selections[obj.name] = obj
+            elif isinstance(obj, SimulationParameters):
+                if self.simulation_parameters is not None:
+                    raise Exception("Group objects cannot contain multiple '<{}>' tags"
+                                    .format(SimulationParameters.element_name))
+                self.simulation_parameters = obj                
             else:
                 raise Exception("Groups may only contain Populations, Projections, Selections or Groups")
 
@@ -738,6 +810,8 @@ class Group(object):
                 obj = Projection.from_xml(child, components)
             elif child.tag == NINEML+Selection.element_name:
                 obj = Selection.from_xml(child, components)
+            elif child.tag == NINEML+SimulationParameters.element_name:
+                obj = SimulationParameters.from_xml(child, components)                
             else:
                 raise Exception("<%s> elements may not contain <%s> elements" % (cls.element_name, child.tag))
             group.add(obj)
