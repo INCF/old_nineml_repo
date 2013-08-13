@@ -27,6 +27,6 @@
       <StandardLibrary xmlns="http://standardlib.networkguru.org/1.0">
 	randomFixedProbability
       </StandardLib>
-    </ConnectionRule>
+    </ConnectionRule> 
   </ComponentClass>
 </NineML> 
