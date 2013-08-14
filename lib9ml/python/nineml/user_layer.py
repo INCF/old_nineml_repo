@@ -491,7 +491,8 @@ class AnonymousFunction(object):
             arguments[arg.attrib['name']] = arg.text 
         constants = {}
         for const in element.findall(NINEML+'const'):
-            constants[const.attrib['name']] = Constant(float(const.find(NINEML+'value').text), const.find(NINEML+'unit').text) 
+            constants[const.attrib['name']] = Constant(float(const.find(NINEML+'value').text), 
+                                                       const.find(NINEML+'unit').text) 
         return cls(inline_function, arguments, constants)
 
 
