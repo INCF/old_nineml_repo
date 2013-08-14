@@ -600,8 +600,8 @@ class Parameter(object):
             elif struct_element is not None:
                 value = get_or_create_component(struct_element, StructureExpression, components)
             else:
-                raise UnrecognisedChildrenTagError("Did not recognise '<{}>' tag when used inside a "
-                                                   "'<{}>' tag".format(element.getchildren()[0].tag,
+                raise UnrecognisedChildrenTagError("Did not recognise '{}' tag when used inside a "
+                                                   "'{}' tag".format(element.getchildren()[0].tag,
                                                                NINEML+cls.element_name))
             unit = None
         elif len(children) == 2: # Assumed to be a value/unit pair
