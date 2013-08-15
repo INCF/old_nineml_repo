@@ -1154,7 +1154,7 @@ class Projection(object):
                 self.references[name] = attr.name
             elif isinstance(attr, basestring):
                 setattr(self, name, None)
-                self.references[name] = attr
+                self.references[name] = attr #TODO: Should these references be checked?
             else:
                 raise TypeError("Invalid type for %s: %s" % (name, type(attr)))
 
@@ -1196,7 +1196,7 @@ class Projection(object):
                    source=get_or_create_component(element.find(NINEML+"source"), Source, components),
                    target=get_or_create_component(element.find(NINEML+"target"), Target, components),
                    rule=get_or_create_component(element.find(NINEML+"rule"), ConnectionRule, components),
-                   synaptic_response=element.find(NINEML+"response").text, # get_or_create_component(element.find(NINEML+"response"), SynapseType, components) - it is too hard to be able to define this as part of the projection here as for both NEURON and NEST it needs to be included in the cell model
+                   synaptic_response=get_or_create_component(element.find(NINEML+"response"), SynapseType, components),
                    connection_type=get_or_create_component(element.find(NINEML+"synapse"), ConnectionType, components))
 
     def to_csa(self):
