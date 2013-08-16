@@ -4,5 +4,6 @@
         <Parameter name="probabilityExpression" />
         <Parameter name="sourceBranch" />
         <Parameter name="targetBranch" />
+        <Parameter name="allowSelfConnections" />
     </ComponentClassStub>
 </nineml>

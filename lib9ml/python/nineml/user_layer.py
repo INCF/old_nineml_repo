@@ -403,30 +403,6 @@ class CurrentSourceType(BaseComponent):
     a spiking node.
     """
     pass
-
-
-class Structure(BaseComponent):
-    """
-    Component representing the structure of a network, e.g. 2D grid, random
-    distribution within a sphere, etc.
-    """
-    pass
-
-    def generate_positions(self, number):
-        """
-        Generate a number of node positions according to the network structure. 
-        """
-        raise NotImplementedError
-
-    @property
-    def is_csa(self):
-        return self.get_definition().__module__ == 'csa.geometry' # probably need a better test
-
-    def to_csa(self):
-        if self.is_csa:
-            return self.get_definition() # e.g. lambda size: csa.random2d(size, *self.parameters)
-        else:
-            raise Exception("Structure cannot be transformed to CSA geometry function")
             
 
 class ConnectionRule(BaseComponent):
@@ -841,13 +817,13 @@ class Population(object):
     """
     element_name = "population"
     
-    def __init__(self, name, number, prototype, positions):
+    def __init__(self, name, number, prototype, structures):
         self.name = name
         self.number = number
         assert isinstance(prototype, (SpikingNodeType, Group))
         self.prototype = prototype
-        assert isinstance(positions, PositionList)
-        self.positions = positions
+        assert isinstance(structures, StructureList)
+        self.structures = structures
     
     def __eq__(self, other):
         return reduce(and_, (self.name==other.name,
@@ -888,19 +864,19 @@ class Population(object):
         return cls(name=element.attrib['name'],
                    number=int(element.find(NINEML+'number').text),
                    prototype=prototype,
-                   positions=PositionList.from_xml(element.find(NINEML+PositionList.element_name), 
+                   structures=StructureList.from_xml(element.find(NINEML+StructureList.element_name), 
                                                    components))
 
 
-class PositionList(object):
+
+class StructureList(list):
     """
-    Represents a list of network node positions. May contain either an
-    explicit list of positions or a Structure instance that can be used to
-    generate positions.
+    Represents a list of all the structures associated with a Population, which are used in 
+    geometric connectivity rules.
     """
-    element_name = "positions"
+    element_name = "structures"
     
-    def __init__(self, positions=[], structure=None):
+    def __init__(self, structures):
         """
         Create a new PositionList.
         
@@ -910,74 +886,186 @@ class PositionList(object):
         `positions` should be a list of (x,y,z) tuples or a 3xN (Nx3?) numpy array.
         `structure` should be a Structure component.
         """
-        if positions and structure:
-            raise Exception("Please provide either positions or structure, not both.")
-        assert not isinstance(positions, Structure)
-        self._positions = positions
-        if isinstance(structure, Structure):
-            self.structure = structure
-        elif structure is None:
-            self.structure = None
-        else:
-            raise Exception("structure is", structure)
-
-    def __eq__(self, other):
-        if self._positions:
-            return self._positions == other._positions
-        else:
-            return self.structure == other.structure
-    
-    def __ne__(self, other):
-        return not self == other
+        for s in structures:
+            assert isinstance(s, Structure)
+            self.append(s)
     
     def __str__(self):
         if self.structure:
-            return "positioned according to '%s'" % self.structure.name
-        else:
-            return "with explicit position list"
-    
-    def get_positions(self, population):
-        """
-        Return a list or 1D numpy array of (x,y,z) positions.
-        """
-        if self._positions:
-            assert len(self._positions) == population.number
-            return self._positions
-        elif self.structure:
-            return self.structure.generate_positions(population.number)
-        else:
-            raise Exception("Neither positions nor structure is set.")
-    
-    def get_components(self):
-        if self.structure:
-            return [self.structure]
-        else:
-            return []
+            return "with structures '{}'".format("', '".join([s.name for s in self.structures]))
     
     def to_xml(self):
         element = E(self.element_name)
-        if self._positions:
-            for pos in self._positions:
-                x,y,z = pos
-                element.append(E.position(x=str(x),y=str(y),z=str(z),unit="um"))
-        elif self.structure:
-            element.append(E.structure(self.structure.name))
-        else:
-            raise Exception("Neither positions nor structure is set.")
+        for s in self.structures:
+            element.append(E.structure(s))
         return element
     
     @classmethod
     def from_xml(cls, element, components):
         assert element.tag == NINEML+cls.element_name
-        structure_element = element.find(NINEML+'structure')
-        if structure_element is not None:             
-            position_list = cls(structure=get_or_create_component(structure_element, Structure, 
-                                                                  components))
+        struct_elems = []
+        for struct_elem in element.findall(NINEML+Structure.element_name):
+            struct_elems.append(Structure.from_xml(struct_elem, components))
+        structures = cls(struct_elems)
+        return structures
+
+
+
+class Layout(BaseComponent):
+    """
+    Component representing the structure of a network, e.g. 2D grid, random
+    distribution within a sphere, etc.
+    """
+    element_name = 'layout'
+
+    def generate_positions(self, number):
+        """
+        Generate a number of node positions according to the network structure. 
+        """
+        raise NotImplementedError
+
+    @property
+    def is_csa(self):
+        return self.get_definition().__module__ == 'csa.geometry' # probably need a better test
+
+    def to_csa(self):
+        if self.is_csa:
+            return self.get_definition() # e.g. lambda size: csa.random2d(size, *self.parameters)
         else:
-            positions = [(float(p.attrib['x']), float(p.attrib['y']), float(p.attrib['z']))
-                         for p in element.findall(NINEML+'position')]
-            position_list = cls(positions=positions)
-        return position_list
+            raise Exception("Structure cannot be transformed to CSA geometry function")
+
+
+class Structure(object):
+    """
+    Represents a list of all the structures associated with a Population, which are used in 
+    geometric connectivity rules.
+    """
+    element_name = "structure"
+    
+    def __init__(self, name, layout, morphologies):
+        """
+        Create a new PositionList.
+        
+        Either `positions` or `structure` should be provided. Providing both
+        will raise an Exception.
+        
+        `positions` should be a list of (x,y,z) tuples or a 3xN (Nx3?) numpy array.
+        `structure` should be a Structure component.
+        """
+        self.name = name
+        self.layout = layout
+        self.morphologies = morphologies
+    
+    def to_xml(self):
+        element = E(self.element_name)
+        element.append(E.positions(self.positions))
+        if self.morphologies:
+            element.append(E.morphologies(self.morphologies))
+        return element
+    
+    @classmethod
+    def from_xml(cls, element, components):
+        assert element.tag == NINEML+cls.element_name
+        name = element.attrib.get('name', '')
+        layout = Layout.from_xml(element.find(NINEML+Layout.element_name), components)
+        morph_elem = element.find(NINEML+Morphologies.element_name)
+        if morph_elem:
+            morphologies = Morphologies.from_xml(morph_elem, components)
+        else:
+            morphologies = None
+        return cls(name, layout, morphologies)
+
+
+class Morphologies(object):
+    element_name = 'morphologies'
+    pass
+
+# class PositionList(object):
+#     """
+#     Represents a list of network node positions. May contain either an
+#     explicit list of positions or a Structure instance that can be used to
+#     generate positions.
+#     """
+#     element_name = "positions"
+#     
+#     def __init__(self, positions=[], structure=None):
+#         """
+#         Create a new PositionList.
+#         
+#         Either `positions` or `structure` should be provided. Providing both
+#         will raise an Exception.
+#         
+#         `positions` should be a list of (x,y,z) tuples or a 3xN (Nx3?) numpy array.
+#         `structure` should be a Structure component.
+#         """
+#         if positions and structure:
+#             raise Exception("Please provide either positions or structure, not both.")
+#         assert not isinstance(positions, Structure)
+#         self._positions = positions
+#         if isinstance(structure, Structure):
+#             self.structure = structure
+#         elif structure is None:
+#             self.structure = None
+#         else:
+#             raise Exception("structure is", structure)
+# 
+#     def __eq__(self, other):
+#         if self._positions:
+#             return self._positions == other._positions
+#         else:
+#             return self.structure == other.structure
+#     
+#     def __ne__(self, other):
+#         return not self == other
+#     
+#     def __str__(self):
+#         if self.structure:
+#             return "positioned according to '%s'" % self.structure.name
+#         else:
+#             return "with explicit position list"
+#     
+#     def get_positions(self, population):
+#         """
+#         Return a list or 1D numpy array of (x,y,z) positions.
+#         """
+#         if self._positions:
+#             assert len(self._positions) == population.number
+#             return self._positions
+#         elif self.structure:
+#             return self.structure.generate_positions(population.number)
+#         else:
+#             raise Exception("Neither positions nor structure is set.")
+#     
+#     def get_components(self):
+#         if self.structure:
+#             return [self.structure]
+#         else:
+#             return []
+#     
+#     def to_xml(self):
+#         element = E(self.element_name)
+#         if self._positions:
+#             for pos in self._positions:
+#                 x,y,z = pos
+#                 element.append(E.position(x=str(x),y=str(y),z=str(z),unit="um"))
+#         elif self.structure:
+#             element.append(E.structure(self.structure.name))
+#         else:
+#             raise Exception("Neither positions nor structure is set.")
+#         return element
+#     
+#     @classmethod
+#     def from_xml(cls, element, components):
+#         assert element.tag == NINEML+cls.element_name
+#         structure_element = element.find(NINEML+'structure')
+#         if structure_element is not None:             
+#             position_list = cls(structure=get_or_create_component(structure_element, Structure, 
+#                                                                   components))
+#         else:
+#             positions = [(float(p.attrib['x']), float(p.attrib['y']), float(p.attrib['z']))
+#                          for p in element.findall(NINEML+'position')]
+#             position_list = cls(positions=positions)
+#         return position_list
 
 # this approach is crying out for a class factory
 class Operator(object):
