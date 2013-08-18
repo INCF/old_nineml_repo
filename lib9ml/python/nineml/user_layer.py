@@ -569,12 +569,15 @@ class Parameter(object):
             rd_element = element.find(NINEML+RandomDistribution.element_name)
             func_element = element.find(NINEML+AnonymousFunction.element_name)
             struct_element = element.find(NINEML+StructureExpression.element_name)
+            ref_element = element.find(NINEML+Reference.element_name)
             if rd_element is not None:
                 value = RandomDistribution.from_xml(rd_element, components)
             elif func_element is not None:
                 value = AnonymousFunction.from_xml(func_element, components)
             elif struct_element is not None:
                 value = get_or_create_component(struct_element, StructureExpression, components)
+            elif ref_element is not None:
+                value = Reference.from_xml(ref_element, components)
             else:
                 raise UnrecognisedChildrenTagError("Did not recognise '{}' tag when used inside a "
                                                    "'{}' tag".format(element.getchildren()[0].tag,
@@ -681,6 +684,41 @@ class ParameterScope(object):
         return cls(name, parameters)
     
 
+class Reference(object):
+    """
+    Used to provide the scoping of parameters into groups
+    """
+    element_name = "ref"
+    
+    def __init__(self, name, url):
+        self.name = name
+        self.component = None
+        self._url = url
+        if self._url is not None:
+            raise NotImplementedError("Url lookup hasn't been implemented for reference objects")
+    
+    def __repr__(self):
+        return "Reference(%s, %s)" % (self.name, self._url)
+    
+    def to_xml(self):
+        raise NotImplementedError
+    
+    def __iter__(self):
+        return self._parameters.__iter__()
+    
+    @classmethod
+    def from_xml(cls, element, components):
+        assert element.tag == NINEML+cls.element_name
+        name = element.find(NINEML+'name').text
+        url_element = element.find(NINEML+'url')
+        if url_element is not None:
+            url = url_element.text
+        else:
+            url = None
+        return cls(name, url)
+    
+
+
 class Group(object):
     """
     Container for populations and projections between those populations. May be
@@ -772,6 +810,7 @@ class Group(object):
             group.add(obj)
         group._resolve_population_references()
         return group
+
 
 
 
