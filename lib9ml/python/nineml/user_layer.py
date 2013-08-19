@@ -804,7 +804,9 @@ class Group(object):
             elif child.tag == NINEML+Selection.element_name:
                 obj = Selection.from_xml(child, components)
             elif child.tag == NINEML+ParameterSet.element_name:
-                obj = ParameterSet.from_xml(child, components)                
+                obj = ParameterSet.from_xml(child, components)
+            elif child.tag == etree.Comment: 
+                pass              
             else:
                 raise Exception("<%s> elements may not contain <%s> elements" % (cls.element_name, child.tag))
             group.add(obj)
