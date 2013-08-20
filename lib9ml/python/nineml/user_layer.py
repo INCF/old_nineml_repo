@@ -459,6 +459,9 @@ class AnonymousFunction(object):
     def _check_inline_math(self):
         pass # TODO: Need to implement check of inline math similar to the abstraction layer checks
     
+    def to_xml(self):
+        raise NotImplementedError
+    
     @classmethod
     def from_xml(cls, element, components): #@UnusedVariable
         inline_function = element.find(NINEML+'math-inline').text
