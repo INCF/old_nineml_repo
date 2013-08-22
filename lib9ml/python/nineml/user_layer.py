@@ -35,6 +35,7 @@ from itertools import chain
 import urllib
 from lxml import etree
 from lxml.builder import E
+import os.path
 from operator import and_, or_
 from nineml.abstraction_layer import ComponentClass, csa, parse as al_parse
 from nineml.abstraction_layer.readers import ForeignXMLFormatException
@@ -65,7 +66,7 @@ def parse(url):
         url = import_element.find(NINEML+"url").text
         imported_doc = etree.parse(url)
         root.extend(imported_doc.getroot().iterchildren())
-    return Model.from_xml(root)
+    return Model.from_xml(root, url)
 
 
 class Model(object):
@@ -136,7 +137,7 @@ class Model(object):
         self.groups[group.name] = group   
 
     @classmethod
-    def from_xml(cls, element):
+    def from_xml(cls, element, url):
         """
         Parse an XML ElementTree structure and return a Model instance.
         
@@ -147,7 +148,8 @@ class Model(object):
             http://codespeak.net/lxml/
         """
         assert element.tag == NINEML+'nineml'
-        model = cls(element.attrib["name"])        
+        model = cls(element.attrib["name"])
+        model.url = url      
         # Note that the components dict initially contains elementtree elements,
         # but is modified within Group.from_xml(), and at the end contains
         # Component instances.
@@ -156,7 +158,7 @@ class Model(object):
         for child in element.findall(NINEML+BaseComponent.element_name):
             components[child.attrib["name"]] = child
         for child in element.findall(NINEML+Group.element_name):
-            group = Group.from_xml(child, components, groups)
+            group = Group.from_xml(child, components, groups, parent=model)
             model.groups[group.name] = group
         for name, c in components.items():
             assert isinstance(c, BaseComponent), "%s is %s" % (name, c)
@@ -208,10 +210,12 @@ class Definition(object):
     """
     element_name = "definition"
 
-    def __init__(self, component):
+    def __init__(self, component, base_url=None):
         self._component = None
         if isinstance(component, basestring):
             self.url = component
+            if self.url.startswith('.'):
+                self.url = os.path.join(os.path.dirname(base_url), self.url)
         elif isinstance(component, (ComponentClass, csa.ConnectionSetTemplate)):
             self._component = component
         else:
@@ -246,8 +250,8 @@ class Definition(object):
         return E(self.element_name, (E.url(self.url)))
 
     @classmethod
-    def from_xml(cls, element):
-        return cls(element.find(NINEML+"url").text)
+    def from_xml(cls, element, base_url=None):
+        return cls(element.find(NINEML+"url").text, base_url)
 
 
 class BaseComponent(object):
@@ -359,7 +363,7 @@ class BaseComponent(object):
         return element
     
     @classmethod
-    def from_xml(cls, element, components):
+    def from_xml(cls, element, components, base_url=None):
 #         if element.tag != NINEML+cls.element_name:
 #             raise Exception("Expecting tag name %s%s, actual tag name %s" % (
 #                 NINEML, cls.element_name, element.tag))
@@ -367,7 +371,7 @@ class BaseComponent(object):
         parameters = ParameterSet.from_xml(element.find(NINEML+ParameterSet.element_name), components)
         definition_element = element.find(NINEML+Definition.element_name)
         if definition_element is not None:
-            definition = Definition.from_xml(definition_element)
+            definition = Definition.from_xml(definition_element, base_url)
             return cls(name, definition, parameters)
         else:
             reference_element = element.find(NINEML+"reference")
@@ -730,8 +734,9 @@ class Group(object):
     """
     element_name = "group"
     
-    def __init__(self, name):
+    def __init__(self, name, parent):
         self.name = name
+        self.parent = parent
         self.populations = {}
         self.projections = {}
         self.selections = {}
@@ -795,15 +800,15 @@ class Group(object):
                                              self.projections.values())])
     
     @classmethod
-    def from_xml(cls, element, components, groups):
+    def from_xml(cls, element, components, groups, parent):
         assert element.tag == NINEML+cls.element_name
-        group = cls(name=element.attrib["name"])
+        group = cls(name=element.attrib["name"], parent=parent)
         groups[group.name] = group
         for child in element.getchildren():
             if child.tag == NINEML+Population.element_name:
-                obj = Population.from_xml(child, components, groups)
+                obj = Population.from_xml(child, components, groups, parent)
             elif child.tag == NINEML+Projection.element_name:
-                obj = Projection.from_xml(child, components)
+                obj = Projection.from_xml(child, components, parent)
             elif child.tag == NINEML+Selection.element_name:
                 obj = Selection.from_xml(child, components)
             elif child.tag == NINEML+ParameterSet.element_name:
@@ -819,7 +824,7 @@ class Group(object):
 
 
 
-def get_or_create_component(element, cls, components):
+def get_or_create_component(element, cls, components, base_url=None):
     """
     Each entry in `components` is either an instance of a BaseComponent subclass,
     or the XML (elementtree Element) defining such an instance.
@@ -829,6 +834,9 @@ def get_or_create_component(element, cls, components):
     """
     # If component is a string treat it as a reference to an external component (defined using a
     # 'node' tag outside of the group
+    kwargs = {}
+    if base_url is not None:
+        kwargs['base_url'] = base_url
     if element.text.strip():
         if element.getchildren():
             raise Exception("<{tag}> component '{name}' contains ambiguous references to an external"
@@ -840,17 +848,17 @@ def get_or_create_component(element, cls, components):
         if ref not in components:
             raise Exception("%s not in global components %s" % (ref, components.keys()))
         if not isinstance(components[ref], BaseComponent):
-            components[ref] = cls.from_xml(components[ref], components)
+            components[ref] = cls.from_xml(components[ref], components, **kwargs)
         component = components[ref]
     else:
-        component = cls.from_xml(element, components)
+        component = cls.from_xml(element, components, **kwargs)
     return component
 
-def get_or_create_prototype(element, components, groups):
+def get_or_create_prototype(element, components, groups, base_url=None):
     if element.text.strip() and element.text in groups:
         return groups[element.text]
     else:
-        return get_or_create_component(element, SpikingNodeType, components)
+        return get_or_create_component(element, SpikingNodeType, components, base_url)
 
 
 class Population(object):
@@ -861,9 +869,10 @@ class Population(object):
     """
     element_name = "population"
     
-    def __init__(self, name, number, prototype, structures):
+    def __init__(self, name, number, prototype, structures, parent):
         self.name = name
         self.number = number
+        self.parent = parent
         assert isinstance(prototype, (SpikingNodeType, Group))
         self.prototype = prototype
         assert isinstance(structures, StructureList)
@@ -899,17 +908,20 @@ class Population(object):
                  name=self.name)
 
     @classmethod
-    def from_xml(cls, element, components, groups):
+    def from_xml(cls, element, components, groups, parent):
         assert element.tag == NINEML+cls.element_name
+        base_url = parent.url
         try:
-            prototype = get_or_create_prototype(element.find(NINEML+'prototype'), components, groups)
+            prototype = get_or_create_prototype(element.find(NINEML+'prototype'), components, groups,
+                                                base_url)
         except ForeignXMLFormatException as e:
             prototype = SpikingNodeType(e.name, reference=e.url)
         return cls(name=element.attrib['name'],
                    number=int(element.find(NINEML+'number').text),
                    prototype=prototype,
                    structures=StructureList.from_xml(element.find(NINEML+StructureList.element_name), 
-                                                   components))
+                                                   components),
+                   parent=parent)
 
 
 
@@ -1255,7 +1267,7 @@ class Projection(object):
     """
     element_name = "projection"
     
-    def __init__(self, name, source, target, rule, synaptic_response, connection_type):
+    def __init__(self, name, source, target, rule, synaptic_response, connection_type, parent):
         """
         Create a new projection.
         
@@ -1270,6 +1282,7 @@ class Projection(object):
                           connections.
         """
         self.name = name
+        self.parent = parent
         self.references = {}
         self.source = source
         self.target = target
@@ -1322,14 +1335,15 @@ class Projection(object):
                  name=self.name)
 
     @classmethod
-    def from_xml(cls, element, components):
+    def from_xml(cls, element, components, parent):
         assert element.tag == NINEML+cls.element_name
         return cls(name=element.attrib["name"],
                    source=get_or_create_component(element.find(NINEML+"source"), Source, components),
                    target=get_or_create_component(element.find(NINEML+"target"), Target, components),
                    rule=get_or_create_component(element.find(NINEML+"rule"), ConnectionRule, components),
                    synaptic_response=get_or_create_component(element.find(NINEML+"response"), SynapseType, components),
-                   connection_type=get_or_create_component(element.find(NINEML+"synapse"), ConnectionType, components))
+                   connection_type=get_or_create_component(element.find(NINEML+"synapse"), ConnectionType, components),
+                   parent=parent)
 
     def to_csa(self):
         if self.rule.is_csa:
