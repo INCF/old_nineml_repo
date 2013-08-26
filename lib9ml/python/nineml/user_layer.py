@@ -656,40 +656,40 @@ class ParameterSet(dict):
                 parameters.append(Parameter.from_xml(parameter_element, components))
         return cls(*parameters)
 
-
-class ParameterScope(object):
-    """
-    Used to provide the scoping of parameters into groups
-    """
-    element_name = "scope"
-    
-    def __init__(self, name, parameters):
-        self.name = name
-        self._parameters = parameters
-    
-    def __repr__(self):
-        return "ParameterScope(%s)" % self.name
-    
-    def to_xml(self):
-        raise NotImplementedError
-    
-    def __iter__(self):
-        return self._parameters.__iter__()
-    
-    @classmethod
-    def from_xml(cls, element, components, scope=[]):
-        assert element.tag == NINEML+cls.element_name
-        name = element.attrib['name']
-        new_scope = copy(scope)
-        new_scope.append(name) 
-        parameters = []
-        for parameter_element in element.getchildren():
-            if parameter_element.tag == NINEML+ParameterScope.element_name:
-                parameters.extend(ParameterScope.from_xml(parameter_element, components, new_scope))
-            else:
-                parameters.append(Parameter.from_xml(parameter_element, components, new_scope))
-        return cls(name, parameters)
-    
+# 
+# class ParameterScope(object):
+#     """
+#     Used to provide the scoping of parameters into groups
+#     """
+#     element_name = "scope"
+#     
+#     def __init__(self, name, parameters):
+#         self.name = name
+#         self._parameters = parameters
+#     
+#     def __repr__(self):
+#         return "ParameterScope(%s)" % self.name
+#     
+#     def to_xml(self):
+#         raise NotImplementedError
+#     
+#     def __iter__(self):
+#         return self._parameters.__iter__()
+#     
+#     @classmethod
+#     def from_xml(cls, element, components, scope=[]):
+#         assert element.tag == NINEML+cls.element_name
+#         name = element.attrib['name']
+#         new_scope = copy(scope)
+#         new_scope.append(name) 
+#         parameters = []
+#         for parameter_element in element.getchildren():
+#             if parameter_element.tag == NINEML+ParameterScope.element_name:
+#                 parameters.extend(ParameterScope.from_xml(parameter_element, components, new_scope))
+#             else:
+#                 parameters.append(Parameter.from_xml(parameter_element, components, new_scope))
+#         return cls(name, parameters)
+#     
 
 class Reference(object):
     """
