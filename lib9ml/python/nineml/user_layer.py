@@ -148,7 +148,6 @@ class Model(object):
         """
         assert element.tag == NINEML+'nineml'
         model = cls(element.attrib["name"])
-        model.url = url      
         # Note that the components dict initially contains elementtree elements,
         # but is modified within Group.from_xml(), and at the end contains
         # Component instances.
@@ -157,7 +156,7 @@ class Model(object):
         for child in element.findall(NINEML+BaseComponent.element_name):
             components[child.attrib["name"]] = child
         for child in element.findall(NINEML+Group.element_name):
-            group = Group.from_xml(child, components, groups, parent=model)
+            group = Group.from_xml(child, components, groups, url)
             model.groups[group.name] = group
         for name, c in components.items():
             assert isinstance(c, BaseComponent), "%s is %s" % (name, c)
@@ -209,7 +208,7 @@ class Definition(object):
     """
     element_name = "definition"
 
-    def __init__(self, component, base_url=None):
+    def __init__(self, component, base_url):
         self._component = None
         if isinstance(component, basestring):
             self.url = component
@@ -249,7 +248,7 @@ class Definition(object):
         return E(self.element_name, (E.url(self.url)))
 
     @classmethod
-    def from_xml(cls, element, base_url=None):
+    def from_xml(cls, element, base_url):
         return cls(element.find(NINEML+"url").text, base_url)
 
 
@@ -362,12 +361,13 @@ class BaseComponent(object):
         return element
     
     @classmethod
-    def from_xml(cls, element, components, base_url=None):
+    def from_xml(cls, element, components, base_url):
 #         if element.tag != NINEML+cls.element_name:
 #             raise Exception("Expecting tag name %s%s, actual tag name %s" % (
 #                 NINEML, cls.element_name, element.tag))
         name = element.attrib.get("name", None)
-        parameters = ParameterSet.from_xml(element.find(NINEML+ParameterSet.element_name), components)
+        parameters = ParameterSet.from_xml(element.find(NINEML+ParameterSet.element_name), 
+                                           components, base_url)
         definition_element = element.find(NINEML+Definition.element_name)
         if definition_element is not None:
             definition = Definition.from_xml(definition_element, base_url)
@@ -466,7 +466,7 @@ class AnonymousFunction(object):
         raise NotImplementedError
     
     @classmethod
-    def from_xml(cls, element, components): #@UnusedVariable
+    def from_xml(cls, element, components, base_url): #@UnusedVariable
         inline_function = element.find(NINEML+'math-inline').text
         arguments = {}
         for arg in element.findall(NINEML+'arg'):
@@ -490,11 +490,10 @@ class Parameter(object):
     """
     element_name = "property" # only used if PARAMETER_NAME_AS_TAG_NAME is False
     
-    def __init__(self, name, value, unit=None, scope=[]):
+    def __init__(self, name, value, unit=None):
         self.name = name
         self.value = value
         self.unit = unit
-        self.scope = scope
     
     def __repr__(self):
         return "Parameter(name=%s, value=%s, unit=%s)" % (self.name, self.value, self.unit)
@@ -558,7 +557,7 @@ class Parameter(object):
                          unit=unit)
     
     @classmethod
-    def _from_xml_generic_tag(cls, element, components, scope=[]):
+    def _from_xml_generic_tag(cls, element, components, base_url):
         assert element.tag == NINEML+cls.element_name, "Found <%s>, expected <%s>" % (element.tag, cls.element_name)
         # Search for the different types of parameter tags
         children = element.getchildren()
@@ -577,13 +576,13 @@ class Parameter(object):
             struct_element = element.find(NINEML+StructureExpression.element_name)
             ref_element = element.find(NINEML+Reference.element_name)
             if rd_element is not None:
-                value = RandomDistribution.from_xml(rd_element, components)
+                value = RandomDistribution.from_xml(rd_element, components, base_url)
             elif func_element is not None:
-                value = AnonymousFunction.from_xml(func_element, components)
+                value = AnonymousFunction.from_xml(func_element, components, base_url)
             elif struct_element is not None:
-                value = get_or_create_component(struct_element, StructureExpression, components)
+                value = get_or_create_component(struct_element, StructureExpression, components, base_url)
             elif ref_element is not None:
-                value = Reference.from_xml(ref_element, components)
+                value = Reference.from_xml(ref_element, components, base_url)
             else:
                 raise UnrecognisedChildrenTagError("Did not recognise '{}' tag when used inside a "
                                                    "'{}' tag".format(element.getchildren()[0].tag,
@@ -596,14 +595,14 @@ class Parameter(object):
             raise UnrecognisedChildrenTagError("'{}' are not valid child tags for '<{}>' tags"
                                                .format([c.tag for c in element.getchildren()], 
                                                        cls.element_name))
-        return cls(name=element.attrib["name"], value=value, unit=unit, scope=scope)
+        return cls(name=element.attrib["name"], value=value, unit=unit)
     
     @classmethod
-    def from_xml(cls, element, components, scope=[]):
+    def from_xml(cls, element, components, base_url):
         if PARAMETER_NAME_AS_TAG_NAME:
             return cls._from_xml_name_as_tag(element, components)
         else:
-            return cls._from_xml_generic_tag(element, components, scope)
+            return cls._from_xml_generic_tag(element, components, base_url)
 
 
 class ParameterSet(dict):
@@ -645,47 +644,13 @@ class ParameterSet(dict):
                  *[p.to_xml() for p in self.values()])
     
     @classmethod
-    def from_xml(cls, element, components):
+    def from_xml(cls, element, components, base_url):
         assert element.tag == NINEML+cls.element_name
         parameters = []
         for parameter_element in element.getchildren():
-            parameters.append(Parameter.from_xml(parameter_element, components))
+            parameters.append(Parameter.from_xml(parameter_element, components, base_url))
         return cls(*parameters)
-
-# 
-# class ParameterScope(object):
-#     """
-#     Used to provide the scoping of parameters into groups
-#     """
-#     element_name = "scope"
-#     
-#     def __init__(self, name, parameters):
-#         self.name = name
-#         self._parameters = parameters
-#     
-#     def __repr__(self):
-#         return "ParameterScope(%s)" % self.name
-#     
-#     def to_xml(self):
-#         raise NotImplementedError
-#     
-#     def __iter__(self):
-#         return self._parameters.__iter__()
-#     
-#     @classmethod
-#     def from_xml(cls, element, components, scope=[]):
-#         assert element.tag == NINEML+cls.element_name
-#         name = element.attrib['name']
-#         new_scope = copy(scope)
-#         new_scope.append(name) 
-#         parameters = []
-#         for parameter_element in element.getchildren():
-#             if parameter_element.tag == NINEML+ParameterScope.element_name:
-#                 parameters.extend(ParameterScope.from_xml(parameter_element, components, new_scope))
-#             else:
-#                 parameters.append(Parameter.from_xml(parameter_element, components, new_scope))
-#         return cls(name, parameters)
-#     
+     
 
 class Reference(object):
     """
@@ -710,12 +675,14 @@ class Reference(object):
         return self._parameters.__iter__()
     
     @classmethod
-    def from_xml(cls, element, components):
+    def from_xml(cls, element, components, base_url):
         assert element.tag == NINEML+cls.element_name
         name = element.find(NINEML+'name').text
         url_element = element.find(NINEML+'url')
         if url_element is not None:
             url = url_element.text
+            if url.startswith('.'):
+                url = os.path.normpath(os.path.join(base_url, url))
         else:
             url = None
         return cls(name, url)
@@ -730,9 +697,8 @@ class Group(object):
     """
     element_name = "group"
     
-    def __init__(self, name, parent):
+    def __init__(self, name):
         self.name = name
-        self.parent = parent
         self.populations = {}
         self.projections = {}
         self.selections = {}
@@ -796,19 +762,19 @@ class Group(object):
                                              self.projections.values())])
     
     @classmethod
-    def from_xml(cls, element, components, groups, parent):
+    def from_xml(cls, element, components, groups, base_url):
         assert element.tag == NINEML+cls.element_name
-        group = cls(name=element.attrib["name"], parent=parent)
+        group = cls(name=element.attrib["name"])
         groups[group.name] = group
         for child in element.getchildren():
             if child.tag == NINEML+Population.element_name:
-                obj = Population.from_xml(child, components, groups, parent)
+                obj = Population.from_xml(child, components, groups, base_url)
             elif child.tag == NINEML+Projection.element_name:
-                obj = Projection.from_xml(child, components, parent)
+                obj = Projection.from_xml(child, components, base_url)
             elif child.tag == NINEML+Selection.element_name:
-                obj = Selection.from_xml(child, components)
+                obj = Selection.from_xml(child, components, base_url)
             elif child.tag == NINEML+ParameterSet.element_name:
-                obj = ParameterSet.from_xml(child, components)
+                obj = ParameterSet.from_xml(child, components, base_url)
             elif child.tag == etree.Comment: 
                 pass              
             else:
@@ -820,7 +786,7 @@ class Group(object):
 
 
 
-def get_or_create_component(element, cls, components, base_url=None):
+def get_or_create_component(element, cls, components, base_url):
     """
     Each entry in `components` is either an instance of a BaseComponent subclass,
     or the XML (elementtree Element) defining such an instance.
@@ -850,7 +816,7 @@ def get_or_create_component(element, cls, components, base_url=None):
         component = cls.from_xml(element, components, **kwargs)
     return component
 
-def get_or_create_prototype(element, components, groups, base_url=None):
+def get_or_create_prototype(element, components, groups, base_url):
     if element.text.strip() and element.text in groups:
         return groups[element.text]
     else:
@@ -865,10 +831,9 @@ class Population(object):
     """
     element_name = "population"
     
-    def __init__(self, name, number, prototype, structures, parent):
+    def __init__(self, name, number, prototype, structures):
         self.name = name
         self.number = number
-        self.parent = parent
         assert isinstance(prototype, (SpikingNodeType, Group))
         self.prototype = prototype
         assert isinstance(structures, StructureList)
@@ -904,17 +869,15 @@ class Population(object):
                  name=self.name)
 
     @classmethod
-    def from_xml(cls, element, components, groups, parent):
+    def from_xml(cls, element, components, groups, base_url):
         assert element.tag == NINEML+cls.element_name
-        base_url = parent.url
         prototype = get_or_create_prototype(element.find(NINEML+'prototype'), components, groups,
                                                 base_url)
         return cls(name=element.attrib['name'],
                    number=int(element.find(NINEML+'number').text),
                    prototype=prototype,
                    structures=StructureList.from_xml(element.find(NINEML+StructureList.element_name), 
-                                                   components),
-                   parent=parent)
+                                                   components, base_url))
 
 
 
@@ -950,11 +913,11 @@ class StructureList(list):
         return element
     
     @classmethod
-    def from_xml(cls, element, components):
+    def from_xml(cls, element, components, base_url):
         assert element.tag == NINEML+cls.element_name
         struct_elems = []
         for struct_elem in element.findall(NINEML+Structure.element_name):
-            struct_elems.append(Structure.from_xml(struct_elem, components))
+            struct_elems.append(Structure.from_xml(struct_elem, components, base_url))
         structures = cls(struct_elems)
         return structures
 
@@ -1013,13 +976,13 @@ class Structure(object):
         return element
     
     @classmethod
-    def from_xml(cls, element, components):
+    def from_xml(cls, element, components, base_url):
         assert element.tag == NINEML+cls.element_name
         name = element.attrib.get('name', '')
-        layout = Layout.from_xml(element.find(NINEML+Layout.element_name), components)
+        layout = Layout.from_xml(element.find(NINEML+Layout.element_name), components, base_url)
         morph_elem = element.find(NINEML+Morphologies.element_name)
         if morph_elem:
-            morphologies = Morphologies.from_xml(morph_elem, components)
+            morphologies = Morphologies.from_xml(morph_elem, components, base_url)
         else:
             morphologies = None
         return cls(name, layout, morphologies)
@@ -1260,7 +1223,7 @@ class Projection(object):
     """
     element_name = "projection"
     
-    def __init__(self, name, source, target, rule, synaptic_response, connection_type, parent):
+    def __init__(self, name, source, target, rule, synaptic_response, connection_type):
         """
         Create a new projection.
         
@@ -1275,7 +1238,6 @@ class Projection(object):
                           connections.
         """
         self.name = name
-        self.parent = parent
         self.references = {}
         self.source = source
         self.target = target
@@ -1328,15 +1290,19 @@ class Projection(object):
                  name=self.name)
 
     @classmethod
-    def from_xml(cls, element, components, parent):
+    def from_xml(cls, element, components, base_url):
         assert element.tag == NINEML+cls.element_name
         return cls(name=element.attrib["name"],
-                   source=get_or_create_component(element.find(NINEML+"source"), Source, components),
-                   target=get_or_create_component(element.find(NINEML+"target"), Target, components),
-                   rule=get_or_create_component(element.find(NINEML+"rule"), ConnectionRule, components),
-                   synaptic_response=get_or_create_component(element.find(NINEML+"response"), SynapseType, components),
-                   connection_type=get_or_create_component(element.find(NINEML+"synapse"), ConnectionType, components),
-                   parent=parent)
+                   source=get_or_create_component(element.find(NINEML+"source"), Source, components,
+                                                  base_url),
+                   target=get_or_create_component(element.find(NINEML+"target"), Target, components,
+                                                   base_url),
+                   rule=get_or_create_component(element.find(NINEML+"rule"), ConnectionRule,
+                                                 components, base_url),
+                   synaptic_response=get_or_create_component(element.find(NINEML+"response"), 
+                                                             SynapseType, components, base_url),
+                   connection_type=get_or_create_component(element.find(NINEML+"synapse"), 
+                                                           ConnectionType, components, base_url))
 
     def to_csa(self):
         if self.rule.is_csa:
@@ -1365,7 +1331,7 @@ class Source(object):
         return E(self.element_name, E.population(self.name), E.segment(self.segment))
         
     @classmethod
-    def from_xml(cls, element, components):  #@UnusedVariable
+    def from_xml(cls, element, components, base_url):  #@UnusedVariable
         return cls(element.find(NINEML+"population").text, element.find(NINEML+"segment").text) 
 
 
@@ -1385,7 +1351,7 @@ class Target(object):
         return E(self.element_name, E.population(self.name), E.segment(self.segment))
         
     @classmethod
-    def from_xml(cls, element, components): #@UnusedVariable
+    def from_xml(cls, element, components, base_url): #@UnusedVariable
         return cls(element.find(NINEML+"population").text, element.find(NINEML+"segment").text) 
 
 
