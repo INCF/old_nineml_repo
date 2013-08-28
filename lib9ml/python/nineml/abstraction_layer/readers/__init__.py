@@ -1,2 +1,2 @@
 
-from xml_reader import XMLReader, ForeignXMLFormatException
+from xml_reader import XMLReader

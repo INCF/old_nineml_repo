@@ -5,16 +5,10 @@
 
 
 import os
-import nineml
-
+import nineml.extensions
 
 __all__ = ['XMLReader']
 
-class ForeignXMLFormatException(Exception):
-    
-    def __init__(self, name, url):
-        self.name = name
-        self.url = url
 
 class XMLLoader(object):
     """This class is used by XMLReader internally.
@@ -30,17 +24,16 @@ class XMLLoader(object):
         
         self.components = []
         self.component_srcs = {}
-        for comp_block in xmlroot.findall(nineml.al.NINEML + "ComponentClass"):
-            component = self.load_componentclass( comp_block )
-
+        for comp_block in xmlroot:
+            if comp_block.tag == nineml.al.NINEML + "ComponentClass":
+                component = self.load_componentclass( comp_block )
+            elif comp_block.tag == nineml.al.NINEML + "ComponentClassStub":
+                component = self.load_componentclassstub( comp_block )
+            else:
+                component = nineml.extensions.load_componentclass(comp_block)
             self.components.append(component)
             self.component_srcs[component] = xml_node_filename_map[comp_block]
-        for comp_block in xmlroot.findall(nineml.al.NINEML + "ComponentClassStub"):
-            component = self.load_componentclassstub( comp_block )
-
-            self.components.append(component)
-            self.component_srcs[component] = xml_node_filename_map[comp_block]
-
+        
 
     def load_connectports(self, element ):
         return element.get('source'), element.get('sink')
@@ -72,13 +65,10 @@ class XMLLoader(object):
                               portconnections = subnodes["ConnectPorts"])
 
     def load_componentclassstub(self, element):
-    
         blocks = ('Parameter',) 
-    
         subnodes = self.loadBlocks( element, blocks=blocks)
-    
         return nineml.al.ComponentClassStub(name=element.get('name'),
-                              parameters = subnodes["Parameter" ])
+                                            parameters=subnodes["Parameter" ])
        
     def load_parameter(self, element):
         return nineml.al.Parameter(name=element.get('name')) 
@@ -288,15 +278,12 @@ class XMLReader(object):
 
         
         root = doc.getroot()
-        if root.nsmap.has_key('ncml'):
-            raise ForeignXMLFormatException(root.attrib['name'], filename.url)
-        else:
-            assert root.nsmap[None] == nineml.al.nineml_namespace
-            # Recursively Load Include Nodes:
-            for include_element in root.getiterator(tag=nineml.al.NINEML+'Include'):
-                cls._load_include( include_element=include_element, 
-                                   basedir=os.path.dirname(filename),
-                                   xml_node_filename_map=xml_node_filename_map )
+        assert root.nsmap[None] == nineml.al.nineml_namespace
+        # Recursively Load Include Nodes:
+        for include_element in root.getiterator(tag=nineml.al.NINEML+'Include'):
+            cls._load_include( include_element=include_element, 
+                               basedir=os.path.dirname(filename),
+                               xml_node_filename_map=xml_node_filename_map )
             
         return root
 

@@ -57,15 +57,13 @@ class ComponentClass(object):
     @classmethod
     def from_xml(cls, element):
         assert element.tag == BIO_CELL_NINEML + cls.element_name
-        parameters = {}
-        mappings = {}
+        parameters = []
+        mappings = []
         for child in element.getchildren():
             if child.tag == BIO_CELL_NINEML + Parameter.element_name:
-                parameter = Parameter.from_xml(child)
-                parameters[parameter.name] = parameter
+                parameters.append(Parameter.from_xml(child))
             elif child.tag == BIO_CELL_NINEML + Mapping.element_name:
-                mapping = Mapping.from_xml(child)
-                mappings[mapping.name] = mapping
+                mappings.append(Mapping.from_xml(child))
             elif child.tag == (nineml.extensions.morphology.MORPH_NINEML + 
                                nineml.extensions.morphology.Morphology.element_name):
                 morphology = nineml.extensions.morphology.Morphology.from_xml(child)

@@ -38,7 +38,6 @@ from lxml.builder import E
 import os.path
 from operator import and_, or_
 from nineml.abstraction_layer import ComponentClass, csa, parse as al_parse
-from nineml.abstraction_layer.readers import ForeignXMLFormatException
 
 nineml_namespace = 'http://nineml.org/9ML/0.1'
 NINEML = "{%s}" % nineml_namespace
@@ -650,10 +649,7 @@ class ParameterSet(dict):
         assert element.tag == NINEML+cls.element_name
         parameters = []
         for parameter_element in element.getchildren():
-            if parameter_element.tag == NINEML+ParameterScope.element_name:
-                parameters.extend(ParameterScope.from_xml(parameter_element, components))
-            else:
-                parameters.append(Parameter.from_xml(parameter_element, components))
+            parameters.append(Parameter.from_xml(parameter_element, components))
         return cls(*parameters)
 
 # 
@@ -911,11 +907,8 @@ class Population(object):
     def from_xml(cls, element, components, groups, parent):
         assert element.tag == NINEML+cls.element_name
         base_url = parent.url
-        try:
-            prototype = get_or_create_prototype(element.find(NINEML+'prototype'), components, groups,
+        prototype = get_or_create_prototype(element.find(NINEML+'prototype'), components, groups,
                                                 base_url)
-        except ForeignXMLFormatException as e:
-            prototype = SpikingNodeType(e.name, reference=e.url)
         return cls(name=element.attrib['name'],
                    number=int(element.find(NINEML+'number').text),
                    prototype=prototype,
