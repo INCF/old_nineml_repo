@@ -221,9 +221,3 @@ class Mapping(object):
                 raise Exception("Unrecognised child element '<{}>' found in <{}> element"
                                 .format(child.tag, element.tag))
         return cls(element.attrib['name'], components, classification, divisions)
-
-
-if __name__ == '__main__':
-    cellmodels = parse('/home/tclose/git/kbrain/9ml/neurons/Golgi_DeSouza10.9ml')
-    for model in cellmodels.itervalues():
-        print(etree.tostring(model.to_xml(), pretty_print=True))

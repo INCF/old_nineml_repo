@@ -124,14 +124,5 @@ class Parameter(object):
             unit = unit_elem.text
         else:
             unit = None
-        return cls(element.attrib['name'], value, unit)
-    
-if __name__ == '__main__':
-    
-    models = parse('/home/tclose/Desktop/biophysics_test.9ml')
-    for model in models.values():
-        print(etree.tostring(model.to_xml(), pretty_print=True))
-
-    
-    
+        return cls(element.attrib['name'], value, unit)  
         
