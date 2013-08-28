@@ -38,8 +38,9 @@ class Morphology(object):
 
     def to_xml(self):
         return E(self.element_name,
-                 name=self.name
-                 * [c.to_xml() for c in chain(self.segments, self.classfications)])
+                 name=self.name,
+                 *[c.to_xml() for c in chain(self.segments.values(),
+                                              self.classifications.values())])
 
     @classmethod
     def from_xml(cls, element):
@@ -73,7 +74,7 @@ class Segment(object):
         self.distal = distal
 
     def __repr__(self):
-        if self.proximal: 
+        if self.proximal:
             p = "proximal: ({})".format(repr(self.proximal))
         else:
             p = "parent: ({})".format(repr(self.parent))
@@ -81,7 +82,7 @@ class Segment(object):
 
     def to_xml(self):
         return E(self.element_name,
-                 self.proximal.to_xml(),
+                 self.proximal.to_xml() if self.proximal else self.parent.to_xml(),
                  self.distal.to_xml())
 
     @classmethod
@@ -120,7 +121,7 @@ class Point3D(object):
 
     def to_xml(self):
         return E(self.element_name,
-                 x=self.x, y=self.y, z=self.z, diameter=self.diameter)
+                 x=str(self.x), y=str(self.y), z=str(self.z), diameter=str(self.diameter))
 
     @classmethod
     def from_xml(cls, element):
