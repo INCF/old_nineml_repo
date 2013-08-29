@@ -37,9 +37,10 @@ class BiophysicsModel(object):
 
     element_name = 'Biophysics'
 
-    def __init__(self, name, components):
+    def __init__(self, name, components, build_hints=None):
         self.name = name
         self.components = components
+        self.build_hints = build_hints
 
     def __repr__(self):
         return ("BiophysicsModel '{}' with {} components(s)"
@@ -54,13 +55,16 @@ class BiophysicsModel(object):
     def from_xml(cls, element):
         assert element.tag == BIO_NINEML + cls.element_name
         components = {}
+        build_hints = None
         for child in element.getchildren():
             if child.tag == BIO_NINEML + Component.element_name:
                 component = Component.from_xml(child)
                 components[component.name] = component
-        return cls(element.attrib['name'], components)
-    
-    
+            elif child.tag == BIO_NINEML + BuildHints.element_name:
+                build_hints = BuildHints.from_xml(child)
+        return cls(element.attrib['name'], components, build_hints)
+
+
 class Component(object):
 
     element_name = 'Component'
@@ -85,15 +89,15 @@ class Component(object):
     def from_xml(cls, element):
         assert element.tag == BIO_NINEML + cls.element_name
         parameters = {}
-        param_elements = element.find(BIO_NINEML+'properties')
+        param_elements = element.find(BIO_NINEML + 'properties')
         if param_elements is not None:
             for child in param_elements.getchildren():
                 if child.tag == BIO_NINEML + Parameter.element_name:
                     parameter = Parameter.from_xml(child)
                     parameters[parameter.name] = parameter
-        return cls(element.attrib.get('name', None), parameters)    
-    
-    
+        return cls(element.attrib.get('name', None), parameters)
+
+
 class Parameter(object):
 
     element_name = 'Parameter'
@@ -118,65 +122,73 @@ class Parameter(object):
     @classmethod
     def from_xml(cls, element):
         assert element.tag == BIO_NINEML + cls.element_name
-        value = element.find(BIO_NINEML+'value').text
-        unit_elem = element.find(BIO_NINEML+'unit')
+        value = element.find(BIO_NINEML + 'value').text
+        unit_elem = element.find(BIO_NINEML + 'unit')
         if unit_elem is not None:
             unit = unit_elem.text
         else:
             unit = None
         return cls(element.attrib['name'], value, unit)
-    
-    
+
+
 class BuildHints(object):
 
-    element_name = 'buildHints'
+    element_name = 'BuildHints'
 
     def __init__(self, builders):
-        self.builders = builders
+        self._builders = builders
+
+    def __getitem__(self, key):
+        return self._builders[key]
 
     def __repr__(self):
         return ("BuildHints for {} builders(s)"
-                .format(len(self.builders)))
+                .format(len(self._builders)))
 
     def to_xml(self):
         return E(self.element_name,
-                 *[c.to_xml() for c in self.builders])
+                 *[c.to_xml() for c in self._builders])
 
     @classmethod
     def from_xml(cls, element):
         assert element.tag == BIO_NINEML + cls.element_name
         builders = {}
-        for child in element.findall(BIO_NINEML + Parameter.element_name):
-            builders.append(Builder.from_xml(child))
+        for child in element.findall(BIO_NINEML + Builder.element_name):
+            builder = Builder.from_xml(child)
+            builders[builder.name] = builder
         return cls(builders)
-                 
-    
+
+
 class Builder(object):
 
-    element_name = 'builder'
+    element_name = 'Builder'
 
     def __init__(self, name, simulators):
         self.name = name
-        self.simulators = simulators
+        self._simulators = simulators
+
+    def __getitem__(self, key):
+        return self._simulators[key]
 
     def __repr__(self):
         return ("Build hints for {} builder for {} simulators(s)"
-                .format(self.name, len(self.simulators)))
+                .format(self.name, len(self._simulators)))
 
     def to_xml(self):
         return E(self.element_name,
                  name=self.name,
-                 *[c.to_xml() for c in self.simulators])
+                 *[c.to_xml() for c in self._simulators])
 
     @classmethod
     def from_xml(cls, element):
         assert element.tag == BIO_NINEML + cls.element_name
         simulators = {}
-        for child in element.findall(BIO_NINEML + Parameter.element_name):
-            simulators.append(Simulator.from_xml(child))
+        for child in element.findall(BIO_NINEML + Simulator.element_name):
+            simulator = Simulator.from_xml(child)
+            simulators[simulator.name] = simulator
         return cls(element.attrib['name'], simulators)
-    
-    
+
+
 class Simulator(object):
 
     element_name = 'Simulator'
@@ -187,7 +199,7 @@ class Simulator(object):
         self.kinetic_components = kinetic_components
 
     def __repr__(self):
-        return ("Build hints for {} simulators"
+        return ("Build hints for the '{}' simulator"
                 .format(self.name))
 
     def to_xml(self):
@@ -202,9 +214,9 @@ class Simulator(object):
     @classmethod
     def from_xml(cls, element):
         assert element.tag == BIO_NINEML + cls.element_name
-        method_elem = element.find(BIO_NINEML+'Method')
-        method = method_elem.text.strip() if method_elem else None
-        kinetic_components = {}
+        method_elem = element.find(BIO_NINEML + 'Method')
+        method = method_elem.text.strip() if method_elem is not None else None
+        kinetic_components = []
         for child in element.findall(BIO_NINEML + 'KineticComponent'):
             kinetic_components.append(child.text.strip())
         return cls(element.attrib['name'], method, kinetic_components)
