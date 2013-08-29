@@ -124,5 +124,87 @@ class Parameter(object):
             unit = unit_elem.text
         else:
             unit = None
-        return cls(element.attrib['name'], value, unit)  
-        
+        return cls(element.attrib['name'], value, unit)
+    
+    
+class BuildHints(object):
+
+    element_name = 'buildHints'
+
+    def __init__(self, builders):
+        self.builders = builders
+
+    def __repr__(self):
+        return ("BuildHints for {} builders(s)"
+                .format(len(self.builders)))
+
+    def to_xml(self):
+        return E(self.element_name,
+                 *[c.to_xml() for c in self.builders])
+
+    @classmethod
+    def from_xml(cls, element):
+        assert element.tag == BIO_NINEML + cls.element_name
+        builders = {}
+        for child in element.findall(BIO_NINEML + Parameter.element_name):
+            builders.append(Builder.from_xml(child))
+        return cls(builders)
+                 
+    
+class Builder(object):
+
+    element_name = 'builder'
+
+    def __init__(self, name, simulators):
+        self.name = name
+        self.simulators = simulators
+
+    def __repr__(self):
+        return ("Build hints for {} builder for {} simulators(s)"
+                .format(self.name, len(self.simulators)))
+
+    def to_xml(self):
+        return E(self.element_name,
+                 name=self.name,
+                 *[c.to_xml() for c in self.simulators])
+
+    @classmethod
+    def from_xml(cls, element):
+        assert element.tag == BIO_NINEML + cls.element_name
+        simulators = {}
+        for child in element.findall(BIO_NINEML + Parameter.element_name):
+            simulators.append(Simulator.from_xml(child))
+        return cls(element.attrib['name'], simulators)
+    
+    
+class Simulator(object):
+
+    element_name = 'Simulator'
+
+    def __init__(self, name, method=None, kinetic_components=[]):
+        self.name = name
+        self.method = method
+        self.kinetic_components = kinetic_components
+
+    def __repr__(self):
+        return ("Build hints for {} simulators"
+                .format(self.name))
+
+    def to_xml(self):
+        optional_components = []
+        if self.method:
+            optional_components.append(E('Method', self.method))
+        optional_components.extend([E('KineticComponent', kc) for kc in self.kinetic_components])
+        return E(self.element_name,
+                 name=self.name,
+                 *optional_components)
+
+    @classmethod
+    def from_xml(cls, element):
+        assert element.tag == BIO_NINEML + cls.element_name
+        method_elem = element.find(BIO_NINEML+'Method')
+        method = method_elem.text.strip() if method_elem else None
+        kinetic_components = {}
+        for child in element.findall(BIO_NINEML + 'KineticComponent'):
+            kinetic_components.append(child.text.strip())
+        return cls(element.attrib['name'], method, kinetic_components)
