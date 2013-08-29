@@ -24,7 +24,7 @@ def parse(url):
     root = doc.getroot()
     comp_classes = {}
     for element in root.findall(BIO_CELL_NINEML + ComponentClass.element_name):
-        comp_class = ComponentClass.from_xml(element)
+        comp_class = ComponentClass.from_xml(element, url)
         comp_classes[comp_class.name] = comp_class
     return comp_classes
 
@@ -33,16 +33,17 @@ class ComponentClass(object):
 
     element_name = 'ComponentClass'
 
-    def __init__(self, name, parameters, mappings, morphology, biophysics):
+    def __init__(self, name, parameters, mappings, morphology, biophysics, url=None):
         self.name = name
         self.parameters = parameters
         self.mappings = mappings
         self.morphology = morphology
         self.biophysics = biophysics
+        self.url = url
 
     def __repr__(self):
-        return ("Morphology '{}' with {} segment(s) and {} mapping(s)"
-                .format(self.name, len(self.parameters), len(self.mappings)))
+        return ("Biophysical cell class '{}' with parameters: '{}'"
+                .format(self.name, "', '".join([p.name for p in self.parameters])))
         
     def check_consistency(self):
         pass # Not implemented yet
