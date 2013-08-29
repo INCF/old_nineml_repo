@@ -849,7 +849,7 @@ class Population(object):
         return not self == other
     
     def __str__(self):
-        return 'Population "%s": %dx"%s" %s' % (self.name, self.number, self.prototype.name, self.positions)
+        return 'Population "%s": %dx"%s"' % (self.name, self.number, self.prototype.name)
     
     def get_components(self):
         components = []
