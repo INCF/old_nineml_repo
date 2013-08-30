@@ -170,38 +170,38 @@ class Classification(object):
 
     element_name = 'classification'
 
-    def __init__(self, name, divisions):
+    def __init__(self, name, classes):
         self.name = name
-        self.divisions = divisions
+        self.classes = classes
 
     def __repr__(self):
         return ("'{}' classification with division(s): '{}'"
-                .format(self.name, "', '".join([d.name for d in self.divisions])))
+                .format(self.name, "', '".join([d.name for d in self.classes])))
 
     def to_xml(self):
         return E(self.element_name,
                  name=self.name,
-                 *[d.to_xml() for d in self.divisions])
+                 *[d.to_xml() for d in self.classes])
 
     @classmethod
     def from_xml(cls, element):
         assert element.tag == MORPH_NINEML + cls.element_name
-        divisions = []
+        classes = []
         for child in element.getchildren():
-            divisions.append(Division.from_xml(child))
-        return cls(element.attrib['name'], divisions)
+            classes.append(SegmentClass.from_xml(child))
+        return cls(element.attrib['name'], classes)
 
 
-class Division(object):
+class SegmentClass(object):
 
-    element_name = 'division'
+    element_name = 'class'
 
     def __init__(self, name, members):
         self.name = name
         self.members = members
 
     def __repr__(self):
-        return "'{}' division with {} member(s)".format(self.name, len(self.members))
+        return "'{}' segment class with {} member(s)".format(self.name, len(self.members))
 
     def to_xml(self):
         return E(self.element_name,
