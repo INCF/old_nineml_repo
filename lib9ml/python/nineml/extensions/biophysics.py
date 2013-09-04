@@ -37,9 +37,10 @@ class BiophysicsModel(object):
 
     element_name = 'Biophysics'
 
-    def __init__(self, name, components, build_hints=None):
+    def __init__(self, name, components, component_classes, build_hints=None):
         self.name = name
         self.components = components
+        self.component_classes = component_classes
         self.build_hints = build_hints
 
     def __repr__(self):
@@ -55,23 +56,48 @@ class BiophysicsModel(object):
     def from_xml(cls, element):
         assert element.tag == BIO_NINEML + cls.element_name
         components = {}
-        build_hints = None
-        for child in element.getchildren():
-            if child.tag == BIO_NINEML + Component.element_name:
-                component = Component.from_xml(child)
-                components[component.name] = component
-            elif child.tag == BIO_NINEML + BuildHints.element_name:
-                build_hints = BuildHints.from_xml(child)
-        return cls(element.attrib['name'], components, build_hints)
+        component_classes = {}
+        for comp_class_elem in element.findall(BIO_NINEML + ComponentClass.element_name):
+            component_class = ComponentClass.from_xml(comp_class_elem)
+            component_classes[component_class.name] = component_class
+        for comp_elem in element.findall(BIO_NINEML + Component.element_name):
+            component = Component.from_xml(comp_elem, component_classes)
+            components[component.name] = component
+        build_hints = BuildHints.from_xml(element.find(BIO_NINEML + BuildHints.element_name))
+        return cls(element.attrib['name'], components, component_classes, build_hints)
+
+
+class ComponentClass(object):
+
+    element_name = 'ComponentClass'
+
+    def __init__(self, name, comp_class_type):
+        self.name = name
+        self.type = comp_class_type
+
+    def __repr__(self):
+        return ("Component Class '{}' of type '{}'"
+                .format(self.name, self.type))
+
+    def to_xml(self):
+        return E(self.element_name,
+                 name=self.name,
+                 type=self.type)
+
+    @classmethod
+    def from_xml(cls, element):
+        assert element.tag == BIO_NINEML + cls.element_name
+        return cls(element.attrib['name'], element.attrib['type'])
 
 
 class Component(object):
 
     element_name = 'Component'
 
-    def __init__(self, name, parameters):
+    def __init__(self, name, parameters, comp_type):
         self.name = name
         self.parameters = parameters
+        self.type = comp_type
 
     def __repr__(self):
         return ("Component '{}' with {} parameters(s)"
@@ -86,16 +112,23 @@ class Component(object):
                  **kwargs)
 
     @classmethod
-    def from_xml(cls, element):
+    def from_xml(cls, element, component_classes):
         assert element.tag == BIO_NINEML + cls.element_name
         parameters = {}
-        param_elements = element.find(BIO_NINEML + 'properties')
-        if param_elements is not None:
-            for child in param_elements.getchildren():
-                if child.tag == BIO_NINEML + Parameter.element_name:
-                    parameter = Parameter.from_xml(child)
-                    parameters[parameter.name] = parameter
-        return cls(element.attrib.get('name', None), parameters)
+        if element.attrib.has_key('definition'):
+            comp_class = component_classes[element.attrib['definition']]
+            comp_type = comp_class.type
+        else:
+            comp_type = element.attrib.get('type', None)
+        properties_element = element.find(BIO_NINEML + 'properties')
+        if properties_element is not None:
+            param_elements = properties_element.findall(BIO_NINEML+Parameter.element_name)
+        else:
+            param_elements = element.findall(BIO_NINEML+Parameter.element_name)
+        for child in param_elements:
+            parameter = Parameter.from_xml(child)
+            parameters[parameter.name] = parameter
+        return cls(element.attrib.get('name', None), parameters, comp_type)
 
 
 class Parameter(object):
