@@ -44,9 +44,9 @@ class ComponentClass(object):
     def __repr__(self):
         return ("Biophysical cell class '{}' with parameters: '{}'"
                 .format(self.name, "', '".join([p.name for p in self.parameters])))
-        
+
     def check_consistency(self):
-        pass # Not implemented yet
+        pass  # Not implemented yet
 
     def to_xml(self):
         return E(self.element_name,
@@ -65,12 +65,12 @@ class ComponentClass(object):
                 parameters.append(Parameter.from_xml(child))
             elif child.tag == BIO_CELL_NINEML + Mapping.element_name:
                 mappings.append(Mapping.from_xml(child))
-            elif child.tag == (nineml.extensions.morphology.MORPH_NINEML + 
+            elif child.tag == (nineml.extensions.morphology.MORPH_NINEML +
                                nineml.extensions.morphology.Morphology.element_name):
                 morphology = nineml.extensions.morphology.Morphology.from_xml(child)
-            elif child.tag == (nineml.extensions.biophysics.BIO_NINEML + 
+            elif child.tag == (nineml.extensions.biophysics.BIO_NINEML +
                                nineml.extensions.biophysics.BiophysicsModel.element_name):
-                biophysics = nineml.extensions.biophysics.BiophysicsModel.from_xml(child)                
+                biophysics = nineml.extensions.biophysics.BiophysicsModel.from_xml(child)
             elif child.tag == etree.Comment:
                 pass
             else:
@@ -83,116 +83,44 @@ class Parameter(object):
 
     element_name = 'Parameter'
 
+    component_name = 'Component'
+    reference_name = 'Reference'
+
+    def __init__(self, name, component, reference, segments):
+        self.name = name
+        self.component = component
+        self.reference = reference
+        self.segments = segments
+
+    def __repr__(self):
+        return ("{} parameter '{}' over {} segment divisions"
+                .format(self.type_name, self.reference, len(self.segment_classes)))
+
+    def to_xml(self):
+        return E(self.element_name,
+                 E(self.component_name, self.component),
+                 E(self.reference_name, self.reference),
+                 self.segments.to_xml(),
+                 name=self.name)
+
     @classmethod
     def from_xml(cls, element):
         assert element.tag == BIO_CELL_NINEML + cls.element_name
-        param_type = element.attrib['type']
-        if param_type == IonicDynamicsParameter.type_name:
-            obj = IonicDynamicsParameter.from_xml(element)
-        elif param_type == GeometryParameter.type_name:
-            obj = GeometryParameter.from_xml(element)
-        elif param_type == InitialStateParameter.type_name:
-            obj = InitialStateParameter.from_xml(element)
-        else:
-            raise Exception("Did not find recognisable '{}', '{}' or '{}'"
-                            .format(IonicDynamicsParameter.type_name,
-                                    GeometryParameter.type_name,
-                                    InitialStateParameter.type_name))
-        return obj
-
-
-class IonicDynamicsParameter(Parameter):
-
-    type_name = 'dynamics'
-    mapping_tag_name = 'Mapping'
-    component_tag_name = 'Component'
-    name_tag_name = 'Name'
-    
-    def __init__(self, name, mapping, component, param_name):
-        self.name = name
-        self.mapping = mapping
-        self.component = component
-        self.param_name = param_name
-
-    def __repr__(self):
-        return ("Dynamics parameter {}->{} over mapping '{}'"
-                .format(self.component, self.param_name, self.mapping))
-
-    def to_xml(self):
-        return E(self.element_name, 
-                 E(self.mapping_tag_name, self.mapping),
-                 E(self.component_tag_name, self.component),
-                 E(self.name_tag_name, self.param_name),
-                 name=self.name,
-                 type=self.type_name)
-
-    @classmethod
-    def from_xml(cls, element):
-        assert element.attrib['type'] == 'dynamics'
         name = element.attrib['name']
-        mapping = element.find(BIO_CELL_NINEML + cls.mapping_tag_name).text.strip()
-        component = element.find(BIO_CELL_NINEML + cls.component_tag_name).text.strip()
-        param_name = element.find(BIO_CELL_NINEML + cls.name_tag_name).text.strip()
-        return cls(name, mapping, component, param_name)
-
-
-class InBuiltParameterType(Parameter):
-    
-    param_name_name = 'Name'
-    division_name = 'Division'
-    classification_attr_name = 'classification'
-    
-    def __init__(self, name, param_name, classification, segment_divisions):
-        self.name = name
-        self.param_name = param_name
-        self.segment_divisions = segment_divisions
-        self.classification = classification
-    
-    def __repr__(self):
-        return ("{} parameter '{}' over {} segment divisions"
-                .format(self.type_name, self.param_name, len(self.segment_divisions)))
-    
-    def to_xml(self):
-        return E(self.element_name, 
-                 E(self.param_name_name, self.param_name),
-                 name=self.name,
-                 type=self.type_name,
-                 *[E(self.division_name, d) for d in self.segment_divisions],
-                 **{self.classification_attr_name:self.classification})
-
-    @classmethod
-    def from_xml(cls, element):
-        assert element.attrib['type'] == cls.type_name
-        name = element.attrib['name']
-        classification = element.attrib[cls.classification_attr_name]
-        param_name = element.find(BIO_CELL_NINEML + cls.param_name_name).text.strip()
-        segment_divisions = [d.text.strip() 
-                             for d in element.findall(BIO_CELL_NINEML + cls.division_name)]
-        return cls(name, param_name, classification, segment_divisions)
-
-
-class GeometryParameter(InBuiltParameterType):
-
-    type_name = 'geometry'
-
-
-class InitialStateParameter(InBuiltParameterType):
-    
-    type_name = 'initialState'
+        component = element.find(BIO_CELL_NINEML + cls.component_name).text.strip()
+        reference = element.find(BIO_CELL_NINEML + cls.reference_name).text.strip()
+        segments = Segments.from_xml(element.find(BIO_CELL_NINEML + Segments.element_name))
+        return cls(name, component, reference, segments)
 
 
 class Mapping(object):
 
     element_name = 'Mapping'
-    component_tag_name = 'Component'
-    division_tag_name = 'Division'
-    classification_attr_name = 'classification'
 
-    def __init__(self, name, components, classification, segment_divisions):
+    def __init__(self, name, components, segments):
         self.name = name
         self.components = components
-        self.segment_divisions = segment_divisions
-        self.classification = classification
+        self.segments = segments
 
     def __repr__(self):
         return ("'{}' mapping with biophysics(s): '{}'"
@@ -200,23 +128,53 @@ class Mapping(object):
 
     def to_xml(self):
         return E(self.element_name,
-                 name=self.name,
-                 *chain([E(self.component_tag_name, c) for c in self.components],
-                        [E(self.division_tag_name, d) for d in self.segment_divisions]),
-                 **{self.classification_attr_name:self.classification})
+                 self.components.to_xml(),
+                 self.segments.to_xml(),
+                 name=self.name)
+
+    @classmethod
+    def from_xml(cls, element):
+        assert element.tag == BIO_CELL_NINEML + cls.element_name
+        components = BiophysicsList.from_xml(element.find(BIO_CELL_NINEML + 
+                                                          BiophysicsList.element_name))
+        segments = Segments.from_xml(element.find(BIO_CELL_NINEML + Segments.element_name))
+        return cls(element.attrib['name'], components, segments)
+
+
+class Segments(list):
+
+    element_name = 'Segments'
+    classification_attr_name = 'classification'
+    segment_class_name = "Class"
+
+    def __init__(self, classification, segments):
+        self.classification = classification
+        self.extend(segments)
+
+    def to_xml(self):
+        return E(self.element_name, *self)
 
     @classmethod
     def from_xml(cls, element):
         assert element.tag == BIO_CELL_NINEML + cls.element_name
         classification = element.attrib[cls.classification_attr_name]
-        components = []
-        divisions = []
-        for child in element.getchildren():
-            if child.tag == BIO_CELL_NINEML+cls.component_tag_name:
-                components.append(child.text.strip())
-            elif child.tag == BIO_CELL_NINEML+cls.division_tag_name:
-                divisions.append(child.text.strip())
-            else:
-                raise Exception("Unrecognised child element '<{}>' found in <{}> element"
-                                .format(child.tag, element.tag))
-        return cls(element.attrib['name'], components, classification, divisions)
+        segments = [c.text.strip() for c in element.findall(BIO_CELL_NINEML + cls.segment_class_name)]
+        return cls(classification, segments)
+
+
+class BiophysicsList(list):
+
+    element_name = "Biophysics"
+    component_name = "Component"
+
+    def __init__(self, components):
+        self.extend(components)
+
+    def to_xml(self):
+        return E(self.element_name, *self)
+
+    @classmethod
+    def from_xml(cls, element):
+        assert element.tag == BIO_CELL_NINEML + cls.element_name
+        components = [c.text.strip() for c in element.findall(BIO_CELL_NINEML + cls.component_name)]
+        return cls(components)
