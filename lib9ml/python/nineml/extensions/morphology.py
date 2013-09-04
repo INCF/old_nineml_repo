@@ -163,7 +163,7 @@ class ParentSegment(object):
     @classmethod
     def from_xml(cls, element):
         assert element.tag == MORPH_NINEML + cls.element_name
-        return cls(element.attrib['segment'], element.attrib.get('fractionAlong', None))
+        return cls(element.attrib['segment'], float(element.attrib.get('fractionAlong', 1.0)))
 
 
 class Classification(object):
@@ -223,6 +223,9 @@ class Member(object):
 
     def __init__(self, segment_name):
         self.segment_name = segment_name
+        
+    def __str__(self):
+        return self.segment_name
 
     def __repr__(self):
         return "segment: {}".format(self.segment_name)
