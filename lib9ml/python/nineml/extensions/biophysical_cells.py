@@ -93,8 +93,8 @@ class Parameter(object):
         self.segments = segments
 
     def __repr__(self):
-        return ("{} parameter '{}' over {} segment divisions"
-                .format(self.type_name, self.reference, len(self.segment_classes)))
+        return ("Parameter '{}', referencing '{}' in component '{}' over {} segment classes"
+                .format(self.name, self.reference, self.component, len(self.segments)))
 
     def to_xml(self):
         return E(self.element_name,
@@ -123,8 +123,9 @@ class Mapping(object):
         self.segments = segments
 
     def __repr__(self):
-        return ("'{}' mapping with biophysics(s): '{}'"
-                .format(self.name, "', '".join([d.name for d in self.biophysicss])))
+        return ("Mapping components '{}' to segment classes '{}'"
+                .format("', '".join([d.name for d in self.components]), 
+                        "', '".join([d.name for d in self.segments])))
 
     def to_xml(self):
         return E(self.element_name,
