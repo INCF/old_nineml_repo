@@ -173,10 +173,13 @@ class Classification(object):
     def __init__(self, name, classes):
         self.name = name
         self.classes = classes
+        
+    def __getitem__(self, key):
+        return self.classes[key]
 
     def __repr__(self):
         return ("'{}' classification with division(s): '{}'"
-                .format(self.name, "', '".join([d.name for d in self.classes])))
+                .format(self.name, "', '".join([k for k in self.classes.keys()])))
 
     def to_xml(self):
         return E(self.element_name,
@@ -186,9 +189,10 @@ class Classification(object):
     @classmethod
     def from_xml(cls, element):
         assert element.tag == MORPH_NINEML + cls.element_name
-        classes = []
+        classes = {}
         for child in element.getchildren():
-            classes.append(SegmentClass.from_xml(child))
+            seg_class = SegmentClass.from_xml(child)
+            classes[seg_class.name] = seg_class
         return cls(element.attrib['name'], classes)
 
 
