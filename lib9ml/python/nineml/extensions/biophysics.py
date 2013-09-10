@@ -120,6 +120,16 @@ class Component(object):
             comp_type = comp_class.type
         else:
             comp_type = element.attrib.get('type', None)
+        name = element.attrib.get('name', None)
+        if name in ('__GLOBALS_COMPONENT__', '__CAPACITANCE__', '__GEOMETRY__'):
+            raise Exception("name '{}' clashes with internal component name, please select another"
+                            .format(name))
+        if comp_type == 'defaults' or comp_type == 'globals':
+            name = '__GLOBALS_COMPONENT__'
+        elif comp_type == 'membrane-capcitance':
+            name = '__CAPACITANCE__'
+        elif comp_type == 'geometry':
+            name = '__GEOMETRY__'
         properties_element = element.find(BIO_NINEML + 'properties')
         if properties_element is not None:
             param_elements = properties_element.findall(BIO_NINEML+Parameter.element_name)
@@ -128,7 +138,7 @@ class Component(object):
         for child in param_elements:
             parameter = Parameter.from_xml(child)
             parameters[parameter.name] = parameter
-        return cls(element.attrib.get('name', None), parameters, comp_type)
+        return cls(name, parameters, comp_type)
 
 
 class Parameter(object):
@@ -156,6 +166,11 @@ class Parameter(object):
     def from_xml(cls, element):
         assert element.tag == BIO_NINEML + cls.element_name
         value = element.find(BIO_NINEML + 'value').text
+        if value.startswith('('):
+            value = value[1:]
+        if value.endswith(')'):
+            value = value[:-1]
+        value = float(value)
         unit_elem = element.find(BIO_NINEML + 'unit')
         if unit_elem is not None:
             unit = unit_elem.text
