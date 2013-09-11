@@ -5,7 +5,6 @@
 """
 
 import urllib
-from itertools import chain
 from lxml import etree
 from lxml.builder import E
 
@@ -121,11 +120,11 @@ class Component(object):
         else:
             comp_type = element.attrib.get('type', None)
         name = element.attrib.get('name', None)
-        if name in ('__GLOBALS_COMPONENT__', '__CAPACITANCE__', '__GEOMETRY__'):
+        if name in ('__GLOBALS__', '__CAPACITANCE__', '__GEOMETRY__'):
             raise Exception("name '{}' clashes with internal component name, please select another"
                             .format(name))
         if comp_type == 'defaults' or comp_type == 'globals':
-            name = '__GLOBALS_COMPONENT__'
+            name = '__GLOBALS__'
         elif comp_type == 'membrane-capcitance':
             name = '__CAPACITANCE__'
         elif comp_type == 'geometry':
@@ -151,7 +150,8 @@ class Parameter(object):
         self.unit = unit
 
     def __repr__(self):
-        return ("Parameter '{}' = {} {}".format(self.name, self.value, self.unit))
+        return ("Parameter '{}' = {} ({})".format(self.name, self.value, 
+                                                  self.unit if self.unit else 'dimensionless'))
 
     def to_xml(self):
         opt_args = []
