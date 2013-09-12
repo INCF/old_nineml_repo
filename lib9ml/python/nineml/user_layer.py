@@ -575,6 +575,7 @@ class Parameter(object):
             func_element = element.find(NINEML+AnonymousFunction.element_name)
             struct_element = element.find(NINEML+StructureExpression.element_name)
             ref_element = element.find(NINEML+Reference.element_name)
+            seq_element = element.find(NINEML+Sequence.element_name)
             if rd_element is not None:
                 value = RandomDistribution.from_xml(rd_element, components, base_url)
             elif func_element is not None:
@@ -583,6 +584,8 @@ class Parameter(object):
                 value = get_or_create_component(struct_element, StructureExpression, components, base_url)
             elif ref_element is not None:
                 value = Reference.from_xml(ref_element, components, base_url)
+            elif seq_element is not None:
+                value = Sequence.from_xml(seq_element, components, base_url)
             else:
                 raise UnrecognisedChildrenTagError("Did not recognise '{}' tag when used inside a "
                                                    "'{}' tag".format(element.getchildren()[0].tag,
@@ -651,6 +654,31 @@ class ParameterSet(dict):
             parameters.append(Parameter.from_xml(parameter_element, components, base_url))
         return cls(*parameters)
      
+     
+class Sequence(list):
+    
+    element_name = 'sequence'
+    sequence_element_name = 'e'
+    
+    def __init__(self, sequence):
+        self.extend(sequence)
+        
+    def __repr__(self):
+        return ("Sequence of length {}: [{}{}]".format(len(self), ', '.join(self[:10]),
+                                                       '..., ' + self[-1] if len(self) > 10 else '')) 
+    
+    def to_xml(self):
+        return E(self.element_name,
+                 *[E(self.sequence_element_name, e) for e in self])
+        
+    @classmethod
+    def from_xml(cls, element, components, base_url): #@UnusedVariable
+        assert element.tag == NINEML+cls.element_name
+        sequence = []
+        for e in element.findall(NINEML+cls.sequence_element_name):
+            sequence.append(float(e.text))
+        return Sequence(sequence)
+        
 
 class Reference(object):
     """
