@@ -86,11 +86,12 @@ class Parameter(object):
     component_name = 'Component'
     reference_name = 'Reference'
 
-    def __init__(self, name, component, reference, segments):
+    def __init__(self, name, component, reference, segments, param_type):
         self.name = name
         self.component = component
         self.reference = reference
         self.segments = segments
+        self.type = param_type
 
     def __repr__(self):
         return ("Parameter '{}', referencing '{}' in component '{}' over {} segment classes"
@@ -100,22 +101,27 @@ class Parameter(object):
         optional_tags = []
         if self.component is not None:
             optional_tags.append(E(self.component_name, self.component))
+        optional_kwargs = {}
+        if self.type is not None:
+            optional_kwargs['type'] = self.type
         return E(self.element_name,
                  E(self.reference_name, self.reference),
                  self.segments.to_xml(),
                  name=self.name,
-                 *optional_tags)
+                 *optional_tags,
+                 **optional_kwargs)
 
     @classmethod
     def from_xml(cls, element):
         assert element.tag == BIO_CELL_NINEML + cls.element_name
         name = element.attrib['name']
+        param_type = element.attrib.get('type', None)
         component_tag = element.find(BIO_CELL_NINEML + cls.component_name)
         if component_tag is not None:
             component = component_tag.text.strip()
         reference = element.find(BIO_CELL_NINEML + cls.reference_name).text.strip()
         segments = Segments.from_xml(element.find(BIO_CELL_NINEML + Segments.element_name))
-        return cls(name, component, reference, segments)
+        return cls(name, component, reference, segments, param_type)
 
 
 class Mapping(object):
