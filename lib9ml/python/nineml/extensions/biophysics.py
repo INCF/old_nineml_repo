@@ -121,8 +121,8 @@ class Component(object):
             comp_type = element.attrib.get('type', None)
         name = element.attrib.get('name', None)
         if name in ('__GLOBALS__', '__CAPACITANCE__', '__GEOMETRY__'):
-            raise Exception("name '{}' clashes with internal component name, please select another"
-                            .format(name))
+            raise Exception("Component name '{}' clashes with internal component name, please "
+                            "select another".format(name))
         if comp_type == 'defaults' or comp_type == 'globals':
             name = '__GLOBALS__'
         elif comp_type == 'membrane-capcitance':
