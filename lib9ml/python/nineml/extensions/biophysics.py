@@ -120,15 +120,11 @@ class Component(object):
         else:
             comp_type = element.attrib.get('type', None)
         name = element.attrib.get('name', None)
-        if name in ('__GLOBALS__', '__CAPACITANCE__', '__GEOMETRY__'):
-            raise Exception("Component name '{}' clashes with internal component name, please "
+        if comp_type == 'defaults' or comp_type == 'globals' or 'membrane-capacitance' or 'geometry':
+            name = '__NO_COMPONENT__'
+        elif name == '__NO_COMPONENT__':
+            raise Exception("Component name '{}' clashes with an internal variable name, please "
                             "select another".format(name))
-        if comp_type == 'defaults' or comp_type == 'globals':
-            name = '__GLOBALS__'
-        elif comp_type == 'membrane-capcitance':
-            name = '__CAPACITANCE__'
-        elif comp_type == 'geometry':
-            name = '__GEOMETRY__'
         properties_element = element.find(BIO_NINEML + 'properties')
         if properties_element is not None:
             param_elements = properties_element.findall(BIO_NINEML+Parameter.element_name)
