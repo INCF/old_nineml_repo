@@ -97,17 +97,22 @@ class Parameter(object):
                 .format(self.name, self.reference, self.component, len(self.segments)))
 
     def to_xml(self):
+        optional_tags = []
+        if self.component is not None:
+            optional_tags.append(E(self.component_name, self.component))
         return E(self.element_name,
-                 E(self.component_name, self.component),
                  E(self.reference_name, self.reference),
                  self.segments.to_xml(),
-                 name=self.name)
+                 name=self.name,
+                 *optional_tags)
 
     @classmethod
     def from_xml(cls, element):
         assert element.tag == BIO_CELL_NINEML + cls.element_name
         name = element.attrib['name']
-        component = element.find(BIO_CELL_NINEML + cls.component_name).text.strip()
+        component_tag = element.find(BIO_CELL_NINEML + cls.component_name)
+        if component_tag is not None:
+            component = component_tag.text.strip()
         reference = element.find(BIO_CELL_NINEML + cls.reference_name).text.strip()
         segments = Segments.from_xml(element.find(BIO_CELL_NINEML + Segments.element_name))
         return cls(name, component, reference, segments)
