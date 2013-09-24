@@ -61,7 +61,10 @@ class BiophysicsModel(object):
             component_classes[component_class.name] = component_class
         for comp_elem in element.findall(BIO_NINEML + Component.element_name):
             component = Component.from_xml(comp_elem, component_classes)
-            components[component.name] = component
+            if component.name == '__NO_COMPONENT__' and components.has_key('__NO_COMPONENT__'):
+                components['__NO_COMPONENT__'].parameters.update(component.parameters)
+            else:
+                components[component.name] = component
         build_hints = BuildHints.from_xml(element.find(BIO_NINEML + BuildHints.element_name))
         return cls(element.attrib['name'], components, component_classes, build_hints)
 
@@ -120,13 +123,13 @@ class Component(object):
         else:
             comp_type = element.attrib.get('type', None)
         name = element.attrib.get('name', None)
-        if comp_type == 'defaults' or comp_type == 'globals' or 'membrane-capacitance' or 'geometry':
+        if comp_type in ('defaults', 'globals', 'membrane-capacitance', 'geometry'):
             name = '__NO_COMPONENT__'
         elif name == '__NO_COMPONENT__':
             raise Exception("Component name '{}' clashes with an internal variable name, please "
                             "select another".format(name))
         properties_element = element.find(BIO_NINEML + 'properties')
-        if properties_element is not None:
+        if properties_element is not None: #FIXME This is a temporary hack until all cases are standardised between either being enclosed in a properties tag or not.
             param_elements = properties_element.findall(BIO_NINEML+Parameter.element_name)
         else:
             param_elements = element.findall(BIO_NINEML+Parameter.element_name)

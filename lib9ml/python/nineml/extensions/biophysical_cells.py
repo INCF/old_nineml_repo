@@ -116,9 +116,9 @@ class Parameter(object):
         assert element.tag == BIO_CELL_NINEML + cls.element_name
         name = element.attrib['name']
         param_type = element.attrib.get('type', None)
-        component_tag = element.find(BIO_CELL_NINEML + cls.component_name)
-        if component_tag is not None:
-            component = component_tag.text.strip()
+        component = element.find(BIO_CELL_NINEML + cls.component_name)
+        if component is not None:
+            component = component.text.strip()
         reference = element.find(BIO_CELL_NINEML + cls.reference_name).text.strip()
         segments = Segments.from_xml(element.find(BIO_CELL_NINEML + Segments.element_name))
         return cls(name, component, reference, segments, param_type)
