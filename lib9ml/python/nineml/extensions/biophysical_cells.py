@@ -135,8 +135,8 @@ class Mapping(object):
 
     def __repr__(self):
         return ("Mapping components '{}' to segment classes '{}'"
-                .format("', '".join([d.name for d in self.components]), 
-                        "', '".join([d.name for d in self.segments])))
+                .format("', '".join(self.components), 
+                        "', '".join(self.segments)))
 
     def to_xml(self):
         return E(self.element_name,
