@@ -2,8 +2,8 @@
 <nineml xmlns="http://nineml.org/9ML/0.1">
     <ComponentClassStub name="PositionBasedProbabilityConnector" >
         <Parameter name="probabilityExpression" />
-        <Parameter name="sourceBranch" />
-        <Parameter name="targetBranch" />
+        <Parameter name="sourceStructure" />
+        <Parameter name="targetStructure" />
         <Parameter name="allowSelfConnections" />
     </ComponentClassStub>
 </nineml>
