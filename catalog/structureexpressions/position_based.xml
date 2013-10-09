@@ -2,7 +2,7 @@
 <nineml xmlns="http://nineml.org/9ML/0.1">
   <ComponentClassStub name="PositionBasedExpression">
     <Parameter name="expression"/>
-    <Parameter name="sourceBranch"/>
-    <Parameter name="targetBranch"/>
+    <Parameter name="sourceStructure"/>
+    <Parameter name="targetStructure"/>
   </ComponentClassStub>
 </nineml>
