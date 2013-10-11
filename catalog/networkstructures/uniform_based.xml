@@ -1,11 +1,10 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <nineml xmlns="http://nineml.org/9ML/0.1">
-  <BaseComponentClass name="UniformWithinBox">
-    <Parameter name="x0"/>
-    <Parameter name="y0"/>
-    <Parameter name="z0"/>
+  <BaseComponentClass name="Uniform">
+    <Parameter name="number" />
     <Parameter name="x"/>
     <Parameter name="y"/>
     <Parameter name="z"/>
+    <Parameter name="rejectCondition"/>
   </BaseComponentClass>
 </nineml>
