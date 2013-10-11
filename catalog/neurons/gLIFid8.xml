@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <nineml xmlns="http://nineml.org/9ML/0.1">
-  <ComponentClassStub name="gLIFid8">
+  <BaseComponentClass name="gLIFid8">
     <Parameter name="Vth"/>
     <Parameter name="Vrest"/>
     <Parameter name="Cm"/>
@@ -23,5 +23,5 @@
       </assignment>
       <event-port symbol="spike_output" mode="send"/>
     </transition>
-  </ComponentClassStub>
+  </BaseComponentClass>
 </nineml>

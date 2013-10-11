@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <nineml xmlns="http://nineml.org/9ML/0.1">
-  <ComponentClassStub name="Izhikevich">
+  <BaseComponentClass name="Izhikevich">
     <Parameter name="V"/>
     <Parameter name="U"/>
     <Parameter name="t"/>
@@ -34,5 +34,5 @@
     </union>
     <transition to="post_spike_regime" from="subthreshold_regime" name="spike_transition" condition="spike"/>
     <transition to="subthreshold_regime" from="post_spike_regime" name="return_transition" condition="true"/>
-  </ComponentClassStub>
+  </BaseComponentClass>
 </nineml>

@@ -1,8 +1,8 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <nineml xmlns="http://nineml.org/9ML/0.1">
-  <ComponentClassStub name="PositionBasedExpression">
+  <BaseComponentClass name="PositionBasedExpression">
     <Parameter name="expression"/>
     <Parameter name="sourceStructure"/>
     <Parameter name="targetStructure"/>
-  </ComponentClassStub>
+  </BaseComponentClass>
 </nineml>

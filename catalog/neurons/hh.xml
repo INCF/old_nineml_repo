@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <nineml xmlns="http://nineml.org/9ML/0.1">
-  <ComponentClassStub name="Hodgkin-Huxley">
+  <BaseComponentClass name="Hodgkin-Huxley">
     <sequence name="hh_regime">
       <union name="current_calculation">
         <sequence name="Regime10">
@@ -96,5 +96,5 @@
       </assignment>
     </sequence>
     <transition to="hh_regime" from="hh_regime" name="spike_emitted" condition="spike"/>
-  </ComponentClassStub>
+  </BaseComponentClass>
 </nineml>

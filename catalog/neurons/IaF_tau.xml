@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <nineml xmlns="http://nineml.org/9ML/0.1">
-  <ComponentClassStub name="Integrate-and-fire neuron parameterized by membrane time constant">
+  <BaseComponentClass name="Integrate-and-fire neuron parameterized by membrane time constant">
     <Parameter name="membranePotential"/>
     <Parameter name="membraneCapacitance"/>
     <Parameter name="membraneTimeConstant"/>
@@ -8,5 +8,5 @@
     <Parameter name="threshold"/>
     <Parameter name="restingPotential"/>
     <Parameter name="resetPotential"/>
-  </ComponentClassStub>
+  </BaseComponentClass>
 </nineml>

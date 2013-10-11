@@ -4,7 +4,7 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://nineml.org/9ML/0.2 NineML_v0.2.xsd">
 
-  <ComponentClassStub xmlns="CoMoDL" name="izhikevichCell">
+  <BaseComponentClass xmlns="CoMoDL" name="izhikevichCell">
 
     <Parameter name="a" dimension='none'/>
     <Parameter name="c" dimension='none'/>
@@ -58,5 +58,5 @@
         </Regime>
     </Dynamics>
 
-  </ComponentClassStub>
+  </BaseComponentClass>
 </NineML>

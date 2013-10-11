@@ -585,9 +585,9 @@ class ComponentClass( ComponentClassMixinFlatStructure,
             trans.set_target_regime( regime_map[trans.target_regime_name] )
 
 
-class ComponentClassStub( ComponentClassMixinFlatStructure, 
+class BaseComponentClass( ComponentClassMixinFlatStructure, 
                       ComponentClassMixinNamespaceStructure ):
-    """A ComponentClassStub object represents a *component* in NineML. 
+    """A BaseComponentClass object represents a *component* in NineML. 
 
       .. todo::
     
@@ -597,7 +597,7 @@ class ComponentClassStub( ComponentClassMixinFlatStructure,
     
 
     def __init__(self, name, parameters=None):
-        """Constructs a ComponentClassStub
+        """Constructs a BaseComponentClass
         
         :param name: The name of the component.
         :param parameters: A list containing either |Parameter| objects 

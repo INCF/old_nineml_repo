@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <nineml xmlns="http://nineml.org/9ML/0.1">
-  <ComponentClassStub name="LPNid8">
+  <BaseComponentClass name="LPNid8">
     <Parameter name="W"/>
     <Parameter name="N"/>
     <analog-port symbol="pfire" mode="send"/>
@@ -22,5 +22,5 @@
       <event-port symbol="spike_output" mode="send"/>
     </transition>
     <transition to="inter_event_regime" from="firing_regime" name="Transition2" condition="pfire &lt; p"/>
-  </ComponentClassStub>
+  </BaseComponentClass>
 </nineml>

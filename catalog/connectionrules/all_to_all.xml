@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <nineml xmlns="http://nineml.org/9ML/0.1">
-    <ComponentClassStub name="AllToAllConnector">
+    <BaseComponentClass name="AllToAllConnector">
         <Parameter name="allowSelfConnections"/>
-    </ComponentClassStub>
+    </BaseComponentClass>
 </nineml>

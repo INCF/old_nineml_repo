@@ -11,7 +11,7 @@ class ComponentValidatorTypes(ActionVisitor):
 
     def action_componentclass(self, component):
         assert (isinstance( component, nineml.al.ComponentClass ) or 
-                isinstance(component, nineml.al.ComponentClassStub))
+                isinstance(component, nineml.al.BaseComponentClass))
         
     def action_dynamics(self, dynamics):
         assert isinstance( dynamics, nineml.al.Dynamics )

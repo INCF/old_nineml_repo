@@ -27,7 +27,7 @@ class XMLLoader(object):
         for comp_block in xmlroot:
             if comp_block.tag == nineml.al.NINEML + "ComponentClass":
                 component = self.load_componentclass( comp_block )
-            elif comp_block.tag == nineml.al.NINEML + "ComponentClassStub":
+            elif comp_block.tag == nineml.al.NINEML + "BaseComponentClass":
                 component = self.load_componentclassstub( comp_block )
             else:
                 component = nineml.extensions.load_componentclass(comp_block)
@@ -67,7 +67,7 @@ class XMLLoader(object):
     def load_componentclassstub(self, element):
         blocks = ('Parameter',) 
         subnodes = self.loadBlocks( element, blocks=blocks)
-        return nineml.al.ComponentClassStub(name=element.get('name'),
+        return nineml.al.BaseComponentClass(name=element.get('name'),
                                             parameters=subnodes["Parameter" ])
        
     def load_parameter(self, element):
