@@ -5,7 +5,7 @@
     <AnalogPort mode="send" name="I"/>
     <EventPort mode="recv" name="spikeinput"/>
     <Parameter dimension="" name="tau"/> 
-    <Parameter dimension="" name="q"/>
+    <Parameter dimension="" name="q"/> 
     <Parameter dimension="" name="vrev"/>
     <Dynamics>
       <Regime name="cobadefaultregime">

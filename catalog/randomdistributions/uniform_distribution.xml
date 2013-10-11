@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <nineml xmlns="http://nineml.org/9ML/0.1">
-  <ComponentClassStub name="UniformDistribution">
+  <BaseComponentClass name="UniformDistribution">
     <Parameter name="low"/>
     <Parameter name="high"/>
-  </ComponentClassStub>
+  </BaseComponentClass>
 </nineml>

@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <nineml xmlns="http://nineml.org/9ML/0.1">
-  <ComponentClassStub name="PerturbedGrid2D">
+  <BaseComponentClass name="PerturbedGrid2D">
     <Parameter name="fillOrder"/>
     <Parameter name="aspectRatioXY"/>
     <Parameter name="dx"/>
@@ -11,5 +11,5 @@
     <Parameter name="xPerturbation"/>
     <Parameter name="yPerturbation"/>
     <Parameter name="zPerturbation"/>
-  </ComponentClassStub>
+  </BaseComponentClass>
 </nineml>

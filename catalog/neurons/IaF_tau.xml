@@ -9,4 +9,4 @@
     <Parameter name="restingPotential"/>
     <Parameter name="resetPotential"/>
   </ComponentClass>
-</NineML>
+</NineML> 

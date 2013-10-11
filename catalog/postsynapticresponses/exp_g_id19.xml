@@ -5,7 +5,7 @@
     <Parameter name="tau"/>
     <Parameter name="E"/>
     <Parameter name="W"/>
-    <AnalogSendPort name="t"/> 
+    <AnalogSendPort name="t"/>
     <AnalogSendPort symbol="Isyn"/>
     <AnalogReceivePort name="V"/>
     <AnalogSendPort name="g"/>

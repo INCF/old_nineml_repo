@@ -5,7 +5,7 @@
     <Parameter name="U"/>
     <Parameter name="t"/>
     <Parameter name="spike"/>
-    <Parameter name="Isyn"/>
+    <Parameter name="Isyn"/> 
     <Parameter name="a"/>
     <Parameter name="b"/>
     <Parameter name="c"/>
