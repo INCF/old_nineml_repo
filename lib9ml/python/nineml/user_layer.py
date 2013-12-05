@@ -262,7 +262,7 @@ class BaseComponent(object):
     """
     element_name = "node"
 
-    def __init__(self, name, definition=None, parameters={}, reference=None):
+    def __init__(self, name, definition=None, parameters={}, reference=None, base_url=None):
         """
         Create a new component with the given name, definition and parameters,
         or create a reference to another component that will be resolved later.
@@ -279,7 +279,7 @@ class BaseComponent(object):
             self.definition = definition
             assert reference is None, "Cannot give both definition and reference."
         elif isinstance(definition, basestring): # should also check is a valid uri
-            self.definition = Definition(definition)
+            self.definition = Definition(definition, base_url)
             assert reference is None, "Cannot give both definition and reference."
         elif definition is None:
             assert reference is not None, "Either definition or reference must be given."

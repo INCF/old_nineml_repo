@@ -8,9 +8,9 @@ import nineml.extensions.biophysics
 biophysical_cells_namespace = 'http://www.nineml.org/BiophysicalCells'
 BIO_CELL_NINEML = "{%s}" % biophysical_cells_namespace
 
-def parse(url):
+def read_elements(url):
     """
-    Read a NineML user-layer file and return a Model object.
+    Read a NineML user-layer file and return a xml element object.
 
     If the URL does not have a scheme identifier, it is taken to refer to a
     local file.
@@ -22,8 +22,17 @@ def parse(url):
     else:
         doc = etree.parse(url)
     root = doc.getroot()
+    return root.findall(BIO_CELL_NINEML + ComponentClass.element_name)
+
+def parse(url):
+    """
+    Read a NineML user-layer file and return a Model object.
+
+    If the URL does not have a scheme identifier, it is taken to refer to a
+    local file.
+    """
     comp_classes = {}
-    for element in root.findall(BIO_CELL_NINEML + ComponentClass.element_name):
+    for element in read_elements(url):
         comp_class = ComponentClass.from_xml(element, url)
         comp_classes[comp_class.name] = comp_class
     return comp_classes
@@ -40,6 +49,7 @@ class ComponentClass(object):
         self.morphology = morphology
         self.biophysics = biophysics
         self.url = url
+        self._check_parameters()
 
     def __repr__(self):
         return ("Biophysical cell class '{}' with parameters: '{}'"
@@ -56,7 +66,7 @@ class ComponentClass(object):
                  *[c.to_xml() for c in chain(self.parameters.values(), self.mappings.values())])
 
     @classmethod
-    def from_xml(cls, element):
+    def from_xml(cls, element, url=None):
         assert element.tag == BIO_CELL_NINEML + cls.element_name
         parameters = []
         mappings = []
@@ -76,8 +86,29 @@ class ComponentClass(object):
             else:
                 raise Exception("<{}> elements may not contain <{}> elements"
                                 .format(cls.element_name, child.tag))
-        return cls(element.attrib['name'], parameters, mappings, morphology, biophysics)
+        return cls(element.attrib['name'], parameters, mappings, morphology, biophysics, url=url)
 
+
+    def _check_parameters(self):
+        for p in self.parameters:
+            if p.reference == 'Diameter':
+                for seg_class in p.segments:
+                    for member in self.morphology.classifications[p.segments.classification][seg_class]:
+                        seg = self.morphology.segments[member.segment_name]
+                        if p.default_value is None:
+                            p.default_value = seg.distal.diameter
+                            p.unit = 'um'
+                        elif p.default_value != seg.diam or p.unit != seg.unit:
+                            raise Exception("Inconsistent values in diameter across morphology")
+            elif p.reference == 'Voltage':
+                p.default_value = -65.0
+                p.unit = 'V'                 
+            else:
+                complete_param = self.biophysics.components[p.component].parameters[p.reference]
+                p.default_value = complete_param.value
+                p.unit = complete_param.unit
+            
+            
 
 class Parameter(object):
 
@@ -92,6 +123,8 @@ class Parameter(object):
         self.reference = reference
         self.segments = segments
         self.type = param_type
+        self.default_value = None
+        self.unit = None
 
     def __repr__(self):
         return ("Parameter '{}', referencing '{}' in component '{}' over {} segment classes"
@@ -190,3 +223,4 @@ class BiophysicsList(list):
         assert element.tag == BIO_CELL_NINEML + cls.element_name
         components = [c.text.strip() for c in element.findall(BIO_CELL_NINEML + cls.component_name)]
         return cls(components)
+    

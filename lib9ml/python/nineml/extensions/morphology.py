@@ -196,13 +196,13 @@ class Classification(object):
         return cls(element.attrib['name'], classes)
 
 
-class SegmentClass(object):
+class SegmentClass(list):
 
     element_name = 'class'
 
     def __init__(self, name, members):
         self.name = name
-        self.members = members
+        self.extend(members)
 
     def __repr__(self):
         return "'{}' segment class with {} member(s)".format(self.name, len(self.members))
