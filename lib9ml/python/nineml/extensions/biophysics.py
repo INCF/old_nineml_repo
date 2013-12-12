@@ -65,7 +65,11 @@ class BiophysicsModel(object):
                 components['__NO_COMPONENT__'].parameters.update(component.parameters)
             else:
                 components[component.name] = component
-        build_hints = BuildHints.from_xml(element.find(BIO_NINEML + BuildHints.element_name))
+        build_hints_elem = element.find(BIO_NINEML + BuildHints.element_name)
+        if build_hints_elem is not None:
+            build_hints = BuildHints.from_xml(build_hints_elem)
+        else:
+            raise Exception("Did not find required build hints tag in biophysics block")
         return cls(element.attrib['name'], components, component_classes, build_hints)
 
 
