@@ -677,8 +677,7 @@ class Reference(object):
             url = None
         return cls(name, url)
     
-
-
+    
 class Group(object):
     """
     Container for populations and projections between those populations. May be
@@ -772,8 +771,6 @@ class Group(object):
             group.add(obj)
         group._resolve_population_references()
         return group
-
-
 
 
 def get_or_create_component(element, cls, components, base_url):
@@ -870,7 +867,6 @@ class Population(object):
                                                    components, base_url))
 
 
-
 class StructureList(list):
     """
     Represents a list of all the structures associated with a Population, which are used in 
@@ -910,7 +906,6 @@ class StructureList(list):
             struct_elems.append(Structure.from_xml(struct_elem, components, base_url))
         structures = cls(struct_elems)
         return structures
-
 
 
 class Layout(BaseComponent):
@@ -1070,6 +1065,8 @@ class Morphologies(object):
 #         return position_list
 
 # this approach is crying out for a class factory
+
+
 class Operator(object):
     
     def __init__(self, *operands):
@@ -1125,17 +1122,20 @@ def qstr(obj):
 class SelectionOperator(Operator):
     pass
 
+
 class Any(SelectionOperator):
     element_name = "any"
     
     def __str__(self):
         return "(" + ") or (".join(qstr(op) for op in self.operands) + ")"
     
+    
 class All(SelectionOperator):
     element_name = "all"
     
     def __str__(self):
         return "(" + ") and (".join(qstr(op) for op in self.operands) + ")"
+    
     
 class Not(SelectionOperator):
     element_name = "not"
@@ -1144,16 +1144,19 @@ class Not(SelectionOperator):
         assert len(operands) == 1
         SelectionOperator.__init__(self, *operands)
 
+
 class Comparison(Operator):
     
     def __init__(self, value1, value2):
         Operator.__init__(self, value1, value2)
+
 
 class Eq(Comparison):
     element_name = "equal"
     
     def __str__(self):        
         return "(%s) == (%s)" % tuple(qstr(op) for op in self.operands)
+
 
 class In(Comparison):
     element_name = "in"
