@@ -10,6 +10,7 @@ from lxml.builder import E
 
 biophysical_cells_namespace = 'http://www.nineml.org/Biophysics'
 BIO_NINEML = "{%s}" % biophysical_cells_namespace
+from nineml.user_layer import NINEML
 
 def parse(url):
     """
@@ -26,6 +27,8 @@ def parse(url):
         doc = etree.parse(url)
     root = doc.getroot()
     biophysics_models = {}
+    if root.tag == NINEML + 'nineml':
+        root = next(root.iterchildren())
     for element in root.findall(BIO_NINEML + BiophysicsModel.element_name):
         biophysics_model = BiophysicsModel.from_xml(element)
         biophysics_models[biophysics_model.name] = biophysics_model
