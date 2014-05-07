@@ -1,0 +1,12 @@
+*.pyc
+x86_64
+*.toc
+*.aux
+*.log
+*.toc
+*.bbl
+*.blg
+*.out
+*.komodoproject
+cover
+build
