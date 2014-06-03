@@ -5,8 +5,8 @@
         Imports CoMoDL_v0.1.xsd which is the common format as discussed in INCF task force meeting May 2011
 -->
 
-<xs:schema targetNamespace="http://nineml.org/9ML/0.2"
-    xmlns="http://nineml.org/9ML/0.2"
+<xs:schema targetNamespace="http://nineml.org/9ML/0.3"
+    xmlns="http://nineml.org/9ML/0.3"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:comodl="CoMoDL"
     elementFormDefault="qualified"

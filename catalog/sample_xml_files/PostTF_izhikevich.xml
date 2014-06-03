@@ -1,8 +1,8 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<NineML xmlns="http://nineml.org/9ML/0.2"
+<NineML xmlns="http://nineml.org/9ML/0.3"
     xmlns:comodl="CoMoDL"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://nineml.org/9ML/0.2 NineML_v0.2.xsd">
+    xsi:schemaLocation="http://nineml.org/9ML/0.3 NineML_v0.2.xsd">
 
   <ComponentClass xmlns="CoMoDL" name="izhikevichCell">
 
