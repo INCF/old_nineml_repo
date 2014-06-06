@@ -1,8 +1,8 @@
 #! /usr/bin/python
 """
 Converts 9ML abstraction layer neuron files to NMODL.
-  
-Copyright Andrew P. Davison, 2010-2011; Michael Hull 2011 
+
+Copyright Andrew P. Davison, 2010-2011; Michael Hull 2011
 # if you edit this file, add your name here
 """
 
@@ -19,7 +19,7 @@ import nineml
 from nineml.utility import filter_expect_single, expect_single
 from nineml.maths import MathUtil
 
-#from jinja2 import Template 
+#from jinja2 import Template
 from Cheetah.Template import Template
 
 FIRST_REGIME_FLAG = 1001
@@ -29,41 +29,41 @@ FIRST_REGIME_FLAG = 1001
 
 tmpl_contents = """
 
-VERBATIM
-extern double nineml_gsl_normal(double, double);
-extern double nineml_gsl_uniform(double, double);
-extern double nineml_gsl_binomial(double, int);
-extern double nineml_gsl_exponential(double);
-extern double nineml_gsl_poisson(double);
-ENDVERBATIM
+:VERBATIM
+:extern double nineml_gsl_normal(double, double);
+:extern double nineml_gsl_uniform(double, double);
+:extern double nineml_gsl_binomial(double, int);
+:extern double nineml_gsl_exponential(double);
+:extern double nineml_gsl_poisson(double);
+:ENDVERBATIM
 
 TITLE Spiking node generated from the 9ML file $input_filename using 9ml2nmodl.py version $version
 
 NEURON {
     POINT_PROCESS $component.name
     RANGE regime
-  
+
     :StateVariables:
-  #for sv in $component.state_variables 
-    RANGE $sv.name 
+  #for sv in $component.state_variables
+    RANGE $sv.name
   #end for
 
     :Parameters
-  #for p in $component.parameters 
+  #for p in $component.parameters
     RANGE $p.name
   #end for
 
     :Aliases
-  #for alias in $component.aliases  
-    RANGE $alias.lhs 
-  #end for 
+  #for alias in $component.aliases
+    RANGE $alias.lhs
+  #end for
 }
 
 CONSTANT {
     SPIKE = 0
     INIT = 1
 
-  #for regime in $component.regimes 
+  #for regime in $component.regimes
     $regime.label = $regime.flag
   #end for
 
@@ -83,7 +83,7 @@ INITIAL {
   #end for
 
     : Initialise Regime:
-    regime = $initial_regime 
+    regime = $initial_regime
 
     : Initialise the NET_RECEIVE block:
     net_send(0, INIT)
@@ -94,14 +94,14 @@ INITIAL {
 PARAMETER {
   #for p in $component.parameters
     $p.name = 0
-  #end for 
+  #end for
 }
 
-STATE { 
+STATE {
   #for var in $component.state_variables
-    $var.name 
-  #end for 
-    first_round_fired 
+    $var.name
+  #end for
+    first_round_fired
 }
 
 ASSIGNED {
@@ -117,21 +117,21 @@ BREAKPOINT {
     SOLVE states METHOD cnexp
 
   #for alias in $component.aliases
-    $alias.lhs = $alias.rhs 
+    $alias.lhs = $alias.rhs
   #end for
 }
 
 DERIVATIVE states {
-  #for var in $component.state_variables 
+  #for var in $component.state_variables
     $var.name' = deriv_${var.name}($deriv_func_args($component, $var.name))
   #end for
 }
 
-#for var in $component.state_variables 
+#for var in $component.state_variables
 FUNCTION deriv_${var.name}($deriv_func_args($component, $var.name)) {
   #for regime in $component.regimes
     if (regime== $regime.label ) {
-        deriv_${var.name} = $ode_for($regime, $var).rhs 
+        deriv_${var.name} = $ode_for($regime, $var).rhs
     }
   #end for
 }
@@ -146,33 +146,33 @@ NET_RECEIVE(w, channel) {
     }
 
     if (flag == INIT) {
-    #for regime in $component.regimes 
-      #for transition in $regime.on_conditions 
+    #for regime in $component.regimes
+      #for transition in $regime.on_conditions
         :WATCH ( $transition.trigger.rhs.replace('=','') )  4000
         WATCH ( $transition.trigger.rhs.replace('=','') )  $transition.flag
-      #end for 
+      #end for
     #end for
     } else if (flag == SPIKE) {
         printf("Received spike with weight %f on channel %f at %f\\n", w, channel, t)
-      #for regime in $component.regimes 
+      #for regime in $component.regimes
         if (regime == $regime.label) {
-          #for on_event in $regime.on_events 
-            #set channel = $get_on_event_channel($on_event,$component) 
+          #for on_event in $regime.on_events
+            #set channel = $get_on_event_channel($on_event,$component)
             if (channel == $channel) {
                 printf("  Resolved to channel $channel\\n" )
-              #if $weight_variables 
+              #if $weight_variables
                 $get_weight_variable($channel, $weight_variables) = w
               #end if
 
-              #for sa in $on_event.state_assignments 
+              #for sa in $on_event.state_assignments
                 $sa.lhs  =  $sa.neuron_rhs
               #end for
-        
-              #for node in $on_event.event_outputs 
+
+              #for node in $on_event.event_outputs
                 $as_expr(node)
               #end for
             }
-          #end for 
+          #end for
         }
       #end for
     }
@@ -208,22 +208,22 @@ NET_RECEIVE(w, channel) {
         printf("\\nt=%f In Regime $regime.name Event With Flag: %f", t, flag )
         printf("\\nt=%f Changing Regime from $regime.name to $transition.target_regime.name via $transition.flag", t )
         regime = $transition.target_regime.flag
-    
+
       #for node in $transition.event_outputs
         net_event(t)
-      #end for 
+      #end for
 
-      #for sa in transition.state_assignments 
+      #for sa in transition.state_assignments
         $sa.lhs  = $sa.neuron_rhs
       #end for
     }
-   #end for 
-  #end for 
+   #end for
+  #end for
 }
-
-$random_functions
-
 """
+#$random_functions
+#
+#"""
 
 neuron_random_func_defs = {
 'normal': """FUNCTION nineml_random_normal(m,s) {
@@ -267,7 +267,7 @@ class NeuronExprRandomBuilder(nineml.abstraction_layer.visitors.ActionVisitor):
         return len(self.required_random_functions) != 0
 
     def action_componentclass(self, component,  **kwargs):
-        pass 
+        pass
     def action_dynamics(self, dynamics, **kwargs):
         pass
     def action_regime(self, regime, **kwargs):
@@ -291,11 +291,11 @@ class NeuronExprRandomBuilder(nineml.abstraction_layer.visitors.ActionVisitor):
     def action_alias(self, alias, **kwargs):
         if alias.rhs_atoms_in_namespace('random'):
             raise NineMLRuntimeError("Alias uses 'random' namespace")
-        
+
     def action_timederivative(self,time_derivative, **kwargs):
         if time_derivative.rhs_atoms_in_namespace('random'):
             raise NineMLRuntimeError("Time Derivative uses 'random' namespace")
-        
+
     def action_condition(self, condition, **kwargs):
         if condition.rhs_atoms_in_namespace('random'):
             raise NineMLRuntimeError("Condition uses 'random' namespace")
@@ -306,7 +306,8 @@ class NeuronExprRandomBuilder(nineml.abstraction_layer.visitors.ActionVisitor):
                     'uniform' : r'nineml_random_uniform(\1,\2)',
                     'binomial' : r'nineml_random_binomial(\1,\2)',
                     'poisson' : r'nineml_random_poisson(\1)',
-                    'exponential' : r'nineml_random_exponential(\1)',
+                    #'exponential' : r'nineml_random_exponential(\1)',
+                    'exponential': r'exprand(\1)',
                 }
 
         expr = assignment.rhs
@@ -314,7 +315,7 @@ class NeuronExprRandomBuilder(nineml.abstraction_layer.visitors.ActionVisitor):
             if not atom in rand_map:
                 err = 'Neuron Simulator does not support: %s'%atom
                 raise nineml.exceptions.NineMLRuntimeError(err)
-            
+
             expr = MathUtil.rename_function(expr, '%s.%s'%('random',atom), rand_map[atom] )
             self.required_random_functions.add(atom)
         assignment.neuron_rhs = expr
@@ -381,7 +382,7 @@ def guess_weight_variable(component):
 
 
 def get_weight_variable(channel, weight_variables):
-   
+
     for k in weight_variables.keys():
         if k.upper() in channel:
             return weight_variables[k]
@@ -400,7 +401,7 @@ def get_ninemlnrnlibdir():
 
 
 def get_ninemlnrnlibfile():
-    libfilefull = '%s/%s'%(get_ninemlnrnlibdir(),ninemlnrn_libfile) 
+    libfilefull = '%s/%s'%(get_ninemlnrnlibdir(),ninemlnrn_libfile)
     return libfilefull
 
 
@@ -415,12 +416,12 @@ def build_context(component, weight_variables,
     if not weight_variables:
         weight_variables = {'': guess_weight_variable(component)}
 
-    # THIS IS JUST NASTY. 
+    # THIS IS JUST NASTY.
     # TODO - PROPERLY WITH A DICTIONARY.
     FIRST_TRANSITION_FLAG = 5000
     for i, transition in enumerate(component.transitions):
         n = FIRST_TRANSITION_FLAG + i
-        transition.label = 'TRANSITION%d'%n 
+        transition.label = 'TRANSITION%d'%n
         transition.flag = n
 
     assert component.is_flat()
@@ -435,21 +436,21 @@ def build_context(component, weight_variables,
     rand = NeuronExprRandomBuilder()
     rand.visit(component)
 
-    if rand.has_random_functions():
-        libfilefull = get_ninemlnrnlibfile()
-        libdir = get_ninemlnrnlibdir()
-        print 'LibFileFull', libfilefull
-        if not os.path.exists( libfilefull ):
-            err = 'Random Library Proxy not built: %s.\nRun make in %s'%(libfilefull, libdir) 
-            raise NineMLRuntimeError(err)
-    
-        LD_LIB_PATH = 'LD_LIBRARY_PATH'
-        err = " *** WARNING CAN'T FIND %s in LD_LIBRARY_PATH\nTHERE MAY BE A PROBLEM USING RANDOM FUNCTIONS"%libdir
-        if not LD_LIB_PATH in os.environ:
-            raise NineMLRuntimeError(err)
-        else:
-            if not libdir in os.environ[LD_LIB_PATH]:
-                raise NineMLRuntimeError(err)
+    #if rand.has_random_functions():
+    #    libfilefull = get_ninemlnrnlibfile()
+    #    libdir = get_ninemlnrnlibdir()
+    #    print 'LibFileFull', libfilefull
+    #    if not os.path.exists( libfilefull ):
+    #        err = 'Random Library Proxy not built: %s.\nRun make in %s'%(libfilefull, libdir)
+    #        raise NineMLRuntimeError(err)
+    #
+    #    LD_LIB_PATH = 'LD_LIBRARY_PATH'
+    #    err = " *** WARNING CAN'T FIND %s in LD_LIBRARY_PATH\nTHERE MAY BE A PROBLEM USING RANDOM FUNCTIONS"%libdir
+    #    if not LD_LIB_PATH in os.environ:
+    #        raise NineMLRuntimeError(err)
+    #    else:
+    #        if not libdir in os.environ[LD_LIB_PATH]:
+    #            raise NineMLRuntimeError(err)
 
     context = {
         "input_filename": input_filename,
@@ -471,7 +472,7 @@ def build_context(component, weight_variables,
     return context
 
 
-def write_nmodl(nineml_file, weight_variables={}, hierarchical_mode=False): 
+def write_nmodl(nineml_file, weight_variables={}, hierarchical_mode=False):
 
     from nineml.abstraction_layer.readers import XMLReader
     components = XMLReader.read_components(nineml_file)
@@ -490,10 +491,10 @@ def write_nmodl(nineml_file, weight_variables={}, hierarchical_mode=False):
 
 
 def write_nmodldirect(component, mod_filename, weight_variables={},hierarchical_mode=False):
-    
+
     print "Writing Mod-File %s" % mod_filename
     with open(mod_filename, "w") as f:
-        context = build_context(component, weight_variables,hierarchical_mode=hierarchical_mode) 
+        context = build_context(component, weight_variables,hierarchical_mode=hierarchical_mode)
         f.write(Template(tmpl_contents, context).respond().replace("**", "^"))  # this filtering of '**' should happen in the template, in case of double pointers in VERBATIM blocks
 
 
