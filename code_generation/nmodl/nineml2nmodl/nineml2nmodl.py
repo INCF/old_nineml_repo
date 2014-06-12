@@ -110,6 +110,9 @@ ASSIGNED {
   #for alias in $component.aliases:
     $alias.lhs
   #end for
+  #for var in $weight_variables.values:
+    $var
+  #end for
 }
 
 BREAKPOINT {
@@ -153,13 +156,13 @@ NET_RECEIVE(w, channel) {
       #end for
     #end for
     } else if (flag == SPIKE) {
-        printf("Received spike with weight %f on channel %f at %f\\n", w, channel, t)
+        :printf("Received spike with weight %f on channel %f at %f\\n", w, channel, t)
       #for regime in $component.regimes
         if (regime == $regime.label) {
           #for on_event in $regime.on_events
             #set channel = $get_on_event_channel($on_event,$component)
             if (channel == $channel) {
-                printf("  Resolved to channel $channel\\n" )
+                :printf("  Resolved to channel $channel\\n" )
               #if $weight_variables
                 $get_weight_variable($channel, $weight_variables) = w
               #end if
