@@ -111,7 +111,8 @@ FUNCTION deriv_${var.name}($deriv_func_args($component, $var.name)) {
 
 NET_RECEIVE(w, channel) {
 
-  #* printf("Received event with weight %f on channel %f at %f\\n", w, channel, t) *#
+    :printf("Received event with weight %f on channel %f at %f\n", w, channel, t)
+    :printf("Received event at %f\n", t)
 
     INITIAL {
       : stop channel being set to 0 by default
@@ -125,13 +126,14 @@ NET_RECEIVE(w, channel) {
       #end for
     #end for
     } else if (flag == SPIKE) {
-        :printf("Received spike with weight %f on channel %f at %f\\n", w, channel, t)
+        printf("Received spike with weight %f on channel %f at %f\n", w, channel, t)
       #for regime in $component.regimes
         if (regime == $regime.label) {
+        printf("Current regime: $regime.label \n")
           #for on_event in $regime.on_events
             #set channel = $get_on_event_channel($on_event,$component)
             if (channel == $channel) {
-                :printf("  Resolved to channel $channel\\n" )
+                printf("  Resolved to channel $channel\n" )
               #if $weight_variables
                 $get_weight_variable($channel, $weight_variables) = w
               #end if
@@ -161,7 +163,7 @@ NET_RECEIVE(w, channel) {
         } else if( regime == $regime.flag ) {
           #for transition in $regime.on_conditions:
             if( $transition.trigger.rhs ) {
-                printf("\\nFirst Round Transition Filtering: Forwarding Event: $transition.flag @ t=%f",t)
+                printf("\nFirst Round Transition Filtering: Forwarding Event: $transition.flag @ t=%f",t)
                 net_send(0, $transition.flag )
             }
           #end for
@@ -177,8 +179,8 @@ NET_RECEIVE(w, channel) {
    #for transition in $regime.on_conditions:
     else if (flag == $transition.flag) {
         first_round_fired = 0
-        printf("\\nt=%f In Regime $regime.name Event With Flag: %f", t, flag )
-        printf("\\nt=%f Changing Regime from $regime.name to $transition.target_regime.name via $transition.flag", t )
+        printf("\nt=%f In Regime $regime.name Event With Flag: %f", t, flag )
+        printf("\nt=%f Changing Regime from $regime.name to $transition.target_regime.name via $transition.flag", t )
         regime = $transition.target_regime.flag
 
       #for node in $transition.event_outputs

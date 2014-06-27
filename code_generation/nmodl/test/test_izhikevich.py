@@ -1,8 +1,29 @@
+# encoding: utf-8
+"""
+A test of injecting current into an Izhikevich neuron.
 
+"""
 
-from single_cell_current_injection import TestCase, configure, run
+from nineml.abstraction_layer.dynamics import (
+    ComponentClass, Regime, On, OutputEvent, SendPort)
+from util import TestFixture
 
-mechanism = "Izhikevich"
+component = ComponentClass(
+    "Izhikevich",
+    regimes=[
+        Regime(
+            name="subthreshold_regime",
+            time_derivatives=[
+                "dV/dt = 0.04*V*V + 5*V + 140.0 - U + Isyn",
+                "dU/dt = a*(b*V - U)"],
+            transitions=[On("V > theta",
+                            do=["V = c",
+                                "U = U + d",
+                                OutputEvent('spikeoutput')])])
+    ],
+    analog_ports=[SendPort("V")]
+)
+
 parameters = {
     'a': 0.02,
     'b': 0.2,
@@ -13,21 +34,23 @@ parameters = {
 }
 initial_values = {
     'V': -65,
-    'U': 0.2 * -65 
+    'U': 0.2 * -65
 }
-expected_output = [# I have no idea if these values are correct
-     2.12834641,   3.17733172,   4.31376038,   5.52657414,
-     6.85904596,   8.33813478,   9.97419301,  11.85470981,
-    14.10067134,  17.04985314,  50.2182681 ,  51.81893091,
-    53.63051808,  55.78022398,  58.53731759,  63.57952919,
-    97.27780952,  98.87851621]
+expected_output = [  # I have no idea if these values are correct
+     2.11456013,   3.16223809,   4.28475028,   5.49598431,
+     6.81459817,   8.26700621,   9.89299053,  11.75840739,
+    13.98970098,  16.91909234,  50.10970927,  51.69737102,
+    53.50838859,  55.65212206,  58.39190026,  63.44686492,
+    97.1294706,   98.71712847]
 
+
+def test_izhikevich(with_figure=False):
+    test = TestFixture(component, parameters, initial_values, expected_output, 100.0)
+    success = test.run()
+    if with_figure:
+        test.plot("test_izhikevich.png")
+    assert success
 
 
 if __name__ == "__main__":
-    configure()
-    test = TestCase(mechanism, parameters, initial_values, expected_output)
-    run(100.0)
-    test.plot("test_izhikevich.png")
-    errors = test.calculate_errors()
-    print test.success and "OK" or "FAIL"
+    test_izhikevich(with_figure=True)
