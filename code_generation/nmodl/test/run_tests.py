@@ -12,9 +12,9 @@ nineml2nmodl = __import__("nineml2nmodl")
 from subprocess import Popen, PIPE
 
 #models = ["izhikevich", "morris_lecar", "leaky_iaf", "if_cond_exp"]
-models = ["izhikevich",] 
+models = ["izhikevich",]
 
-from nineml.abstraction_layer.component_modifiers import ComponentModifier
+from nineml.abstraction_layer.dynamics.component_modifiers import ComponentModifier
 from nineml.abstraction_layer.testing_utils import TestableComponent
 
 

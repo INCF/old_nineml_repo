@@ -1,6 +1,7 @@
 #!/usr/bin/python
 """
-
+Iterates over all the testable components found in the Python nineml distribution,
+and checks that they compile successfully.
 """
 
 import os
@@ -9,11 +10,9 @@ import shutil
 from StringIO import StringIO
 from subprocess import check_call, STDOUT, CalledProcessError
 
-import nose
-
-from nineml.abstraction_layer.component_modifiers import ComponentModifier
-from nineml.abstraction_layer.flattening import flatten
-from nineml.abstraction_layer.testing_utils import TestableComponent
+from nineml.abstraction_layer.dynamics.component_modifiers import ComponentModifier
+from nineml.abstraction_layer.dynamics.flattening import flatten
+from nineml.abstraction_layer.dynamics.testing_utils import TestableComponent
 from nineml2nmodl import write_nmodl, write_nmodldirect
 
 
@@ -24,7 +23,7 @@ def clear_and_recreate_dir(dir_name):
     print '  -- Clearing the build_dir: %s' % dir_name
     if os.path.exists(dir_name):
         shutil.rmtree(dir_name)
-    os.mkdir(dir_name)
+    os.makedirs(dir_name)
 
 
 def compile_nmodl(dir_name):
@@ -45,7 +44,7 @@ def compile_nmodl(dir_name):
 
 def test_generator():
     testable_components = [TestableComponent(source_file)
-                       for source_file in TestableComponent.list_available()]
+                           for source_file in TestableComponent.list_available()]
     nrn_components = [tc() for tc in testable_components] #  if (tc.has_metadata() and tc.metadata.is_neuron_model)]
     for tc in nrn_components:
         yield write_and_compile_nmodl, tc
