@@ -6,6 +6,7 @@ from lxml.builder import E
 morphology_namespace = 'http://www.nineml.org/Morphology'
 MORPH_NINEML = "{%s}" % morphology_namespace
 
+
 def parse(url):
     """
     Read a NineML user-layer file and return a Model object.
@@ -34,7 +35,8 @@ class Morphology(object):
 
     def __repr__(self):
         return ("Morphology '{}' with {} segment(s) and {} classification(s)"
-                .format(self.name, len(self.segments), len(self.classifications)))
+                .format(self.name, len(self.segments),
+                        len(self.classifications)))
 
     def to_xml(self):
         return E(self.element_name,
@@ -67,7 +69,8 @@ class Segment(object):
     element_name = 'segment'
 
     def __init__(self, name, distal, proximal=None, parent=None):
-        assert int(proximal is None) + int(parent is None) == 1  # Only one of proximal and parent can be used
+        assert int(proximal is None) + int(parent is None) == 1, \
+                                  "Only one of proximal and parent can be used"
         self.name = name
         self.proximal = proximal
         self.parent = parent
@@ -78,23 +81,29 @@ class Segment(object):
             p = "proximal: ({})".format(repr(self.proximal))
         else:
             p = "parent: ({})".format(repr(self.parent))
-        return "Segment: '{}', {}, distal: ({})".format(self.name, p, self.distal)
+        return "Segment: '{}', {}, distal: ({})".format(self.name, p,
+                                                        self.distal)
 
     def to_xml(self):
         return E(self.element_name,
-                 self.proximal.to_xml() if self.proximal else self.parent.to_xml(),
+                 (self.proximal.to_xml()
+                  if self.proximal else self.parent.to_xml()),
                  self.distal.to_xml())
 
     @classmethod
     def from_xml(cls, element):
         assert element.tag == MORPH_NINEML + cls.element_name
-        distal = DistalPoint.from_xml(element.find(MORPH_NINEML + DistalPoint.element_name))
+        distal = DistalPoint.from_xml(element.find(MORPH_NINEML +
+                                                   DistalPoint.element_name))
         prox_element = element.find(MORPH_NINEML + ProximalPoint.element_name)
-        parent_element = element.find(MORPH_NINEML + ParentSegment.element_name)
+        parent_element = element.find(MORPH_NINEML +
+                                      ParentSegment.element_name)
         if prox_element is not None:
             if parent_element is not None:
-                raise Exception("<{}> and <{}> tags cannot be used together in segment '{}'"
-                                .format(ProximalPoint.element_name, ParentSegment.element_name,
+                raise Exception("<{}> and <{}> tags cannot be used together "
+                                "in segment '{}'"
+                                .format(ProximalPoint.element_name,
+                                        ParentSegment.element_name,
                                         element.attrib['name']))
             proximal = ProximalPoint.from_xml(prox_element)
             parent = None
@@ -102,10 +111,12 @@ class Segment(object):
             parent = ParentSegment.from_xml(parent_element)
             proximal = None
         else:
-            raise Exception("Either <{}> or <{}> must be provided to segment '{}'"
-                            .format(ProximalPoint.element_name, ParentSegment.element_name,
-                                        element.attrib['name']))
-        return cls(element.attrib['name'], distal, proximal=proximal, parent=parent)
+            raise Exception("Either <{}> or <{}> must be provided to segment "
+                            "'{}'".format(ProximalPoint.element_name,
+                                          ParentSegment.element_name,
+                                          element.attrib['name']))
+        return cls(element.attrib['name'], distal, proximal=proximal,
+                   parent=parent)
 
 
 class Point3D(object):
@@ -117,17 +128,19 @@ class Point3D(object):
         self.diameter = float(diameter)
 
     def __repr__(self):
-        return "[{}, {}, {}, diam:{}]".format(self.x, self.y, self.z, self.diameter)
+        return "[{}, {}, {}, diam:{}]".format(self.x, self.y, self.z,
+                                              self.diameter)
 
     def to_xml(self):
         return E(self.element_name,
-                 x=str(self.x), y=str(self.y), z=str(self.z), diameter=str(self.diameter))
+                 x=str(self.x), y=str(self.y), z=str(self.z),
+                 diameter=str(self.diameter))
 
     @classmethod
     def from_xml(cls, element):
         assert element.tag == MORPH_NINEML + cls.element_name
-        return cls(element.attrib['x'], element.attrib['y'], element.attrib['z'],
-                   element.attrib['diameter'])
+        return cls(element.attrib['x'], element.attrib['y'],
+                   element.attrib['z'], element.attrib['diameter'])
 
 
 class ProximalPoint(Point3D):
@@ -163,7 +176,8 @@ class ParentSegment(object):
     @classmethod
     def from_xml(cls, element):
         assert element.tag == MORPH_NINEML + cls.element_name
-        return cls(element.attrib['segment'], float(element.attrib.get('fractionAlong', 1.0)))
+        return cls(element.attrib['segment'],
+                   float(element.attrib.get('fractionAlong', 1.0)))
 
 
 class Classification(object):
@@ -173,13 +187,14 @@ class Classification(object):
     def __init__(self, name, classes):
         self.name = name
         self.classes = classes
-        
+
     def __getitem__(self, key):
         return self.classes[key]
 
     def __repr__(self):
         return ("'{}' classification with division(s): '{}'"
-                .format(self.name, "', '".join([k for k in self.classes.keys()])))
+                .format(self.name,
+                        "', '".join([k for k in self.classes.keys()])))
 
     def to_xml(self):
         return E(self.element_name,
@@ -205,7 +220,8 @@ class SegmentClass(list):
         self.extend(members)
 
     def __repr__(self):
-        return "'{}' segment class with {} member(s)".format(self.name, len(self.members))
+        return ("'{}' segment class with {} member(s)"
+                .format(self.name, len(self.members)))
 
     def to_xml(self):
         return E(self.element_name,
@@ -227,7 +243,7 @@ class Member(object):
 
     def __init__(self, segment_name):
         self.segment_name = segment_name
-        
+
     def __str__(self):
         return self.segment_name
 
