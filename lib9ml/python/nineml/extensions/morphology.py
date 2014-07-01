@@ -285,7 +285,8 @@ class Classification(object):
     def to_xml(self):
         return E(self.element_name,
                  name=self.name,
-                 *[c.to_xml() for c in self.classes.itervalues() if c.members])
+                 *[c.to_xml() for c in self.classes.itervalues()
+                   if not c.empty()])
 
     @classmethod
     def from_xml(cls, element):
@@ -313,7 +314,7 @@ class SegmentClass(object):
         self._morphology = morphology
         for seg in morphology.segments:
             if seg.name in self._member_names:
-                seg.classes.append(self)
+                seg.classes.append(self.name)
         # Clear the member names as class members will now be accessed by
         # the class list in the segments themselves
         self._member_names = []
@@ -323,12 +324,15 @@ class SegmentClass(object):
         return (seg for seg in self._morphology.segments
                 if self.name in seg.classes)
 
+    def empty(self):
+        return list(self.members) == []
+
     def __iter__(self):
         return iter(self._members)
 
     def __repr__(self):
         return ("'{}' segment class with {} member(s)"
-                .format(self.name, len(self.members)))
+                .format(self.name, len(list(self.members))))
 
     def to_xml(self):
         return E(self.element_name,
