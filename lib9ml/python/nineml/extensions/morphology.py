@@ -34,13 +34,15 @@ class Morphology(object):
         # Set root segment and children references
         self.root = None
         for seg in segments.itervalues():
-            if seg._parent_ref:
-                segments[seg._parent_ref.name].children.append(seg)
+            if seg.parent_ref:
+                parent = segments[seg.parent_ref.name]
+                parent.children.append(seg)
+                seg.parent_ref.segment = parent
             else:
                 if self.root:
                     raise Exception("Multiple root segments found ({} and {})"
                                     .format(self.root.name,
-                                            seg._parent_ref.name))
+                                            seg.parent_ref.name))
                 else:
                     self.root = seg
         if self.root is None:
@@ -103,27 +105,27 @@ class Segment(object):
 
     element_name = 'segment'
 
-    def __init__(self, name, distal, proximal=None, parent=None):
-        if proximal is None and parent is None:
-            raise Exception("Only one of proximal and _parent_ref can be used")
-        elif proximal is not None and parent is not None:
-            raise Exception("Proximal or _parent_ref must be supplied")
+    def __init__(self, name, distal, proximal=None, parent_ref=None):
+        if proximal is None and parent_ref is None:
+            raise Exception("Only one of proximal and parent_ref can be used")
+        elif proximal is not None and parent_ref is not None:
+            raise Exception("Proximal or parent_ref must be supplied")
         self.name = name
         self._proximal = proximal
-        self._parent_ref = parent
+        self.parent_ref = parent_ref
         self.distal = distal
         self.children = []
         self.classes = []
 
     @property
     def proximal(self):
-        if self._parent_ref:
-            if self._parent_ref.fraction_along:
+        if self.parent_ref:
+            if self.parent_ref.fraction_along:
                 pos = (self.parent.proximal.pos +
                        (self.parent.distal.pos /
-                        self._parent_ref.fraction_along))
+                        self.parent_ref.fraction_along))
             else:
-                pos = self._parent_ref.segment.distal.pos
+                pos = self.parent_ref.segment.distal.pos
             return Point3D(pos[0], pos[1], pos[2], self.distal.diameter)
         else:
             return self._proximal
@@ -139,7 +141,7 @@ class Segment(object):
     @property
     def parent(self):
         try:
-            return self._parent_ref.segment
+            return self.parent_ref.segment
         except AttributeError:
             return None
 
@@ -151,8 +153,8 @@ class Segment(object):
                 yield childs_child
 
     def __repr__(self):
-        if self._parent_ref:
-            p = "_parent_ref: ({})".format(repr(self._parent_ref))
+        if self.parent_ref:
+            p = "parent_ref: ({})".format(repr(self.parent_ref))
         else:
             p = "proximal: ({})".format(repr(self._proximal))
         return "Segment: '{}', {}, distal: ({})".format(self.name, p,
@@ -160,8 +162,8 @@ class Segment(object):
 
     def to_xml(self):
         return E(self.element_name,
-                 (self._parent_ref.to_xml()
-                  if self._parent_ref else self._proximal.to_xml()),
+                 (self.parent_ref.to_xml()
+                  if self.parent_ref else self._proximal.to_xml()),
                  self.distal.to_xml(),
                  name=self.name)
 
@@ -181,9 +183,9 @@ class Segment(object):
                                         ParentReference.element_name,
                                         element.attrib['name']))
             proximal = ProximalPoint.from_xml(prox_element)
-            parent = None
+            parent_ref = None
         elif parent_element is not None:
-            parent = ParentReference.from_xml(parent_element)
+            parent_ref = ParentReference.from_xml(parent_element)
             proximal = None
         else:
             raise Exception("Either <{}> or <{}> must be provided to segment "
@@ -191,7 +193,7 @@ class Segment(object):
                                           ParentReference.element_name,
                                           element.attrib['name']))
         return cls(element.attrib['name'], distal, proximal=proximal,
-                   parent=parent)
+                   parent_ref=parent_ref)
 
 
 class Point3D(object):
@@ -319,20 +321,16 @@ class SegmentClass(object):
         # the class list in the segments themselves
         self._member_names = []
 
-    @property
-    def members(self):
+    def __iter__(self):
         return (seg for seg in self._morphology.segments
                 if self.name in seg.classes)
 
-    def empty(self):
-        return list(self.members) == []
-
-    def __iter__(self):
-        return iter(self._members)
+    def __len__(self):
+        return len(list(iter(self)))
 
     def __repr__(self):
         return ("'{}' segment class with {} member(s)"
-                .format(self.name, len(list(self.members))))
+                .format(self.name, 0))
 
     def to_xml(self):
         return E(self.element_name,
