@@ -93,7 +93,7 @@ class ComponentClass(object):
         for p in self.parameters:
             if p.reference == 'Diameter':
                 for seg_class in p.segments:
-                    for member in self.morphology.classifications[p.segments.classification][seg_class]:
+                    for member in self.morphology.classifications[p.segments.classification][seg_class].members:
                         seg = self.morphology.segments[member.name]
                         if p.default_value is None:
                             p.default_value = seg.distal.diameter

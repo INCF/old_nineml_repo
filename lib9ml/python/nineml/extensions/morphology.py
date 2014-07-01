@@ -140,7 +140,7 @@ class Segment(object):
     def parent(self):
         try:
             return self._parent_ref.segment
-        except TypeError:
+        except AttributeError:
             return None
 
     @property
