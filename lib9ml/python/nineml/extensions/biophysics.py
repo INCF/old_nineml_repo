@@ -1,7 +1,8 @@
 """
-  At this stage, this file is just a stub as the compilation of biophysical components is done by a 
-  Scheme package, which at this time is called "NeMo" (which conflicts with a simulator of the same
-  name) but is likely to change at a later point
+  At this stage, this file is just a stub as the compilation of biophysical
+  components is done by a Scheme package, which at this time is called "NeMo"
+  (which conflicts with a simulator of the same name) but is likely to change
+  at a later point
 """
 
 import urllib
@@ -11,6 +12,7 @@ from lxml.builder import E
 biophysical_cells_namespace = 'http://www.nineml.org/Biophysics'
 BIO_NINEML = "{%s}" % biophysical_cells_namespace
 from nineml.user_layer import NINEML
+
 
 def parse(url):
     """
@@ -59,21 +61,26 @@ class BiophysicsModel(object):
         assert element.tag == BIO_NINEML + cls.element_name
         components = {}
         component_classes = {}
-        for comp_class_elem in element.findall(BIO_NINEML + ComponentClass.element_name):
+        for comp_class_elem in element.findall(BIO_NINEML +
+                                               ComponentClass.element_name):
             component_class = ComponentClass.from_xml(comp_class_elem)
             component_classes[component_class.name] = component_class
         for comp_elem in element.findall(BIO_NINEML + Component.element_name):
             component = Component.from_xml(comp_elem, component_classes)
-            if component.name == '__NO_COMPONENT__' and components.has_key('__NO_COMPONENT__'):
-                components['__NO_COMPONENT__'].parameters.update(component.parameters)
+            if (component.name == '__NO_COMPONENT__' and
+                '__NO_COMPONENT__' in components):
+                components['__NO_COMPONENT__'].parameters.\
+                                                   update(component.parameters)
             else:
                 components[component.name] = component
         build_hints_elem = element.find(BIO_NINEML + BuildHints.element_name)
         if build_hints_elem is not None:
             build_hints = BuildHints.from_xml(build_hints_elem)
         else:
-            raise Exception("Did not find required build hints tag in biophysics block")
-        return cls(element.attrib['name'], components, component_classes, build_hints)
+            raise Exception("Did not find required build hints tag in "
+                            "biophysics block")
+        return cls(element.attrib['name'], components, component_classes,
+                   build_hints)
 
 
 class ComponentClass(object):
@@ -130,16 +137,22 @@ class Component(object):
         else:
             comp_type = element.attrib.get('type', None)
         name = element.attrib.get('name', None)
-        if comp_type in ('defaults', 'globals', 'membrane-capacitance', 'geometry'):
+        if comp_type in ('defaults', 'globals', 'membrane-capacitance',
+                         'geometry'):
             name = '__NO_COMPONENT__'
         elif name == '__NO_COMPONENT__':
-            raise Exception("Component name '{}' clashes with an internal variable name, please "
-                            "select another".format(name))
+            raise Exception("Component name '{}' clashes with an internal "
+                            "variable name, please select another"
+                            .format(name))
         properties_element = element.find(BIO_NINEML + 'properties')
-        if properties_element is not None: #FIXME This is a temporary hack until all cases are standardised between either being enclosed in a properties tag or not.
-            param_elements = properties_element.findall(BIO_NINEML+Parameter.element_name)
+        # FIXME This is a temporary hack until all cases are standardised
+        # between either being enclosed in a properties tag or not.
+        if properties_element is not None:
+            param_elements = properties_element.findall(BIO_NINEML +
+                                                        Parameter.element_name)
         else:
-            param_elements = element.findall(BIO_NINEML+Parameter.element_name)
+            param_elements = element.findall(BIO_NINEML +
+                                             Parameter.element_name)
         for child in param_elements:
             parameter = Parameter.from_xml(child)
             parameters[parameter.name] = parameter
@@ -156,8 +169,9 @@ class Parameter(object):
         self.unit = unit
 
     def __repr__(self):
-        return ("Parameter '{}' = {} ({})".format(self.name, self.value, 
-                                                  self.unit if self.unit else 'dimensionless'))
+        return ("Parameter '{}' = {} ({})".format(self.name, self.value,
+                                                  self.unit if self.unit else
+                                                              'dimensionless'))
 
     def to_xml(self):
         opt_args = []
@@ -260,7 +274,8 @@ class Simulator(object):
         optional_components = []
         if self.method:
             optional_components.append(E('Method', self.method))
-        optional_components.extend([E('KineticComponent', kc) for kc in self.kinetic_components])
+        optional_components.extend([E('KineticComponent', kc)
+                                    for kc in self.kinetic_components])
         return E(self.element_name,
                  name=self.name,
                  *optional_components)
