@@ -2,6 +2,7 @@ import urllib
 from itertools import chain
 from lxml import etree
 from lxml.builder import E
+import numpy
 
 morphology_namespace = 'http://www.nineml.org/Morphology'
 MORPH_NINEML = "{%s}" % morphology_namespace
@@ -30,8 +31,42 @@ class Morphology(object):
 
     def __init__(self, name, segments, classifications):
         self.name = name
-        self.segments = segments
+        # Set root segment and children references
+        self.root = None
+        for seg in segments.itervalues():
+            if seg._parent_ref:
+                segments[seg._parent_ref.name].children.append(seg)
+            else:
+                if self.root:
+                    raise Exception("Multiple root segments found ({} and {})"
+                                    .format(self.root.name,
+                                            seg._parent_ref.name))
+                else:
+                    self.root = seg
+        if self.root is None:
+            raise Exception("No root segment found in tree -> circular "
+                            "references exist")
         self.classifications = classifications
+        for classification in self.classifications.itervalues():
+            for seg_class in classification.classes.itervalues():
+                seg_class._set_members(self)
+
+    @property
+    def segments(self):
+        """
+        Segments are not stored directly as a flat list to allow branches
+        to be edited by altering the children of segments. This iterator is
+        then used to flatten the list of segments
+        """
+        return chain([self.root], self.root.all_children)
+
+    def segment(self, name):
+        match = [seg for seg in self.segments if seg.name == name]
+        #TODO: Need to check this on initialisation
+        assert len(match) <= 1, "Multiple segments with key '{}'".format(name)
+        if not len(match):
+            raise KeyError("Segment '{}' was not found".format(name))
+        return match[0]
 
     def __repr__(self):
         return ("Morphology '{}' with {} segment(s) and {} classification(s)"
@@ -41,8 +76,8 @@ class Morphology(object):
     def to_xml(self):
         return E(self.element_name,
                  name=self.name,
-                 *[c.to_xml() for c in chain(self.segments.values(),
-                                              self.classifications.values())])
+                 *[c.to_xml() for c in chain(self.segments,
+                                             self.classifications.values())])
 
     @classmethod
     def from_xml(cls, element):
@@ -69,26 +104,66 @@ class Segment(object):
     element_name = 'segment'
 
     def __init__(self, name, distal, proximal=None, parent=None):
-        assert int(proximal is None) + int(parent is None) == 1, \
-                                  "Only one of proximal and parent can be used"
+        if proximal is None and parent is None:
+            raise Exception("Only one of proximal and _parent_ref can be used")
+        elif proximal is not None and parent is not None:
+            raise Exception("Proximal or _parent_ref must be supplied")
         self.name = name
-        self.proximal = proximal
-        self.parent = parent
+        self._proximal = proximal
+        self._parent_ref = parent
         self.distal = distal
+        self.children = []
+        self.classes = []
+
+    @property
+    def proximal(self):
+        if self._parent_ref:
+            if self._parent_ref.fraction_along:
+                pos = (self.parent.proximal.pos +
+                       (self.parent.distal.pos /
+                        self._parent_ref.fraction_along))
+            else:
+                pos = self._parent_ref.segment.distal.pos
+            return Point3D(pos[0], pos[1], pos[2], self.distal.diameter)
+        else:
+            return self._proximal
+
+    @property
+    def length(self):
+        return numpy.sqrt(numpy.sum(self.distal.pos - self.proximal.pos))
+
+    def diameter(self, fraction_along=1.0):
+        return (self.proximal.diameter * (1.0 - fraction_along) +
+                self.distal.diameter * fraction_along)
+
+    @property
+    def parent(self):
+        try:
+            return self._parent_ref.segment
+        except TypeError:
+            return None
+
+    @property
+    def all_children(self):
+        for child in self.children:
+            yield child
+            for childs_child in child.all_children:
+                yield childs_child
 
     def __repr__(self):
-        if self.proximal:
-            p = "proximal: ({})".format(repr(self.proximal))
+        if self._parent_ref:
+            p = "_parent_ref: ({})".format(repr(self._parent_ref))
         else:
-            p = "parent: ({})".format(repr(self.parent))
+            p = "proximal: ({})".format(repr(self._proximal))
         return "Segment: '{}', {}, distal: ({})".format(self.name, p,
                                                         self.distal)
 
     def to_xml(self):
         return E(self.element_name,
-                 (self.proximal.to_xml()
-                  if self.proximal else self.parent.to_xml()),
-                 self.distal.to_xml())
+                 (self._parent_ref.to_xml()
+                  if self._parent_ref else self._proximal.to_xml()),
+                 self.distal.to_xml(),
+                 name=self.name)
 
     @classmethod
     def from_xml(cls, element):
@@ -97,23 +172,23 @@ class Segment(object):
                                                    DistalPoint.element_name))
         prox_element = element.find(MORPH_NINEML + ProximalPoint.element_name)
         parent_element = element.find(MORPH_NINEML +
-                                      ParentSegment.element_name)
+                                      ParentReference.element_name)
         if prox_element is not None:
             if parent_element is not None:
                 raise Exception("<{}> and <{}> tags cannot be used together "
                                 "in segment '{}'"
                                 .format(ProximalPoint.element_name,
-                                        ParentSegment.element_name,
+                                        ParentReference.element_name,
                                         element.attrib['name']))
             proximal = ProximalPoint.from_xml(prox_element)
             parent = None
         elif parent_element is not None:
-            parent = ParentSegment.from_xml(parent_element)
+            parent = ParentReference.from_xml(parent_element)
             proximal = None
         else:
             raise Exception("Either <{}> or <{}> must be provided to segment "
                             "'{}'".format(ProximalPoint.element_name,
-                                          ParentSegment.element_name,
+                                          ParentReference.element_name,
                                           element.attrib['name']))
         return cls(element.attrib['name'], distal, proximal=proximal,
                    parent=parent)
@@ -122,10 +197,20 @@ class Segment(object):
 class Point3D(object):
 
     def __init__(self, x, y, z, diameter):
-        self.x = float(x)
-        self.y = float(y)
-        self.z = float(z)
+        self.pos = numpy.array([float(x), float(y), float(z)])
         self.diameter = float(diameter)
+
+    @property
+    def x(self):
+        return self.pos[0]
+
+    @property
+    def y(self):
+        return self.pos[1]
+
+    @property
+    def z(self):
+        return self.pos[2]
 
     def __repr__(self):
         return "[{}, {}, {}, diam:{}]".format(self.x, self.y, self.z,
@@ -153,25 +238,26 @@ class DistalPoint(Point3D):
     element_name = 'distal'
 
 
-class ParentSegment(object):
+class ParentReference(object):
 
     element_name = 'parent'
 
     def __init__(self, segment_name, fraction_along):
-        self.segment_name = segment_name
-        self.fraction_along = fraction_along
+        self.name = segment_name
+        self.fraction_along = float(fraction_along)
+        self.segment = None
 
     def __repr__(self):
-        rep = "segment: {}".format(self.segment_name)
+        rep = "segment: {}".format(self.name)
         if self.fraction_along is not None:
             rep += ", fraction along: {}".format(self.fraction_along)
         return rep
 
     def to_xml(self):
         opt_kwargs = {}
-        if self.fraction_along is not None:
-            opt_kwargs['fractionAlong'] = self.fraction_along
-        return E(self.element_name, segment=self.segment_name, **opt_kwargs)
+        if self.fraction_along != 1.0:
+            opt_kwargs['fractionAlong'] = str(self.fraction_along)
+        return E(self.element_name, segment=self.name, **opt_kwargs)
 
     @classmethod
     def from_xml(cls, element):
@@ -199,7 +285,7 @@ class Classification(object):
     def to_xml(self):
         return E(self.element_name,
                  name=self.name,
-                 *[d.to_xml() for d in self.classes])
+                 *[c.to_xml() for c in self.classes.itervalues() if c.members])
 
     @classmethod
     def from_xml(cls, element):
@@ -211,13 +297,34 @@ class Classification(object):
         return cls(element.attrib['name'], classes)
 
 
-class SegmentClass(list):
+class SegmentClass(object):
 
     element_name = 'class'
+    member_name = 'member'
 
     def __init__(self, name, members):
         self.name = name
-        self.extend(members)
+        # Temporarily store the member names before the classes are stored
+        # in the segments themselves
+        self._member_names = members
+        self._morphology = None
+
+    def _set_members(self, morphology):
+        self._morphology = morphology
+        for seg in morphology.segments:
+            if seg.name in self._member_names:
+                seg.classes.append(self)
+        # Clear the member names as class members will now be accessed by
+        # the class list in the segments themselves
+        self._member_names = []
+
+    @property
+    def members(self):
+        return (seg for seg in self._morphology.segments
+                if self.name in seg.classes)
+
+    def __iter__(self):
+        return iter(self._members)
 
     def __repr__(self):
         return ("'{}' segment class with {} member(s)"
@@ -226,34 +333,13 @@ class SegmentClass(list):
     def to_xml(self):
         return E(self.element_name,
                  name=self.name,
-                 *[d.to_xml() for d in self.members])
+                 *[E(self.member_name, m.name) for m in self.members])
 
     @classmethod
     def from_xml(cls, element):
         assert element.tag == MORPH_NINEML + cls.element_name
         members = []
         for child in element.getchildren():
-            members.append(Member.from_xml(child))
+            assert child.tag == MORPH_NINEML + cls.member_name
+            members.append(child.text)
         return cls(element.attrib['name'], members)
-
-
-class Member(object):
-
-    element_name = 'member'
-
-    def __init__(self, segment_name):
-        self.segment_name = segment_name
-
-    def __str__(self):
-        return self.segment_name
-
-    def __repr__(self):
-        return "segment: {}".format(self.segment_name)
-
-    def to_xml(self):
-        return E(self.element_name, self.segment_name)
-
-    @classmethod
-    def from_xml(cls, element):
-        assert element.tag == MORPH_NINEML + cls.element_name
-        return cls(element.text)

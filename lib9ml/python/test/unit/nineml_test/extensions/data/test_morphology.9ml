@@ -1,0 +1,665 @@
+<M:morphology name="WithAxon" xmlns:M="http://www.nineml.org/Morphology">
+    <M:segment name="soma">
+        <M:proximal x="0" y="0" z="0" diameter="27"/>
+        <M:distal x="0" y="0" z="27" diameter="27"/>
+    </M:segment>
+    <M:segment name="dend_0_0">
+        <M:parent segment="soma" fractionAlong="0.5"/>
+        <M:distal x="11.3" y="0" z="13.5" diameter="3"/>
+    </M:segment>
+    <M:segment name="dend_0_1">
+        <M:parent segment="dend_0_0"/>
+        <M:distal x="22.6" y="0" z="13.5" diameter="3"/>
+    </M:segment>
+    <M:segment name="dend_0_2">
+        <M:parent segment="dend_0_1"/>
+        <M:distal x="33.9" y="0" z="13.5" diameter="3"/>
+    </M:segment>
+    <M:segment name="dend_0_3">
+        <M:parent segment="dend_0_2"/>
+        <M:distal x="45.2" y="0" z="13.5" diameter="3"/>
+    </M:segment>
+    <M:segment name="dend_0_4">
+        <M:parent segment="dend_0_3"/>
+        <M:distal x="56.5" y="0" z="13.5" diameter="3"/>
+    </M:segment>
+    <M:segment name="dend_0_5">
+        <M:parent segment="dend_0_4"/>
+        <M:distal x="67.8" y="0" z="13.5" diameter="3"/>
+    </M:segment>
+    <M:segment name="dend_0_6">
+        <M:parent segment="dend_0_5"/>
+        <M:distal x="79.1" y="0" z="13.5" diameter="3"/>
+    </M:segment>
+    <M:segment name="dend_0_7">
+        <M:parent segment="dend_0_6"/>
+        <M:distal x="90.4" y="0" z="13.5" diameter="3"/>
+    </M:segment>
+    <M:segment name="dend_0_8">
+        <M:parent segment="dend_0_7"/>
+        <M:distal x="101.7" y="0" z="13.5" diameter="3"/>
+    </M:segment>
+    <M:segment name="dend_0_9">
+        <M:parent segment="dend_0_8"/>
+        <M:distal x="113.0" y="0" z="13.5" diameter="3"/>
+    </M:segment>
+    <M:segment name="dend_1_0">
+        <M:parent segment="soma" fractionAlong="0.5"/>
+        <M:distal x="-11.3" y="0" z="13.5" diameter="3"/>
+    </M:segment>
+    <M:segment name="dend_1_1">
+        <M:parent segment="dend_1_0"/>
+        <M:distal x="-22.6" y="0" z="13.5" diameter="3"/>
+    </M:segment>
+    <M:segment name="dend_1_2">
+        <M:parent segment="dend_1_1"/>
+        <M:distal x="-33.9" y="0" z="13.5" diameter="3"/>
+    </M:segment>
+    <M:segment name="dend_1_3">
+        <M:parent segment="dend_1_2"/>
+        <M:distal x="-45.2" y="0" z="13.5" diameter="3"/>
+    </M:segment>
+    <M:segment name="dend_1_4">
+        <M:parent segment="dend_1_3"/>
+        <M:distal x="-56.5" y="0" z="13.5" diameter="3"/>
+    </M:segment>
+    <M:segment name="dend_1_5">
+        <M:parent segment="dend_1_4"/>
+        <M:distal x="-67.8" y="0" z="13.5" diameter="3"/>
+    </M:segment>
+    <M:segment name="dend_1_6">
+        <M:parent segment="dend_1_5"/>
+        <M:distal x="-79.1" y="0" z="13.5" diameter="3"/>
+    </M:segment>
+    <M:segment name="dend_1_7">
+        <M:parent segment="dend_1_6"/>
+        <M:distal x="-90.4" y="0" z="13.5" diameter="3"/>
+    </M:segment>
+    <M:segment name="dend_1_8">
+        <M:parent segment="dend_1_7"/>
+        <M:distal x="-101.7" y="0" z="13.5" diameter="3"/>
+    </M:segment>
+    <M:segment name="dend_1_9">
+        <M:parent segment="dend_1_8"/>
+        <M:distal x="-113.0" y="0" z="13.5" diameter="3"/>
+    </M:segment>
+    <M:segment name="dend_2_0">
+        <M:parent segment="soma" fractionAlong="0.5"/>
+        <M:distal x="0" y="11.3" z="13.5" diameter="3"/>
+    </M:segment>
+    <M:segment name="dend_2_1">
+        <M:parent segment="dend_2_0"/>
+        <M:distal x="0" y="22.6" z="13.5" diameter="3"/>
+    </M:segment>
+    <M:segment name="dend_2_2">
+        <M:parent segment="dend_2_1"/>
+        <M:distal x="0" y="33.9" z="13.5" diameter="3"/>
+    </M:segment>
+    <M:segment name="dend_2_3">
+        <M:parent segment="dend_2_2"/>
+        <M:distal x="0" y="45.2" z="13.5" diameter="3"/>
+    </M:segment>
+    <M:segment name="dend_2_4">
+        <M:parent segment="dend_2_3"/>
+        <M:distal x="0" y="56.5" z="13.5" diameter="3"/>
+    </M:segment>
+    <M:segment name="dend_2_5">
+        <M:parent segment="dend_2_4"/>
+        <M:distal x="0" y="67.8" z="13.5" diameter="3"/>
+    </M:segment>
+    <M:segment name="dend_2_6">
+        <M:parent segment="dend_2_5"/>
+        <M:distal x="0" y="79.1" z="13.5" diameter="3"/>
+    </M:segment>
+    <M:segment name="dend_2_7">
+        <M:parent segment="dend_2_6"/>
+        <M:distal x="0" y="90.4" z="13.5" diameter="3"/>
+    </M:segment>
+    <M:segment name="dend_2_8">
+        <M:parent segment="dend_2_7"/>
+        <M:distal x="0" y="101.7" z="13.5" diameter="3"/>
+    </M:segment>
+    <M:segment name="dend_2_9">
+        <M:parent segment="dend_2_8"/>
+        <M:distal x="0" y="113.0" z="13.5" diameter="3"/>
+    </M:segment>
+    <M:segment name="axon_0">
+        <M:parent segment="soma" fractionAlong="0.5"/>
+        <M:distal x="0.0" y="-12.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_1">
+        <M:parent segment="axon_0"/>
+        <M:distal x="0.0" y="-24.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_2">
+        <M:parent segment="axon_1"/>
+        <M:distal x="0.0" y="-36.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_3">
+        <M:parent segment="axon_2"/>
+        <M:distal x="0.0" y="-48.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_4">
+        <M:parent segment="axon_3"/>
+        <M:distal x="0.0" y="-60.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_5">
+        <M:parent segment="axon_4"/>
+        <M:distal x="0.0" y="-72.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_6">
+        <M:parent segment="axon_5"/>
+        <M:distal x="0.0" y="-84.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_7">
+        <M:parent segment="axon_6"/>
+        <M:distal x="0.0" y="-96.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_8">
+        <M:parent segment="axon_7"/>
+        <M:distal x="0.0" y="-108.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_9">
+        <M:parent segment="axon_8"/>
+        <M:distal x="0.0" y="-120.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_10">
+        <M:parent segment="axon_9"/>
+        <M:distal x="0.0" y="-132.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_11">
+        <M:parent segment="axon_10"/>
+        <M:distal x="0.0" y="-144.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_12">
+        <M:parent segment="axon_11"/>
+        <M:distal x="0.0" y="-156.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_13">
+        <M:parent segment="axon_12"/>
+        <M:distal x="0.0" y="-168.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_14">
+        <M:parent segment="axon_13"/>
+        <M:distal x="0.0" y="-180.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_15">
+        <M:parent segment="axon_14"/>
+        <M:distal x="0.0" y="-192.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_16">
+        <M:parent segment="axon_15"/>
+        <M:distal x="0.0" y="-204.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_17">
+        <M:parent segment="axon_16"/>
+        <M:distal x="0.0" y="-216.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_18">
+        <M:parent segment="axon_17"/>
+        <M:distal x="0.0" y="-228.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_19">
+        <M:parent segment="axon_18"/>
+        <M:distal x="0.0" y="-240.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_20">
+        <M:parent segment="axon_19"/>
+        <M:distal x="0.0" y="-252.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_21">
+        <M:parent segment="axon_20"/>
+        <M:distal x="0.0" y="-264.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_22">
+        <M:parent segment="axon_21"/>
+        <M:distal x="0.0" y="-276.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_23">
+        <M:parent segment="axon_22"/>
+        <M:distal x="0.0" y="-288.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_24">
+        <M:parent segment="axon_23"/>
+        <M:distal x="0.0" y="-300.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_25">
+        <M:parent segment="axon_24"/>
+        <M:distal x="0.0" y="-312.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_26">
+        <M:parent segment="axon_25"/>
+        <M:distal x="0.0" y="-324.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_27">
+        <M:parent segment="axon_26"/>
+        <M:distal x="0.0" y="-336.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_28">
+        <M:parent segment="axon_27"/>
+        <M:distal x="0.0" y="-348.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_29">
+        <M:parent segment="axon_28"/>
+        <M:distal x="0.0" y="-360.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_30">
+        <M:parent segment="axon_29"/>
+        <M:distal x="0.0" y="-372.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_31">
+        <M:parent segment="axon_30"/>
+        <M:distal x="0.0" y="-384.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_32">
+        <M:parent segment="axon_31"/>
+        <M:distal x="0.0" y="-396.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_33">
+        <M:parent segment="axon_32"/>
+        <M:distal x="0.0" y="-408.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_34">
+        <M:parent segment="axon_33"/>
+        <M:distal x="0.0" y="-420.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_35">
+        <M:parent segment="axon_34"/>
+        <M:distal x="0.0" y="-432.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_36">
+        <M:parent segment="axon_35"/>
+        <M:distal x="0.0" y="-444.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_37">
+        <M:parent segment="axon_36"/>
+        <M:distal x="0.0" y="-456.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_38">
+        <M:parent segment="axon_37"/>
+        <M:distal x="0.0" y="-468.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_39">
+        <M:parent segment="axon_38"/>
+        <M:distal x="0.0" y="-480.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_40">
+        <M:parent segment="axon_39"/>
+        <M:distal x="0.0" y="-492.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_41">
+        <M:parent segment="axon_40"/>
+        <M:distal x="0.0" y="-504.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_42">
+        <M:parent segment="axon_41"/>
+        <M:distal x="0.0" y="-516.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_43">
+        <M:parent segment="axon_42"/>
+        <M:distal x="0.0" y="-528.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_44">
+        <M:parent segment="axon_43"/>
+        <M:distal x="0.0" y="-540.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_45">
+        <M:parent segment="axon_44"/>
+        <M:distal x="0.0" y="-552.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_46">
+        <M:parent segment="axon_45"/>
+        <M:distal x="0.0" y="-564.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_47">
+        <M:parent segment="axon_46"/>
+        <M:distal x="0.0" y="-576.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_48">
+        <M:parent segment="axon_47"/>
+        <M:distal x="0.0" y="-588.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_49">
+        <M:parent segment="axon_48"/>
+        <M:distal x="0.0" y="-600.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_50">
+        <M:parent segment="axon_49"/>
+        <M:distal x="0.0" y="-612.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_51">
+        <M:parent segment="axon_50"/>
+        <M:distal x="0.0" y="-624.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_52">
+        <M:parent segment="axon_51"/>
+        <M:distal x="0.0" y="-636.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_53">
+        <M:parent segment="axon_52"/>
+        <M:distal x="0.0" y="-648.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_54">
+        <M:parent segment="axon_53"/>
+        <M:distal x="0.0" y="-660.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_55">
+        <M:parent segment="axon_54"/>
+        <M:distal x="0.0" y="-672.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_56">
+        <M:parent segment="axon_55"/>
+        <M:distal x="0.0" y="-684.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_57">
+        <M:parent segment="axon_56"/>
+        <M:distal x="0.0" y="-696.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_58">
+        <M:parent segment="axon_57"/>
+        <M:distal x="0.0" y="-708.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_59">
+        <M:parent segment="axon_58"/>
+        <M:distal x="0.0" y="-720.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_60">
+        <M:parent segment="axon_59"/>
+        <M:distal x="0.0" y="-732.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_61">
+        <M:parent segment="axon_60"/>
+        <M:distal x="0.0" y="-744.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_62">
+        <M:parent segment="axon_61"/>
+        <M:distal x="0.0" y="-756.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_63">
+        <M:parent segment="axon_62"/>
+        <M:distal x="0.0" y="-768.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_64">
+        <M:parent segment="axon_63"/>
+        <M:distal x="0.0" y="-780.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_65">
+        <M:parent segment="axon_64"/>
+        <M:distal x="0.0" y="-792.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_66">
+        <M:parent segment="axon_65"/>
+        <M:distal x="0.0" y="-804.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_67">
+        <M:parent segment="axon_66"/>
+        <M:distal x="0.0" y="-816.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_68">
+        <M:parent segment="axon_67"/>
+        <M:distal x="0.0" y="-828.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_69">
+        <M:parent segment="axon_68"/>
+        <M:distal x="0.0" y="-840.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_70">
+        <M:parent segment="axon_69"/>
+        <M:distal x="0.0" y="-852.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_71">
+        <M:parent segment="axon_70"/>
+        <M:distal x="0.0" y="-864.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_72">
+        <M:parent segment="axon_71"/>
+        <M:distal x="0.0" y="-876.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_73">
+        <M:parent segment="axon_72"/>
+        <M:distal x="0.0" y="-888.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_74">
+        <M:parent segment="axon_73"/>
+        <M:distal x="0.0" y="-900.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_75">
+        <M:parent segment="axon_74"/>
+        <M:distal x="0.0" y="-912.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_76">
+        <M:parent segment="axon_75"/>
+        <M:distal x="0.0" y="-924.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_77">
+        <M:parent segment="axon_76"/>
+        <M:distal x="0.0" y="-936.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_78">
+        <M:parent segment="axon_77"/>
+        <M:distal x="0.0" y="-948.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_79">
+        <M:parent segment="axon_78"/>
+        <M:distal x="0.0" y="-960.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_80">
+        <M:parent segment="axon_79"/>
+        <M:distal x="0.0" y="-972.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_81">
+        <M:parent segment="axon_80"/>
+        <M:distal x="0.0" y="-984.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_82">
+        <M:parent segment="axon_81"/>
+        <M:distal x="0.0" y="-996.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_83">
+        <M:parent segment="axon_82"/>
+        <M:distal x="0.0" y="-1008.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_84">
+        <M:parent segment="axon_83"/>
+        <M:distal x="0.0" y="-1020.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_85">
+        <M:parent segment="axon_84"/>
+        <M:distal x="0.0" y="-1032.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_86">
+        <M:parent segment="axon_85"/>
+        <M:distal x="0.0" y="-1044.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_87">
+        <M:parent segment="axon_86"/>
+        <M:distal x="0.0" y="-1056.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_88">
+        <M:parent segment="axon_87"/>
+        <M:distal x="0.0" y="-1068.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_89">
+        <M:parent segment="axon_88"/>
+        <M:distal x="0.0" y="-1080.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_90">
+        <M:parent segment="axon_89"/>
+        <M:distal x="0.0" y="-1092.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_91">
+        <M:parent segment="axon_90"/>
+        <M:distal x="0.0" y="-1104.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_92">
+        <M:parent segment="axon_91"/>
+        <M:distal x="0.0" y="-1116.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_93">
+        <M:parent segment="axon_92"/>
+        <M:distal x="0.0" y="-1128.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_94">
+        <M:parent segment="axon_93"/>
+        <M:distal x="0.0" y="-1140.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_95">
+        <M:parent segment="axon_94"/>
+        <M:distal x="0.0" y="-1152.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_96">
+        <M:parent segment="axon_95"/>
+        <M:distal x="0.0" y="-1164.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_97">
+        <M:parent segment="axon_96"/>
+        <M:distal x="0.0" y="-1176.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_98">
+        <M:parent segment="axon_97"/>
+        <M:distal x="0.0" y="-1188.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:segment name="axon_99">
+        <M:parent segment="axon_98"/>
+        <M:distal x="0.0" y="-1200.0" z="13.5" diameter="2.4"/>
+    </M:segment>
+    <M:classification name="BasicAnatomy">
+        <M:class name="Soma" default="True">
+            <M:member>soma</M:member>
+        </M:class>
+        <M:class name="Dendrites">
+            <M:member>dend_0_0</M:member>
+            <M:member>dend_0_1</M:member>
+            <M:member>dend_0_2</M:member>
+            <M:member>dend_0_3</M:member>
+            <M:member>dend_0_4</M:member>
+            <M:member>dend_0_5</M:member>
+            <M:member>dend_0_6</M:member>
+            <M:member>dend_0_7</M:member>
+            <M:member>dend_0_8</M:member>
+            <M:member>dend_0_9</M:member>
+            <M:member>dend_1_0</M:member>
+            <M:member>dend_1_1</M:member>
+            <M:member>dend_1_2</M:member>
+            <M:member>dend_1_3</M:member>
+            <M:member>dend_1_4</M:member>
+            <M:member>dend_1_5</M:member>
+            <M:member>dend_1_6</M:member>
+            <M:member>dend_1_7</M:member>
+            <M:member>dend_1_8</M:member>
+            <M:member>dend_1_9</M:member>
+            <M:member>dend_2_0</M:member>
+            <M:member>dend_2_1</M:member>
+            <M:member>dend_2_2</M:member>
+            <M:member>dend_2_3</M:member>
+            <M:member>dend_2_4</M:member>
+            <M:member>dend_2_5</M:member>
+            <M:member>dend_2_6</M:member>
+            <M:member>dend_2_7</M:member>
+            <M:member>dend_2_8</M:member>
+            <M:member>dend_2_9</M:member>
+        </M:class>
+        <M:class name="Axon">
+            <M:member>axon_0</M:member>
+            <M:member>axon_1</M:member>
+            <M:member>axon_2</M:member>
+            <M:member>axon_3</M:member>
+            <M:member>axon_4</M:member>
+            <M:member>axon_5</M:member>
+            <M:member>axon_6</M:member>
+            <M:member>axon_7</M:member>
+            <M:member>axon_8</M:member>
+            <M:member>axon_9</M:member>
+            <M:member>axon_10</M:member>
+            <M:member>axon_11</M:member>
+            <M:member>axon_12</M:member>
+            <M:member>axon_13</M:member>
+            <M:member>axon_14</M:member>
+            <M:member>axon_15</M:member>
+            <M:member>axon_16</M:member>
+            <M:member>axon_17</M:member>
+            <M:member>axon_18</M:member>
+            <M:member>axon_19</M:member>
+            <M:member>axon_20</M:member>
+            <M:member>axon_21</M:member>
+            <M:member>axon_22</M:member>
+            <M:member>axon_23</M:member>
+            <M:member>axon_24</M:member>
+            <M:member>axon_25</M:member>
+            <M:member>axon_26</M:member>
+            <M:member>axon_27</M:member>
+            <M:member>axon_28</M:member>
+            <M:member>axon_29</M:member>
+            <M:member>axon_30</M:member>
+            <M:member>axon_31</M:member>
+            <M:member>axon_32</M:member>
+            <M:member>axon_33</M:member>
+            <M:member>axon_34</M:member>
+            <M:member>axon_35</M:member>
+            <M:member>axon_36</M:member>
+            <M:member>axon_37</M:member>
+            <M:member>axon_38</M:member>
+            <M:member>axon_39</M:member>
+            <M:member>axon_40</M:member>
+            <M:member>axon_41</M:member>
+            <M:member>axon_42</M:member>
+            <M:member>axon_43</M:member>
+            <M:member>axon_44</M:member>
+            <M:member>axon_45</M:member>
+            <M:member>axon_46</M:member>
+            <M:member>axon_47</M:member>
+            <M:member>axon_48</M:member>
+            <M:member>axon_49</M:member>
+            <M:member>axon_50</M:member>
+            <M:member>axon_51</M:member>
+            <M:member>axon_52</M:member>
+            <M:member>axon_53</M:member>
+            <M:member>axon_54</M:member>
+            <M:member>axon_55</M:member>
+            <M:member>axon_56</M:member>
+            <M:member>axon_57</M:member>
+            <M:member>axon_58</M:member>
+            <M:member>axon_59</M:member>
+            <M:member>axon_60</M:member>
+            <M:member>axon_61</M:member>
+            <M:member>axon_62</M:member>
+            <M:member>axon_63</M:member>
+            <M:member>axon_64</M:member>
+            <M:member>axon_65</M:member>
+            <M:member>axon_66</M:member>
+            <M:member>axon_67</M:member>
+            <M:member>axon_68</M:member>
+            <M:member>axon_69</M:member>
+            <M:member>axon_70</M:member>
+            <M:member>axon_71</M:member>
+            <M:member>axon_72</M:member>
+            <M:member>axon_73</M:member>
+            <M:member>axon_74</M:member>
+            <M:member>axon_75</M:member>
+            <M:member>axon_76</M:member>
+            <M:member>axon_77</M:member>
+            <M:member>axon_78</M:member>
+            <M:member>axon_79</M:member>
+            <M:member>axon_80</M:member>
+            <M:member>axon_81</M:member>
+            <M:member>axon_82</M:member>
+            <M:member>axon_83</M:member>
+            <M:member>axon_84</M:member>
+            <M:member>axon_85</M:member>
+            <M:member>axon_86</M:member>
+            <M:member>axon_87</M:member>
+            <M:member>axon_88</M:member>
+            <M:member>axon_89</M:member>
+            <M:member>axon_90</M:member>
+            <M:member>axon_91</M:member>
+            <M:member>axon_92</M:member>
+            <M:member>axon_93</M:member>
+            <M:member>axon_94</M:member>
+            <M:member>axon_95</M:member>
+            <M:member>axon_96</M:member>
+            <M:member>axon_97</M:member>
+            <M:member>axon_98</M:member>
+            <M:member>axon_99</M:member>
+        </M:class>
+    </M:classification>
+</M:morphology>

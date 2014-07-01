@@ -94,7 +94,7 @@ class ComponentClass(object):
             if p.reference == 'Diameter':
                 for seg_class in p.segments:
                     for member in self.morphology.classifications[p.segments.classification][seg_class]:
-                        seg = self.morphology.segments[member.segment_name]
+                        seg = self.morphology.segments[member.name]
                         if p.default_value is None:
                             p.default_value = seg.distal.diameter
                             p.unit = 'um'
