@@ -3,6 +3,7 @@ from itertools import chain
 from lxml import etree
 from lxml.builder import E
 import numpy
+from copy import deepcopy
 
 morphology_namespace = 'http://www.nineml.org/Morphology'
 MORPH_NINEML = "{%s}" % morphology_namespace
@@ -62,6 +63,13 @@ class Morphology(object):
         """
         return chain([self.root], self.root.all_children)
 
+    @property
+    def branches(self):
+        """
+        An iterator over all branches in the tree
+        """
+        return self.root.sub_branches
+
     def segment(self, name):
         match = [seg for seg in self.segments if seg.name == name]
         #TODO: Need to check this on initialisation
@@ -72,7 +80,7 @@ class Morphology(object):
 
     def __repr__(self):
         return ("Morphology '{}' with {} segment(s) and {} classification(s)"
-                .format(self.name, len(self.segments),
+                .format(self.name, len(list(self.segments)),
                         len(self.classifications)))
 
     def to_xml(self):
@@ -112,38 +120,155 @@ class Segment(object):
             raise Exception("Proximal or parent_ref must be supplied")
         self.name = name
         self._proximal = proximal
+        self._distal = distal
         self.parent_ref = parent_ref
-        self.distal = distal
         self.children = []
-        self.classes = []
+        self.classes = set()
 
     @property
     def proximal(self):
         if self.parent_ref:
-            if self.parent_ref.fraction_along:
-                pos = (self.parent.proximal.pos +
-                       (self.parent.distal.pos /
+            if self.parent_ref.fraction_along != 1.0:
+                pos = (self.parent.proximal +
+                       (self.parent.distal *
                         self.parent_ref.fraction_along))
             else:
-                pos = self.parent_ref.segment.distal.pos
-            return Point3D(pos[0], pos[1], pos[2], self.distal.diameter)
+                pos = self.parent_ref.segment.distal
         else:
-            return self._proximal
+            pos = self._proximal.pos
+        return pos
+
+    @property
+    def distal(self):
+        return self._distal.pos
+
+    @property
+    def disp(self):
+        return self.distal - self.proximal
 
     @property
     def length(self):
-        return numpy.sqrt(numpy.sum(self.distal.pos - self.proximal.pos))
+        return numpy.sqrt(numpy.sum(self.disp ** 2))
+
+    @property
+    def branch_depth(self):
+        branch_count = 0
+        seg = self
+        while seg.parent_ref:
+            if seg.siblings:
+                branch_count += 1
+            seg = seg.parent_ref.segment
+        return branch_count
+
+    @property
+    def sub_branches(self):
+        """
+        Iterates through all sub-branches of the current segment, starting at
+        the current segment
+        """
+        seg = self
+        branch = [self]
+        while len(seg.children) == 1:
+            seg = seg.children[0]
+            branch.append(seg)
+        yield branch
+        for child in seg.children:
+            for sub_branch in child.sub_branches:
+                yield sub_branch
+
+    def branch_start(self):
+        """
+        Gets the start of the branch (a section of tree without any sub
+        branches the current segment lies on
+        """
+        seg = self
+        while seg.parent and not seg.siblings:
+            seg = seg.parent
+        return seg
 
     def diameter(self, fraction_along=1.0):
-        return (self.proximal.diameter * (1.0 - fraction_along) +
-                self.distal.diameter * fraction_along)
+        if self.parent_ref:
+            return self._distal.diameter
+        else:
+            return (self._proximal.diameter * (1.0 - fraction_along) +
+                    self._distal.diameter * fraction_along)
 
     @property
     def parent(self):
         try:
             return self.parent_ref.segment
-        except AttributeError:
+        except AttributeError:  # No parent reference
             return None
+
+    @property
+    def siblings(self):
+        try:
+            return [c for c in self.parent.children if c is not self]
+        except AttributeError:  # No parent
+            return []
+
+    def set_proximal(self, proximal):
+        """
+        Updates the proximal point of the segment if it is the root node,
+        otherwise it raises and Exception
+
+        `distal`         -- the point to update the distal endpoint of the
+                            segment to [numpy.array(3)]
+        """
+        if self.parent_ref:
+            raise Exception("Cannot set proximal point as it is part of a "
+                            "parent segment")
+        else:
+            self._proximal = proximal
+
+    def set_distal(self, distal, shift_children=True):
+        """
+        Sets the distal point of the segment, optionally shifting all child
+        segments by the same displacement (to keep their lengths constant)
+
+        `distal`         -- the point to update the distal endpoint of the
+                            segment to [numpy.array(3)]
+        `shift_children` -- update all child branches so that their lengths
+                            stay constant
+        """
+        if shift_children:
+            disp = distal - self._distal.pos
+            for child in self.all_children:
+                child._distal.pos += disp
+        self._distal.pos = distal
+
+    def set_length(self, length):
+        """
+        Sets the length of the segment, shifting the positions of all child
+        nodes so that their lengths stay constant
+
+        `length` -- the new length to set the segment to
+        """
+        seg_disp = self.distal - self.proximal
+        orig_length = numpy.sqrt(numpy.sum(seg_disp ** 2))
+        seg_disp *= length / orig_length
+        self.set_distal(self.proximal + seg_disp, shift_children=True)
+
+    def set_diameter(self, diameter):
+        """
+        Sets the length of the segment, shifting the positions of all child
+        nodes so that their lengths stay constant
+
+        `diameter` -- the new diameter(s) to set the segment to (can be a tuple
+                      when the segment has an explict proximal point)
+        """
+        if self.parent_ref:
+            if not isinstance(diameter, float):
+                raise Exception("Diameter must be a float for segments with "
+                                "parent segments (provided {})"
+                                .format(diameter))
+            self._distal.diameter = diameter
+        else:
+            try:
+                self._proximal.diameter = diameter[0]
+                self._distal.diameter = diameter[1]
+            except TypeError:  # If a float is provided instead of a tuple
+                self._proximal.diameter = self._distal.diameter = diameter
 
     @property
     def all_children(self):
@@ -152,19 +277,46 @@ class Segment(object):
             for childs_child in child.all_children:
                 yield childs_child
 
+    def pop_child(self, child_name):
+        for i, child in enumerate(self.children):
+            if child.name == child_name:
+                popped = self.children.pop(i)
+                break
+        try:
+            proximal = (self.proximal *
+                        (1.0 - popped.parent_ref.fraction_along) +
+                        self.distal * popped.parent_ref.fraction_along)
+            popped._proximal = ProximalPoint(proximal[0], proximal[1],
+                                             proximal[2],
+                                             popped._distal.diameter)
+            popped.parent_ref = None
+        except NameError:
+            raise Exception("No child segments match the name '{}'"
+                            .format(child_name))
+        return popped
+
+    def add_child(self, segment, fraction_along=1.0):
+        new_distal = ((self.disp * fraction_along + self.proximal) +
+                      segment.disp)
+        seg_copy = deepcopy(segment)
+        seg_copy.set_distal(new_distal)
+        self.children.append(seg_copy)
+
     def __repr__(self):
         if self.parent_ref:
             p = "parent_ref: ({})".format(repr(self.parent_ref))
         else:
-            p = "proximal: ({})".format(repr(self._proximal))
-        return "Segment: '{}', {}, distal: ({})".format(self.name, p,
-                                                        self.distal)
+            p = ("proximal: ({}, diam={})"
+                 .format(repr(self.proximal),
+                         self.diameter(0.0)))
+        return ("Segment: '{}', {}, distal: (pos: {}, diam: {})"
+                .format(self.name, p, self.distal, self.diameter(1.0)))
 
     def to_xml(self):
         return E(self.element_name,
                  (self.parent_ref.to_xml()
                   if self.parent_ref else self._proximal.to_xml()),
-                 self.distal.to_xml(),
+                 self._distal.to_xml(),
                  name=self.name)
 
     @classmethod
@@ -288,7 +440,7 @@ class Classification(object):
         return E(self.element_name,
                  name=self.name,
                  *[c.to_xml() for c in self.classes.itervalues()
-                   if not c.empty()])
+                   if len(c)])
 
     @classmethod
     def from_xml(cls, element):
@@ -316,7 +468,7 @@ class SegmentClass(object):
         self._morphology = morphology
         for seg in morphology.segments:
             if seg.name in self._member_names:
-                seg.classes.append(self.name)
+                seg.classes.add(self.name)
         # Clear the member names as class members will now be accessed by
         # the class list in the segments themselves
         self._member_names = []
@@ -335,7 +487,7 @@ class SegmentClass(object):
     def to_xml(self):
         return E(self.element_name,
                  name=self.name,
-                 *[E(self.member_name, m.name) for m in self.members])
+                 *[E(self.member_name, m.name) for m in self])
 
     @classmethod
     def from_xml(cls, element):

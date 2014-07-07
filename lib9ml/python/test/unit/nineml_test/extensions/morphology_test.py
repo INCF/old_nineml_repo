@@ -33,6 +33,14 @@ class TestMorphology(unittest.TestCase):
         morph9ml = parse(self.test_file)
 #         with open(self.test_file) as f:
 #             test_file_text = f.read()
+        s = morph9ml.segment('soma')
+        d = s.pop_child('dend_0_0')
+        s.pop_child('dend_1_0')
+        s.pop_child('dend_2_0')
+        s.pop_child('axon_0')
+        d.set_length(100)
+        d.set_diameter(100)
+        s.add_child(d)
         etree.ElementTree(morph9ml.to_xml()).write(
                      os.path.join(os.path.dirname(self.test_file),
                                                   'test_morphology_out.9ml'),
