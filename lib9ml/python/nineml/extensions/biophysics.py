@@ -178,7 +178,7 @@ class Parameter(object):
         if self.unit:
             opt_args.append(E('unit', self.unit))
         return E(self.element_name,
-                 E('value', self.value),
+                 E('value', str(self.value)),
                  name=self.name,
                  *opt_args)
 

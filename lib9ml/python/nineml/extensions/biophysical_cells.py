@@ -63,7 +63,7 @@ class ComponentClass(object):
                  E(nineml.extensions.morphology.Morphology.element_name, self.morphology.to_xml()),
                  E(nineml.extensions.biophysics.BiophysicsModel.element_name, self.biophysics.to_xml()),
                  name=self.name,
-                 *[c.to_xml() for c in chain(self.parameters.values(), self.mappings.values())])
+                 *[c.to_xml() for c in chain(self.parameters, self.mappings)])
 
     @classmethod
     def from_xml(cls, element, url=None):
@@ -96,7 +96,7 @@ class ComponentClass(object):
                     for member in self.morphology.classifications[p.segments.classification][seg_class]:
                         seg = self.morphology.segment(member.name)
                         if p.default_value is None:
-                            p.default_value = seg.distal.diameter
+                            p.default_value = seg.diameter()
                             p.unit = 'um'
                         elif p.default_value != seg.diam or p.unit != seg.unit:
                             raise Exception("Inconsistent values in diameter across morphology")
