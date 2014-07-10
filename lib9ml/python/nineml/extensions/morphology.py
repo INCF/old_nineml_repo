@@ -70,6 +70,13 @@ class Morphology(object):
         """
         return self.root.sub_branches
 
+    @property
+    def classes(self):
+        classes = set()
+        for seg in self.segments:
+            classes.update(seg.classes)
+        return classes
+
     def segment(self, name):
         match = [seg for seg in self.segments if seg.name == name]
         #TODO: Need to check this on initialisation

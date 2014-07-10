@@ -8,6 +8,7 @@ import nineml.extensions.biophysics
 biophysical_cells_namespace = 'http://www.nineml.org/BiophysicalCells'
 BIO_CELL_NINEML = "{%s}" % biophysical_cells_namespace
 
+
 def read_elements(url):
     """
     Read a NineML user-layer file and return a xml element object.
@@ -23,6 +24,7 @@ def read_elements(url):
         doc = etree.parse(url)
     root = doc.getroot()
     return root.findall(BIO_CELL_NINEML + ComponentClass.element_name)
+
 
 def parse(url):
     """
