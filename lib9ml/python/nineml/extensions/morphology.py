@@ -32,6 +32,16 @@ class Morphology(object):
         self.name = name
         self.segments = segments
         self.classifications = classifications
+        root_segment = [seg for seg in self.segments.itervalues()
+                        if seg.parent is None]
+        if not root_segment:
+            raise Exception("Root segment not found in morphology")
+        elif len(root_segment) > 1:
+            raise Exception("Multiple root segments found in morphology ('{}')"
+                            .format("', '".join([seg.name
+                                                 for seg in root_segment])))
+        else:
+            self.root_segment = root_segment[0]
 
     def __repr__(self):
         return ("Morphology '{}' with {} segment(s) and {} classification(s)"
