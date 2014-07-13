@@ -1,4 +1,5 @@
 import urllib
+from collections import OrderedDict
 from itertools import chain
 from lxml import etree
 from lxml.builder import E
@@ -51,8 +52,9 @@ class Morphology(object):
     def to_xml(self):
         return E(self.element_name,
                  name=self.name,
-                 *[c.to_xml() for c in chain(self.segments.values(),
-                                              self.classifications.values())])
+                 *[c.to_xml() for c in chain(
+                                           self.segments.itervalues(),
+                                           self.classifications.itervalues())])
 
     @classmethod
     def from_xml(cls, element):
@@ -98,7 +100,8 @@ class Segment(object):
         return E(self.element_name,
                  (self.proximal.to_xml()
                   if self.proximal else self.parent.to_xml()),
-                 self.distal.to_xml())
+                 self.distal.to_xml(),
+                 name=self.name)
 
     @classmethod
     def from_xml(cls, element):
@@ -143,8 +146,9 @@ class Point3D(object):
 
     def to_xml(self):
         return E(self.element_name,
-                 x=str(self.x), y=str(self.y), z=str(self.z),
-                 diameter=str(self.diameter))
+                 OrderedDict([('x', str(self.x)), ('y', str(self.y)),
+                              ('z', str(self.z)),
+                              ('diameter', str(self.diameter))]))
 
     @classmethod
     def from_xml(cls, element):
@@ -179,8 +183,8 @@ class ParentSegment(object):
 
     def to_xml(self):
         opt_kwargs = {}
-        if self.fraction_along is not None:
-            opt_kwargs['fractionAlong'] = self.fraction_along
+        if self.fraction_along is not None and self.fraction_along != 1.0:
+            opt_kwargs['fractionAlong'] = str(self.fraction_along)
         return E(self.element_name, segment=self.segment_name, **opt_kwargs)
 
     @classmethod
@@ -209,7 +213,7 @@ class Classification(object):
     def to_xml(self):
         return E(self.element_name,
                  name=self.name,
-                 *[d.to_xml() for d in self.classes])
+                 *[d.to_xml() for d in self.classes if d.name is not None])
 
     @classmethod
     def from_xml(cls, element):
@@ -221,13 +225,13 @@ class Classification(object):
         return cls(element.attrib['name'], classes)
 
 
-class SegmentClass(list):
+class SegmentClass(object):
 
     element_name = 'class'
 
     def __init__(self, name, members):
         self.name = name
-        self.extend(members)
+        self.members = members
 
     def __repr__(self):
         return ("'{}' segment class with {} member(s)"
@@ -237,6 +241,9 @@ class SegmentClass(list):
         return E(self.element_name,
                  name=self.name,
                  *[d.to_xml() for d in self.members])
+
+    def __iter__(self):
+        return iter(self.members)
 
     @classmethod
     def from_xml(cls, element):
