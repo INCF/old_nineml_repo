@@ -1,5 +1,3 @@
-
-
 import warnings
 import unittest
 from nineml.exceptions import NineMLRuntimeError
