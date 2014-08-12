@@ -28,6 +28,44 @@
       <StateVariable name="h">
         <Initial>u_inf</Initial>
       </StateVariable>
+      <Alias name="i">
+       <MathInline>gbar * m * m * h * (v - e_reversal)</MathInline>
+      </Alias>
+      <Regime>
+        <TimeDerivative variable="m">
+          <MathInline>(m_inf - m) / m_tau</MathInline>
+        </TimeDerivative>
+        <TimeDerivative variable="h">
+          <MathInline>(h_inf - h) / h_tau</MathInline>
+        </TimeDerivative>
+      </Regime>
+      <Alias name="e_reversal">
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+          <piecewise>
+            <piece>
+              <ci>nerstLowerLimit</ci>
+              <apply><leq/><ci>caExternal</ci><ci>zeroConc</ci></apply>
+            </piece>            
+            <piece>
+              <ci>nerstUpperLimit</ci>
+              <apply>
+                <and/>
+                <apply><leq/><ci>caInternal</ci><ci>zeroConc</ci></apply>
+                <apply><gt/><ci>caExternal</ci><ci>zeroConc</ci></apply>
+              </apply>
+            </piece>
+            <otherwise>
+              <ci>nernstPotential</ci>
+            </otherwise>
+          </piecewise>
+        </math>
+      </Alias>
+      <Alias name="nernstPotential">
+        <MathInline>  
+          log(caExternal / caInternal) * UniversalGasConstant * 
+          (celsius - AbsoluteZero) / (Faraday * IonicValence)
+        </MathInline>
+      </Alias>
       <Alias name="Faraday">
         <Value units="C/mol">96485.309</Value>
       </Alias>
@@ -43,29 +81,12 @@
       <Alias name="zeroConc">
         <Value units="mM">0.0</Value>
       </Alias>
-      <Alias name="nernstPotential">
-        <MathInline>  
-          log(caExternal / caInternal) * UniversalGasConstant * 
-          (celsius - AbsoluteZero) / (Faraday * IonicValence)
-        </MathInline>
-      </Alias>
       <Alias name="nernstLowerLimit">
         <Value units="mV">-1e6</Value>
       </Alias>      
       <Alias name="nernstUpperLimit">
         <Value units="mV">1e6</Value>
       </Alias>
-      <Regime>
-        <AnalogOut port="i">
-          <MathInline>gbar * m * m * h * (v - e_reversal)</MathInline>
-        </AnalogOut>
-        <TimeDerivative variable="m">
-          <MathInline>(m_inf - m) / m_tau</MathInline>
-        </TimeDerivative>
-        <TimeDerivative variable="h">
-          <MathInline>(h_inf - h) / h_tau</MathInline>
-        </TimeDerivative>
-      </Regime>
       <Alias name="m_inf">
         <MathInline>s_inf</MathInline>
       </Alias>
@@ -104,27 +125,6 @@
       </Alias>
       <Alias name="beta_u">
         <MathInline>Q10 * Abeta_u * exp((v - V0beta_u) / Kbeta_u)</MathInline>
-      </Alias>
-      <Alias name="e_reversal">
-        <math xmlns="http://www.w3.org/1998/Math/MathML">
-          <piecewise>
-            <piece>
-              <ci>nerstLowerLimit</ci>
-              <apply><leq/><ci>caExternal</ci><ci>zeroConc</ci></apply>
-            </piece>            
-            <piece>
-              <ci>nerstUpperLimit</ci>
-              <apply>
-                <and/>
-                <apply><leq/><ci>caInternal</ci><ci>zeroConc</ci></apply>
-                <apply><gt/><ci>caExternal</ci><ci>zeroConc</ci></apply>
-              </apply>
-            </piece>
-            <otherwise>
-              <ci>nernstPotential</ci>
-            </otherwise>
-          </piecewise>
-        </math>
       </Alias>
     </Dynamics>
   </ComponentClass>

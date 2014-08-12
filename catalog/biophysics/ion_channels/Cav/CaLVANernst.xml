@@ -58,10 +58,10 @@
       <Alias name="nernstUpperLimit">
         <Value units="mV">1e6</Value>
       </Alias>
+      <Alias name="i">
+       <MathInline>gbar * m * m * h * (v - e_reversal)</MathInline>
+      </Alias>
       <Regime>
-        <AnalogOut port="i">
-          <MathInline>gbar * m * m * h * (v - e_reversal)</MathInline>
-        </AnalogOut>
         <TimeDerivative variable="m">
           <MathInline>(m_inf - m) / m_tau</MathInline>
         </TimeDerivative>

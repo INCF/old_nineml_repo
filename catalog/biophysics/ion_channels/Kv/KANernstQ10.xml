@@ -32,10 +32,10 @@
       <StateVariable name="h">
         <Initial>h_inf</Initial>
       </StateVariable>
+      <Alias name="i">
+       <MathInline>gbar * m * m * m * h * (v - e_reversal)</MathInline>
+      </Alias>
       <Regime>
-        <AnalogOut port="i">
-          <MathInline>gbar * m * m * m * h * (v - e_reversal)</MathInline>
-        </AnalogOut>
         <TimeDerivative variable="m">
           <MathInline>(m_inf - m) / m_tau</MathInline>
         </TimeDerivative>

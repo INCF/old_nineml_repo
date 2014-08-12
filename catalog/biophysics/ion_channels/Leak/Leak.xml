@@ -8,10 +8,10 @@
     <AnalogPort mode="recv" name="v" dimension="voltage"/>
     <AnalogPort mode="send" name="i" dimension="current_density"/>
     <Dynamics>
+      <Alias name="i">
+       <MathInline>g * (v - e_reversal)</MathInline>
+      </Alias>
       <Regime>
-        <AnalogOut port="i">
-          <MathInline>g * (v - e_reversal)</MathInline>
-        </AnalogOut>
       </Regime>
     </Dynamics>
   </ComponentClass>

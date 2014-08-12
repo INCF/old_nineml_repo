@@ -19,10 +19,10 @@
       <StateVariable name="n">
         <Initial>n_inf</Initial>
       </StateVariable>
+      <Alias name="i">
+       <MathInline>gbar * n * n * n * n * (v - e_reversal)</MathInline>
+      </Alias>
       <Regime>
-        <AnalogOut port="i">
-          <MathInline>gbar * n * n * n * n * (v - e_reversal)</MathInline>
-        </AnalogOut>
         <TimeDerivative variable="n">
           <MathInline>(n_inf - n) / n_tau</MathInline>
         </TimeDerivative>

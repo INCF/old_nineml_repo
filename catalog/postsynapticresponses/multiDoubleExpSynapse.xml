@@ -28,10 +28,10 @@
                 <MathInline> 1 / (exp(-tp / tau2) - exp(-tp / tau1))
                 </MathInline>
             </Alias>
-            <Regime>
-                <AnalogOut port="i">
-                    <MathInline>(g2 - g1) * (v - eReversal)</MathInline>
-                </AnalogOut>
+            <Alias name="i">
+                 <MathInline>(g2 - g1) * (v - eReversal)</MathInline>
+              </Alias>
+              <Regime>
                 <TimeDerivative variable="g1">
                     <MathInline>-g1 / tau1</MathInline>
                 </TimeDerivative>

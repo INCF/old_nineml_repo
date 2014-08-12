@@ -21,10 +21,10 @@
       <StateVariable name="m">
         <Initial>(1 / (1 + exp((neg(v - V0_ninf)) / B_ninf)))</Initial>
       </StateVariable>
+      <Alias name="i">
+       <MathInline>gbar * m * (v - e_reversal)</MathInline>
+      </Alias>
       <Regime>
-        <AnalogOut port="i">
-          <MathInline>gbar * m * (v - e_reversal)</MathInline>
-        </AnalogOut>
         <TimeDerivative variable="m">
           <MathInline>(m_inf - m) / m_tau</MathInline>
         </TimeDerivative>

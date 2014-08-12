@@ -133,10 +133,10 @@
                     </piecewise>
                 </math>
             </Alias>
-            <Regime>
-                <AnalogOut port="i">
-                    <MathInline>gbar * m * m * m * h * (v - e_reversal)</MathInline>
-                </AnalogOut>                
+            <Alias name="i">
+                 <MathInline>gbar * m * m * m * h * (v - e_reversal)</MathInline>
+              </Alias>
+              <Regime>                
                 <TimeDerivative variable="m">
                     <MathInline>(m_inf - m) / m_tau</MathInline>
                 </TimeDerivative>
