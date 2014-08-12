@@ -69,7 +69,7 @@
                 <Value>1e-6</Value>
             </Alias>
             <Alias name="linoid">
-                <math xmlns="http://www.w3.org/1998/Math/MathML">
+                <MathML xmlns="http://www.w3.org/1998/Math/MathML">
                     <piecewise>
                         <piece>
                             <ci>linoid_bounded</ci>
@@ -83,7 +83,7 @@
                             <ci>linoid_unbounded</ci>
                         </otherwise>
                     </piecewise>
-                </math>
+                </MathML>
             </Alias>          
             <Alias name="Q10">
                 <MathInline>pow(3, (celsius - 20) / 10)</MathInline>
@@ -113,7 +113,7 @@
                 <MathInline>1 / (alpha_h + beta_h)</MathInline>
             </Alias>
             <Alias name="e_reversal">
-                <math xmlns="http://www.w3.org/1998/Math/MathML">
+                <MathML xmlns="http://www.w3.org/1998/Math/MathML">
                     <piecewise>
                         <piece>
                             <ci>nerstLowerLimit</ci>
@@ -131,7 +131,7 @@
                             <ci>nernstPotential</ci>
                         </otherwise>
                     </piecewise>
-                </math>
+                </MathML>
             </Alias>
             <Alias name="i">
                  <MathInline>gbar * m * m * m * h * (v - e_reversal)</MathInline>

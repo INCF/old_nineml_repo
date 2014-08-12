@@ -49,7 +49,7 @@
                 <MathInline>(rA * v) + rB</MathInline>
             </Alias>
             <Alias name="trunc_r">
-                <math xmlns="http://www.w3.org/1998/Math/MathML">
+                <MathML xmlns="http://www.w3.org/1998/Math/MathML">
                     <piecewise>
                         <piece>
                             <cn>0.0</cn>
@@ -71,7 +71,7 @@
                             <ci>r</ci>
                         </otherwise>
                     </piecewise>
-                </math>
+                </MathML>
             </Alias>
             <Alias name="i">
                  <MathInline>g * (v - e_reversal)</MathInline>

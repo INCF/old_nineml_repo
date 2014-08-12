@@ -2,7 +2,7 @@
 <NineML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns="http://nineml.incf.org/9ML/0.3"
   xsi:schemaLocation="http://nineml.incf.org/9ML/NineML_v0.3.xsd">
-  <ComponentClass xmlns="" name="CaLVA">
+  <ComponentClass name="CaLVA">
     <Parameter name="shift" dimension="voltage"/>
     <Parameter name="v0_m_inf" dimension="voltage"/>
     <Parameter name="v0_h_inf" dimension="voltage"/>
@@ -105,7 +105,7 @@
           </MathInline>
         </Alias>
         <Alias name="e_reversal">
-          <math xmlns="http://www.w3.org/1998/Math/MathML">
+          <MathML xmlns="http://www.w3.org/1998/Math/MathML">
             <piecewise>
               <piece>
                 <ci>nerstLowerLimit</ci>
@@ -135,7 +135,7 @@
                 <ci>nernstPotential</ci>
               </otherwise>
             </piecewise>
-          </math>
+          </MathML>
         </Alias>
       </Regime>
     </Dynamics>

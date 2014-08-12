@@ -2,7 +2,7 @@
 <NineML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns="http://nineml.incf.org/9ML/0.3"
   xsi:schemaLocation="http://nineml.incf.org/9ML/NineML_v0.3.xsd">
-  <ComponentClass xmlns="" name="CaHVA">
+  <ComponentClass name="CaHVA">
     <Parameter name="Aalpha_s" dimension="frequency"/>
     <Parameter name="Kalpha_s" dimension="voltage"/>
     <Parameter name="V0alpha_s" dimension="voltage"/>
@@ -40,7 +40,7 @@
         </TimeDerivative>
       </Regime>
       <Alias name="e_reversal">
-        <math xmlns="http://www.w3.org/1998/Math/MathML">
+        <MathML xmlns="http://www.w3.org/1998/Math/MathML">
           <piecewise>
             <piece>
               <ci>nerstLowerLimit</ci>
@@ -58,7 +58,7 @@
               <ci>nernstPotential</ci>
             </otherwise>
           </piecewise>
-        </math>
+        </MathML>
       </Alias>
       <Alias name="nernstPotential">
         <MathInline>  

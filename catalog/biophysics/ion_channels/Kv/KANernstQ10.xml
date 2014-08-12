@@ -2,7 +2,7 @@
 <NineML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns="http://nineml.incf.org/9ML/0.3"
   xsi:schemaLocation="http://nineml.incf.org/9ML/NineML_v0.3.xsd">
-  <ComponentClass xmlns="" name="KAdef">
+  <ComponentClass name="KAdef">
     <Parameter name="Aalpha_a" dimension="frequency"/>
     <Parameter name="Kalpha_a" dimension="voltage"/>
     <Parameter name="V0alpha_a" dimension="voltage"/>
@@ -104,7 +104,7 @@
         <MathInline>Q10 * Abeta_b * sigm((v - V0beta_b) Kbeta_b)</MathInline>
       </Alias>
       <Alias name="e_reversal">
-        <math xmlns="http://www.w3.org/1998/Math/MathML">
+        <MathML xmlns="http://www.w3.org/1998/Math/MathML">
           <piecewise>
             <piece>
               <ci>nerstLowerLimit</ci>
@@ -122,7 +122,7 @@
               <ci>nernstPotential</ci>
             </otherwise>
           </piecewise>
-        </math>
+        </MathML>
       </Alias>
     </Dynamics>
   </ComponentClass>
