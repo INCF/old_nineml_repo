@@ -19,7 +19,7 @@
         <Paramater name="upperTruncationVoltage" dimension="voltage"/>
         <Paramater name="lowerTruncationVoltage" dimension="voltage"/>      
         <AnalogPort mode="receive" name="v" dimension="voltage"/>
-        <AanlogPort mode="send" name="i" dimension="current"/>
+        <AnalogPort mode="send" name="i" dimension="current"/>
         <Dynamics>
             <StateVariable name="o_slow">
                 <Initial>o_slow_inf</Initial>

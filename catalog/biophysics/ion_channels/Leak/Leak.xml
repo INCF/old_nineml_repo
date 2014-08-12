@@ -6,7 +6,7 @@
     <Parameter name="g" dimension="conductance_density"/>
     <Parameter name="e_reversal" dimension="voltage"/>
     <AnalogPort mode="receive" name="v" dimension="voltage"/>
-    <AanlogPort mode="send" name="i" dimension="current_density"/>
+    <AnalogPort mode="send" name="i" dimension="current_density"/>
     <Dynamics>
       <Regime>
         <AnalogOut port="i">

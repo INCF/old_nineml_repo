@@ -25,7 +25,7 @@
     <AnalogPort mode="receive" name="ca2o" dimension="current_density"/>
     <AnalogPort mode="receive" name="celsius" dimension="temperature"/>
     <AnalogPort mode="receive" name="v" dimension="voltage"/>
-    <AanlogPort mode="send" name="i" dimension="current_density"/>
+    <AnalogPort mode="send" name="i" dimension="current_density"/>
     <Dynamics>
       <StateVariable name="m">
         <Initial>m_inf</Initial>

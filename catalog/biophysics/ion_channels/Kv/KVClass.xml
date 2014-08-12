@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<NineML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="http://nineml.incf.org/9ML/0.3"
+  xsi:schemaLocation="http://nineml.incf.org/9ML/NineML_v0.3.xsd">
+  <ComponentClass xmlns="" name="KVdef">
+    <Parameter name="Aalpha" dimension="frequency"/>
+    <Parameter name="Kalpha" dimension="voltage"/>
+    <Parameter name="V0alpha" dimension="voltage"/>
+    <Parameter name="Abeta" dimension="frequency"/>
+    <Parameter name="Kbeta" dimension="voltage"/>
+    <Parameter name="V0beta" dimension="voltage"/>
+    <Parameter name="gbar" dimension="conductance_density"/>
+    <AnalogPort mode="receive" name="internalK" dimension="current_density"/>
+    <AnalogPort mode="receive" name="externalK" dimension="current_density"/>
+    <AnalogPort mode="receive" name="celsius" dimension="temperature"/>
+    <AnalogPort mode="receive" name="v" dimension="voltage"/>
+    <AnalogPort mode="send" name="i" dimension="current_density"/>
+    <Dynamics>
+      <StateVariable name="n">
+        <Initial>n_inf</Initial>
+      </StateVariable>
+      <Regime>
+        <AnalogOut port="i">
+          <MathInline>gbar * n * n * n * n * (v - e_reversal)</MathInline>
+        </AnalogOut>
+        <TimeDerivative variable="n">
+          <MathInline>(n_inf - n) / n_tau</MathInline>
+        </TimeDerivative>
+      </Regime>
+      <Alias name="e_reversal">
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+          <piecewise>
+            <piece>
+              <ci>nerstLowerLimit</ci>
+              <apply><leq/><ci>caExternal</ci><ci>zeroConc</ci></apply>
+            </piece>            
+            <piece>
+              <ci>nerstUpperLimit</ci>
+              <apply>
+                <and/>
+                <apply><leq/><ci>caInternal</ci><ci>zeroConc</ci></apply>
+                <apply><gt/><ci>caExternal</ci><ci>zeroConc</ci></apply>
+              </apply>
+            </piece>
+            <otherwise>
+              <ci>nerstPotential</ci>
+            </otherwise>
+          </piecewise>
+        </math>
+      </Alias>
+      <Alias name="zeroConc">
+        <Value units="mM">0.0</Value>
+      </Alias>
+      <Alias name="nerstPotential">
+        <MathInline>  
+          log[caExternal / caInternal] * UniversalGasConstant * 
+          (celsius - AbsoluteZero) / (Faraday * IonicValence)
+        </MathInline>
+      </Alias>
+      <Alias name="Faraday">
+        <Value units="C/mol">96485.309</Value>
+      </Alias>
+      <Alias name="UniversalGasConstant">
+        <Value units="J/(K * mol)">8.314472</Value>
+      </Alias>
+      <Alias name="AbsoluteZero">
+        <Value units="K">−273.15</Value>
+      </Alias>
+      <Alias name="IonicValence">
+        <Value>2</Value>
+      </Alias>
+      <Alias name="nernstLowerLimit">
+        <Value units="mV">-1e6</Value>
+      </Alias>      
+      <Alias name="nernstUpperLimit">
+        <Value units="mV">1e6</Value>
+      </Alias>      
+      <Alias name="Q10">
+        <MathInline>pow(3, (celsius - 6.3) / 10)</MathInline>
+      </Alias>
+      <Alias name="n_inf">
+        <MathInline>(alpha) / (alpha + beta)</MathInline>
+      </Alias>
+      <Alias name="tau_n">
+        <MathInline>1 / (alpha + beta)</MathInline>
+      </Alias>
+      <Alias name="linoid">
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+          <piecewise>
+            <piece>
+              <ci>linoid_bounded</ci>
+              <apply>
+                <lt/>
+                <ci>linoid_test</ci>
+                <ci>linoid_voltage_bound</ci>
+              </apply>
+            </piece>
+            <otherwise>
+              <ci>linoid_unbounded</ci>
+            </otherwise>
+          </piecewise>
+        </math>
+      </Alias>
+      <Alias name="linoid_test">
+        <MathInline>abs[(v - V0alpha) / Kalpha]</MathInline>
+      </Alias>
+      <Alias name="linoid_bounded">
+        <MathInline>Kalpha * (1 - ((v - V0alpha) / Kalpha) / 2)</MathInline>
+      </Alias>            
+      <Alias name="linoid_unbounded">
+        <MathInline>(v - V0alpha) / (1 - exp[(v - V0alpha) / Kalpha])</MathInline>
+      </Alias>
+      <Alias name="linoid_voltage_bound">
+        <Value>1e-6</Value>
+      </Alias>      
+      <Alias name="alpha">
+        <MathInline>Q10 * Aalpha * linoid</MathInline>
+      </Alias>
+      <Alias name="beta">
+        <MathInline>Q10 * Abeta * exp((v - V0beta) / Kbeta)</MathInline>
+      </Alias>
+    </Dynamics>
+  </ComponentClass>
+</NineML>

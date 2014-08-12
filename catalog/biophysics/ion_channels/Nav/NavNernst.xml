@@ -21,7 +21,7 @@
         <AnalogPort mode="receive" name="internalNa" dimension="concentration"/>
         <AnalogPort mode="receive" name="externalNa" dimension="concentration"/>
         <AnalogPort mode="receive" name="celsius" dimension="temperature"/>
-        <AanlogPort mode="send" name="i" dimension="current"/>
+        <AnalogPort mode="send" name="i" dimension="current"/>
         <Dynamics>
             <StateVariable name="m">
                 <Initial>m_inf</Initial>
@@ -46,7 +46,7 @@
             </Alias>
             <Alias name="nerstPotential">
                 <MathInline>  
-                    log[caExternal / caInternal] * UniversalGasConstant * 
+                    log[externalNa / internalNa] * UniversalGasConstant * 
                     (celsius - AbsoluteZero) / (Faraday * IonicValence)
                 </MathInline>
             </Alias>
@@ -65,7 +65,7 @@
             <Alias name="linoid_unbounded">
                 <MathInline>(v - V0alpha_m) / (1 - exp[(v - V0alpha_m) / Kalpha_m])</MathInline>
             </Alias>
-            <Alias name="linoid_bound">
+            <Alias name="linoid_voltage_bound">
                 <Value>1e-6</Value>
             </Alias>
             <Alias name="linoid">
@@ -76,7 +76,7 @@
                             <apply>
                                 <lt/>
                                 <ci>linoid_test</ci>
-                                <ci>linoid_bound</ci>
+                                <ci>linoid_voltage_bound</ci>
                             </apply>
                         </piece>
                         <otherwise>
@@ -117,14 +117,14 @@
                     <piecewise>
                         <piece>
                             <ci>nerstLowerLimit</ci>
-                            <apply><leq/><ci>caExternal</ci><ci>zeroConc</ci></apply>
+                            <apply><leq/><ci>externalNa</ci><ci>zeroConc</ci></apply>
                         </piece>            
                         <piece>
                             <ci>nerstUpperLimit</ci>
                             <apply>
                                 <and/>
-                                <apply><leq/><ci>caInternal</ci><ci>zeroConc</ci></apply>
-                                <apply><gt/><ci>caExternal</ci><ci>zeroConc</ci></apply>
+                                <apply><leq/><ci>internalNa</ci><ci>zeroConc</ci></apply>
+                                <apply><gt/><ci>externalNa</ci><ci>zeroConc</ci></apply>
                             </apply>
                         </piece>
                         <otherwise>
