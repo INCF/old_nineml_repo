@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<NineML xmlns="http://nineml.incf.org/9ML/0.3" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://nineml.incf.org/9ML/0.3/../NineML_v0.3.xsd">
+    <ComponentClass name="TruncatedHCN"
+                    xmlns="http://nineml.incf.org/9ML/0.3/Biophys">
+        <Parameter name="gbar" dimension="membrane_conductance"/>
+        <Parameter name="e_reversal" dimension="voltage"/>
+        <Parameter name="Ehalf"/>
+        <Parameter name="c"/>
+        <Parameter name="rA"/>
+        <Parameter name="rB"/>
+        <Parameter name="tCs"/>
+        <Parameter name="tDs"/>
+        <Parameter name="tEs"/>
+        <Parameter name="tCf"/>
+        <Parameter name="tDf"/>
+        <Parameter name="tEf"/>
+        <Paramater name="upperTruncationVoltage" dimension="voltage"/>
+        <Paramater name="lowerTruncationVoltage" dimension="voltage"/>      
+        <AnalogPort mode="receive" name="v" dimension="voltage"/>
+        <AanlogPort mode="send" name="i" dimension="current"/>
+        <Dynamics>
+            <StateVariable name="o_slow">
+                <Initial>o_slow_inf</Initial>
+            </StateVariable>
+            <StateVariable name="o_fast">
+                <Initial>o_fast_inf</Initial>
+            </StateVariable>
+            <Alias name="g">
+                <MathInline>gbar * o_slow * o_fast</MathInline>
+            </Alias>
+            <Alias name="tau_slow">
+                <MathInline>exp[tEs * (tCs * v - tDs)]</MathInline>
+            </Alias>
+            <Alias name="tau_fast">
+                <MathInline>exp[tEf * (tCf * v - tDf)]</MathInline>
+            </Alias>
+            <Alias name="o_slow_inf">
+                <MathInline>(1 - trunc_r) * o_inf</MathInline>
+            </Alias>
+            <Alias name="o_fast_inf">
+                <MathInline>trunc_r * o_inf</MathInline>
+            </Alias>
+            <Alias name="o_inf">
+                <MathInline>1 / (1 + exp[(v - Ehalf) * c)]</MathInline>
+            </Alias>
+            <Alias name="r">
+                <MathInline>(rA * v) + rB</MathInline>
+            </Alias>
+            <Alias name="trunc_r">
+                <math xmlns="http://www.w3.org/1998/Math/MathML">
+                    <piecewise>
+                        <piece>
+                            <cn>0.0</cn>
+                            <apply>
+                                <gt/>
+                                <ci>v</ci>
+                                <ci>upperTruncationVoltage</ci>
+                            </apply>
+                        </piece>            
+                        <piece>
+                            <cn>1.0</cn>
+                            <apply>
+                                <lt/>
+                                <ci>v</ci>
+                                <ci>lowerTruncationVoltage</ci>
+                            </apply>
+                        </piece>
+                        <otherwise>
+                            <ci>r</ci>
+                        </otherwise>
+                    </piecewise>
+                </math>
+            </Alias>
+            <Regime>
+                <AnalogOut port="i">
+                    <MathInline>g * (v - e_reversal)</MathInline>
+                </AnalogOut>            
+                <TimeDerivative variable="o_slow">
+                    <MathInline>(o_slow_inf - o_slow) / tau_slow</MathInline>
+                </TimeDerivative>
+                <TimeDerivative variable="o_fast">
+                    <MathInline>(o_fast_inf - o_fast) / tau_fast</MathInline>
+                </TimeDerivative>
+            </Regime>            
+        </Dynamics>
+    </ComponentClass>
+</NineML>
