@@ -6,7 +6,7 @@
     <Parameter name="diameter" dimension="length"/>
     <Parameter name="steadyState" dimension="concentration"/>
     <Parameter name="beta" dimension="frequency"/>
-    <AnalogPort mode="receive" name="i" dimension="current_density"/>
+    <AnalogPort mode="recv" name="i" dimension="current_density"/>
     <AnalogPort mode="send" name="concentration" dimension="concentration"/>
     <Dynamics>
       <StateVariable name="c">

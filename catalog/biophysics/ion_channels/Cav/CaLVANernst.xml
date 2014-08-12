@@ -21,10 +21,10 @@
     <Parameter name="k_tau_h1" dimension="voltage"/>
     <Parameter name="k_tau_h2" dimension="voltage"/>
     <Parameter name="gbar" dimension="conductance_density"/>
-    <AnalogPort mode="receive" name="ca2i" dimension="current_density"/>
-    <AnalogPort mode="receive" name="ca2o" dimension="current_density"/>
-    <AnalogPort mode="receive" name="celsius" dimension="temperature"/>
-    <AnalogPort mode="receive" name="v" dimension="voltage"/>
+    <AnalogPort mode="recv" name="ca2i" dimension="current_density"/>
+    <AnalogPort mode="recv" name="ca2o" dimension="current_density"/>
+    <AnalogPort mode="recv" name="celsius" dimension="temperature"/>
+    <AnalogPort mode="recv" name="v" dimension="voltage"/>
     <AnalogPort mode="send" name="i" dimension="current_density"/>
     <Dynamics>
       <StateVariable name="m">
@@ -48,8 +48,8 @@
       <Alias name="zeroConc">
         <Value units="mM">0.0</Value>
       </Alias>
-      <Alias name="nerstPotential">
-        <MathInline> log[caExternal / caInternal] * UniversalGasConstant *
+      <Alias name="nernstPotential">
+        <MathInline> log(caExternal / caInternal) * UniversalGasConstant *
           (celsius - AbsoluteZero) / (Faraday * IonicValence) </MathInline>
       </Alias>
       <Alias name="nernstLowerLimit">
@@ -132,7 +132,7 @@
                 </apply>
               </piece>
               <otherwise>
-                <ci>nerstPotential</ci>
+                <ci>nernstPotential</ci>
               </otherwise>
             </piecewise>
           </math>

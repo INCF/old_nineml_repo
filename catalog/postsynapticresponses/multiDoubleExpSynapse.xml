@@ -6,8 +6,8 @@
         <Parameter name="tau1" dimension="time"/>
         <Parameter name="tau2" dimension="time"/>
         <Parameter name="eReversal" dimension="voltage"/>
-        <AnalogPort mode="receive" name="v" dimension="voltage"/>
-        <EventPort mode="receive" name="wSpike" dimension="conductance_density"/>
+        <AnalogPort mode="recv" name="v" dimension="voltage"/>
+        <EventPort mode="recv" name="wSpike" dimension="conductance_density"/>
         <AnalogPort mode="send" name="i" dimension="current_density"/>
         <Dynamics>
             <StateVariable name="g1">

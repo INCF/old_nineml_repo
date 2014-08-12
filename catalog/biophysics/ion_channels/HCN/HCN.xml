@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <NineML xmlns="http://nineml.incf.org/9ML/0.3" 
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://nineml.incf.org/9ML/0.3/../NineML_v0.3.xsd">
+    xsi:schemaLocation="http://nineml.incf.org/9ML/0.3../NineML_v0.3.xsd">
     <ComponentClass name="HCN"
-        xmlns="http://nineml.incf.org/9ML/0.3/Biophys">
+        xmlns="http://nineml.incf.org/9ML/0.3">
         <Parameter name="gbar" dimension="membrane_conductance"/>
         <Parameter name="e_reversal" dimension="voltage"/>
         <Parameter name="Ehalf"/>
@@ -16,7 +16,7 @@
         <Parameter name="tCf"/>
         <Parameter name="tDf"/>
         <Parameter name="tEf"/>
-        <AnalogPort mode="receive" name="v" dimension="voltage"/>
+        <AnalogPort mode="recv" name="v" dimension="voltage"/>
         <AnalogPort mode="send" name="i" dimension="current"/>
         <Dynamics>
             <StateVariable name="o_slow">
@@ -29,10 +29,10 @@
                 <MathInline>gbar * o_slow * o_fast</MathInline>
             </Alias>    
             <Alias name="tau_slow">
-                <MathInline>exp[tEs * (tCs * v - tDs)]</MathInline>
+                <MathInline>exp(tEs * (tCs * v - tDs))</MathInline>
             </Alias>
             <Alias name="tau_fast">
-                <MathInline>exp[tEf * (tCf * v - tDf)]</MathInline>
+                <MathInline>exp(tEf * (tCf * v - tDf))</MathInline>
             </Alias>
             <Alias name="o_slow_inf">
                 <MathInline>(1 - r) * o_inf</MathInline>
@@ -41,7 +41,7 @@
                 <MathInline>r * o_inf</MathInline>
             </Alias>
             <Alias name="o_inf">
-                <MathInline>1 / (1 + exp[(v - Ehalf) * c)]</MathInline>
+                <MathInline>1 / (1 + exp((v - Ehalf) * c))</MathInline>
             </Alias>
             <Alias name="r">
                 <MathInline>rA * v + rB</MathInline>

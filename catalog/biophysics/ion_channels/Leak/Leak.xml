@@ -5,7 +5,7 @@
   <ComponentClass name="Leak">
     <Parameter name="g" dimension="conductance_density"/>
     <Parameter name="e_reversal" dimension="voltage"/>
-    <AnalogPort mode="receive" name="v" dimension="voltage"/>
+    <AnalogPort mode="recv" name="v" dimension="voltage"/>
     <AnalogPort mode="send" name="i" dimension="current_density"/>
     <Dynamics>
       <Regime>

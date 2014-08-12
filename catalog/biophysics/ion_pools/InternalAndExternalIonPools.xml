@@ -7,7 +7,7 @@
     <Parameter name="steadyStateInternal" dimension="concentration"/>
     <Parameter name="steadyStateExternal" dimension="concentration"/>
     <Parameter name="beta" dimension="frequency"/>
-    <AnalogPort mode="receive" name="i" dimension="current_density"/>
+    <AnalogPort mode="recv" name="i" dimension="current_density"/>
     <AnalogPort mode="send" name="internal" dimension="concentration"/>
     <AnalogPort mode="send" name="external" dimension="concentration"/>
     <Dynamics>

@@ -20,10 +20,10 @@
     <Parameter name="V0_binf" dimension="voltage"/>
     <Parameter name="K_binf" dimension="voltage"/>
     <Parameter name="gbar" dimension="conductance_density"/>
-    <AnalogPort mode="receive" name="internalK" dimension="current_density"/>
-    <AnalogPort mode="receive" name="externalK" dimension="current_density"/>
-    <AnalogPort mode="receive" name="celsius" dimension="temperature"/>
-    <AnalogPort mode="receive" name="v" dimension="voltage"/>
+    <AnalogPort mode="recv" name="internalK" dimension="current_density"/>
+    <AnalogPort mode="recv" name="externalK" dimension="current_density"/>
+    <AnalogPort mode="recv" name="celsius" dimension="temperature"/>
+    <AnalogPort mode="recv" name="v" dimension="voltage"/>
     <AnalogPort mode="send" name="i" dimension="current_density"/>
     <Dynamics>
       <StateVariable name="m">
@@ -58,9 +58,9 @@
       <Alias name="zeroConc">
         <Value units="mM">0.0</Value>
       </Alias>
-      <Alias name="nerstPotential">
+      <Alias name="nernstPotential">
         <MathInline>  
-          log[externalK / internalK] * UniversalGasConstant * 
+          log(externalK / internalK) * UniversalGasConstant * 
           (celsius - AbsoluteZero) / (Faraday * IonicValence)
         </MathInline>
       </Alias>
@@ -119,7 +119,7 @@
               </apply>
             </piece>
             <otherwise>
-              <ci>nerstPotential</ci>
+              <ci>nernstPotential</ci>
             </otherwise>
           </piecewise>
         </math>
