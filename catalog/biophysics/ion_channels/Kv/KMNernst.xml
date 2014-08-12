@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<NineML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="http://nineml.incf.org/9ML/0.3"
+  xsi:schemaLocation="http://nineml.incf.org/9ML/NineML_v0.3.xsd">
+  <ComponentClass xmlns="" name="KMdef">
+    <Parameter name="Aalpha_n" dimension="frequency"/>
+    <Parameter name="Kalpha_n" dimension="voltage"/>
+    <Parameter name="V0alpha_n" dimension="voltage"/>
+    <Parameter name="Abeta_n" dimension="frequency"/>
+    <Parameter name="Kbeta_n" dimension="voltage"/>
+    <Parameter name="V0beta_n" dimension="voltage"/>
+    <Parameter name="V0_ninf" dimension="voltage"/>
+    <Parameter name="B_ninf" dimension="concentration"/>
+    <Parameter name="gbar" dimension="conductance_density"/>
+    <AnalogPort mode="receive" name="ki" dimension="current_density"/>
+    <AnalogPort mode="receive" name="ko" dimension="current_density"/>
+    <AnalogPort mode="receive" name="celsius" dimension="temperature"/>
+    <AnalogPort mode="receive" name="v" dimension="voltage"/>
+    <AnalogPort mode="send" name="i" dimension="current_density"/>
+    <Dynamics>
+      <StateVariable name="m">
+        <Initial>(1 / (1 + exp((neg(v - V0_ninf)) / B_ninf)))</Initial>
+      </StateVariable>
+      <Regime>
+        <AnalogOut port="i">
+          <MathInline>gbar * m * pow(h, 0) * (v - e_reversal)</MathInline>
+        </AnalogOut>
+        <TimeDerivative variable="m">
+          <MathInline>(m_inf - m) / m_tau</MathInline>
+        </TimeDerivative>
+      </Regime>
+      <Alias name="m_inf">
+        <MathInline>(1 / (1 + exp((neg(v - V0_ninf)) / B_ninf)))</MathInline>
+      </Alias>
+      <Alias name="m_tau">
+        <MathInline>(1 / (alpha_n + beta_n))</MathInline>
+      </Alias>
+      <Alias name="Q10">
+        <MathInline>pow(3, ((celsius - 22) / 10))</MathInline>
+      </Alias>
+      <Alias name="alpha_n">
+        <MathInline>Q10 * Aalpha_n * exp((v - V0alpha_n) /
+          Kalpha_n)</MathInline>
+      </Alias>
+      <Alias name="beta_n">
+        <MathInline>Q10 * Abeta_n * exp((v - V0beta_n) /
+          Kbeta_n)</MathInline>
+      </Alias>
+      <Alias name="e_reversal">
+        <MathInline>log[ko / ki] * 8.314 * (celsius + 273.15) /
+          (96485)</MathInline>
+      </Alias>
+    </Dynamics>
+  </ComponentClass>
+</NineML>
