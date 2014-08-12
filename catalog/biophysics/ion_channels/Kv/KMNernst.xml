@@ -12,8 +12,8 @@
     <Parameter name="V0_ninf" dimension="voltage"/>
     <Parameter name="B_ninf" dimension="concentration"/>
     <Parameter name="gbar" dimension="conductance_density"/>
-    <AnalogPort mode="receive" name="ki" dimension="current_density"/>
-    <AnalogPort mode="receive" name="ko" dimension="current_density"/>
+    <AnalogPort mode="receive" name="internalK" dimension="current_density"/>
+    <AnalogPort mode="receive" name="externalK" dimension="current_density"/>
     <AnalogPort mode="receive" name="celsius" dimension="temperature"/>
     <AnalogPort mode="receive" name="v" dimension="voltage"/>
     <AnalogPort mode="send" name="i" dimension="current_density"/>
@@ -23,7 +23,7 @@
       </StateVariable>
       <Regime>
         <AnalogOut port="i">
-          <MathInline>gbar * m * pow(h, 0) * (v - e_reversal)</MathInline>
+          <MathInline>gbar * m * (v - e_reversal)</MathInline>
         </AnalogOut>
         <TimeDerivative variable="m">
           <MathInline>(m_inf - m) / m_tau</MathInline>
@@ -36,7 +36,7 @@
         <MathInline>(1 / (alpha_n + beta_n))</MathInline>
       </Alias>
       <Alias name="Q10">
-        <MathInline>pow(3, ((celsius - 22) / 10))</MathInline>
+        <MathInline>pow(3, (celsius - 22) / 10)</MathInline>
       </Alias>
       <Alias name="alpha_n">
         <MathInline>Q10 * Aalpha_n * exp((v - V0alpha_n) /
@@ -47,9 +47,53 @@
           Kbeta_n)</MathInline>
       </Alias>
       <Alias name="e_reversal">
-        <MathInline>log[ko / ki] * 8.314 * (celsius + 273.15) /
-          (96485)</MathInline>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+          <piecewise>
+            <piece>
+              <ci>nerstLowerLimit</ci>
+              <apply><leq/><ci>externalK</ci><ci>zeroConc</ci></apply>
+            </piece>            
+            <piece>
+              <ci>nerstUpperLimit</ci>
+              <apply>
+                <and/>
+                <apply><leq/><ci>internalK</ci><ci>zeroConc</ci></apply>
+                <apply><gt/><ci>externalK</ci><ci>zeroConc</ci></apply>
+              </apply>
+            </piece>
+            <otherwise>
+              <ci>nerstPotential</ci>
+            </otherwise>
+          </piecewise>
+        </math>
       </Alias>
+      <Alias name="zeroConc">
+        <Value units="mM">0.0</Value>
+      </Alias>
+      <Alias name="nerstPotential">
+        <MathInline>  
+          log[externalK / internalK] * UniversalGasConstant * 
+          (celsius - AbsoluteZero) / (Faraday * IonicValence)
+        </MathInline>
+      </Alias>
+      <Alias name="Faraday">
+        <Value units="C/mol">96485.309</Value>
+      </Alias>
+      <Alias name="UniversalGasConstant">
+        <Value units="J/(K * mol)">8.314472</Value>
+      </Alias>
+      <Alias name="AbsoluteZero">
+        <Value units="K">−273.15</Value>
+      </Alias>
+      <Alias name="IonicValence">
+        <Value>2</Value>
+      </Alias>
+      <Alias name="nernstLowerLimit">
+        <Value units="mV">-1e6</Value>
+      </Alias>      
+      <Alias name="nernstUpperLimit">
+        <Value units="mV">1e6</Value>
+      </Alias>   
     </Dynamics>
   </ComponentClass>
 </NineML>

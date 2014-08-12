@@ -32,14 +32,14 @@
           <piecewise>
             <piece>
               <ci>nerstLowerLimit</ci>
-              <apply><leq/><ci>caExternal</ci><ci>zeroConc</ci></apply>
+              <apply><leq/><ci>externalK</ci><ci>zeroConc</ci></apply>
             </piece>            
             <piece>
               <ci>nerstUpperLimit</ci>
               <apply>
                 <and/>
-                <apply><leq/><ci>caInternal</ci><ci>zeroConc</ci></apply>
-                <apply><gt/><ci>caExternal</ci><ci>zeroConc</ci></apply>
+                <apply><leq/><ci>internalK</ci><ci>zeroConc</ci></apply>
+                <apply><gt/><ci>externalK</ci><ci>zeroConc</ci></apply>
               </apply>
             </piece>
             <otherwise>
@@ -53,7 +53,7 @@
       </Alias>
       <Alias name="nerstPotential">
         <MathInline>  
-          log[caExternal / caInternal] * UniversalGasConstant * 
+          log[externalK / internalK] * UniversalGasConstant * 
           (celsius - AbsoluteZero) / (Faraday * IonicValence)
         </MathInline>
       </Alias>
