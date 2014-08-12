@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<NineML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="http://nineml.incf.org/9ML/0.3"
+  xsi:schemaLocation="http://nineml.incf.org/9ML/NineML_v0.3.xsd">
+  <ComponentClass xmlns="" name="CaLVA">
+    <Parameter name="shift" dimension="voltage"/>
+    <Parameter name="v0_m_inf" dimension="voltage"/>
+    <Parameter name="v0_h_inf" dimension="voltage"/>
+    <Parameter name="k_m_inf" dimension="voltage"/>
+    <Parameter name="k_h_inf" dimension="voltage"/>
+    <Parameter name="C_tau_m"/>
+    <Parameter name="A_tau_m" dimension="frequency"/>
+    <Parameter name="v0_tau_m1" dimension="voltage"/>
+    <Parameter name="v0_tau_m2" dimension="voltage"/>
+    <Parameter name="k_tau_m1" dimension="voltage"/>
+    <Parameter name="k_tau_m2" dimension="voltage"/>
+    <Parameter name="C_tau_h"/>
+    <Parameter name="A_tau_h" dimension="frequency"/>
+    <Parameter name="v0_tau_h1" dimension="voltage"/>
+    <Parameter name="v0_tau_h2" dimension="voltage"/>
+    <Parameter name="k_tau_h1" dimension="voltage"/>
+    <Parameter name="k_tau_h2" dimension="voltage"/>
+    <Parameter name="gbar" dimension="conductance_density"/>
+    <AnalogPort mode="receive" name="ca2i" dimension="current_density"/>
+    <AnalogPort mode="receive" name="ca2o" dimension="current_density"/>
+    <AnalogPort mode="receive" name="celsius" dimension="temperature"/>
+    <AnalogPort mode="receive" name="v" dimension="voltage"/>
+    <AanlogPort mode="send" name="i" dimension="current_density"/>
+    <Dynamics>
+      <StateVariable name="m">
+        <Initial>m_inf</Initial>
+      </StateVariable>
+      <StateVariable name="h">
+        <Initial>h_inf</Initial>
+      </StateVariable>
+      <Alias name="Faraday">
+        <Value units="C/mol">96485.309</Value>
+      </Alias>
+      <Alias name="UniversalGasConstant">
+        <Value units="J/(K * mol)">8.314472</Value>
+      </Alias>
+      <Alias name="AbsoluteZero">
+        <Value units="K">−273.15</Value>
+      </Alias>
+      <Alias name="IonicValence">
+        <Value>2</Value>
+      </Alias>
+      <Alias name="zeroConc">
+        <Value units="mM">0.0</Value>
+      </Alias>
+      <Alias name="nerstPotential">
+        <MathInline> log[caExternal / caInternal] * UniversalGasConstant *
+          (celsius - AbsoluteZero) / (Faraday * IonicValence) </MathInline>
+      </Alias>
+      <Alias name="nernstLowerLimit">
+        <Value units="mV">-1e6</Value>
+      </Alias>
+      <Alias name="nernstUpperLimit">
+        <Value units="mV">1e6</Value>
+      </Alias>
+      <Regime>
+        <AnalogOut port="i">
+          <MathInline>gbar * m * m * h * (v - e_reversal)</MathInline>
+        </AnalogOut>
+        <TimeDerivative variable="m">
+          <MathInline>(m_inf - m) / m_tau</MathInline>
+        </TimeDerivative>
+        <TimeDerivative variable="h">
+          <MathInline>(h_inf - h) / h_tau</MathInline>
+        </TimeDerivative>
+        <Alias name="m_inf">
+          <MathInline>m_inf</MathInline>
+        </Alias>
+        <Alias name="m_tau">
+          <MathInline>tau_m</MathInline>
+        </Alias>
+        <Alias name="h_inf">
+          <MathInline>h_inf</MathInline>
+        </Alias>
+        <Alias name="h_tau">
+          <MathInline>tau_h</MathInline>
+        </Alias>
+        <Alias name="phi_m">
+          <MathInline>pow(5.0 ((celsius - 24) / 10))</MathInline>
+        </Alias>
+        <Alias name="phi_h">
+          <MathInline>pow(3.0 ((celsius - 24) / 10))</MathInline>
+        </Alias>
+        <Alias name="m_inf">
+          <MathInline>1.0 / (1 + exp((v + shift - v0_m_inf) /
+            k_m_inf))</MathInline>
+        </Alias>
+        <Alias name="h_inf">
+          <MathInline>1.0 / (1 + exp((v + shift - v0_h_inf) /
+            k_h_inf))</MathInline>
+        </Alias>
+        <Alias name="tau_m">
+          <MathInline>((C_tau_m + A_tau_m / (exp((v + shift - v0_tau_m1) /
+            k_tau_m1) + exp ((v + shift - v0_tau_m2) / k_tau_m2))) / phi_m)
+          </MathInline>
+        </Alias>
+        <Alias name="tau_h">
+          <MathInline>((C_tau_h + A_tau_h / (exp((v + shift - v0_tau_h1) /
+            k_tau_h1) + exp ((v + shift - v0_tau_h2) / k_tau_h2))) / phi_h)
+          </MathInline>
+        </Alias>
+        <Alias name="e_reversal">
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <piecewise>
+              <piece>
+                <ci>nerstLowerLimit</ci>
+                <apply>
+                  <leq/>
+                  <ci>caExternal</ci>
+                  <ci>zeroConc</ci>
+                </apply>
+              </piece>
+              <piece>
+                <ci>nerstUpperLimit</ci>
+                <apply>
+                  <and/>
+                  <apply>
+                    <leq/>
+                    <ci>caInternal</ci>
+                    <ci>zeroConc</ci>
+                  </apply>
+                  <apply>
+                    <gt/>
+                    <ci>caExternal</ci>
+                    <ci>zeroConc</ci>
+                  </apply>
+                </apply>
+              </piece>
+              <otherwise>
+                <ci>nerstPotential</ci>
+              </otherwise>
+            </piecewise>
+          </math>
+        </Alias>
+      </Regime>
+    </Dynamics>
+  </ComponentClass>
+</NineML>

@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<NineML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="http://nineml.incf.org/9ML/0.3"
+  xsi:schemaLocation="http://nineml.incf.org/9ML/NineML_v0.3.xsd">
+  <ComponentClass xmlns="" name="CaHVA">
+    <Parameter name="Aalpha_s" dimension="frequency"/>
+    <Parameter name="Kalpha_s" dimension="voltage"/>
+    <Parameter name="V0alpha_s" dimension="voltage"/>
+    <Parameter name="Abeta_s" dimension="frequency"/>
+    <Parameter name="Kbeta_s" dimension="voltage"/>
+    <Parameter name="V0beta_s" dimension="voltage"/>
+    <Parameter name="Aalpha_u" dimension="frequency"/>
+    <Parameter name="Kalpha_u" dimension="voltage"/>
+    <Parameter name="V0alpha_u" dimension="voltage"/>
+    <Parameter name="Abeta_u" dimension="frequency"/>
+    <Parameter name="Kbeta_u" dimension="voltage"/>
+    <Parameter name="V0beta_u" dimension="voltage"/>
+    <Parameter name="gbar" dimension="conductance_density"/>
+    <AnalogPort mode="receive" name="caInternal" dimension="current_density"/>
+    <AnalogPort mode="receive" name="caExternal" dimension="current_density"/>
+    <AnalogPort mode="receive" name="celsius" dimension="temperature"/>
+    <AnalogPort mode="receive" name="v" dimension="voltage"/>
+    <AanlogPort mode="send" name="i" dimension="current_density"/>
+    <Dynamics>
+      <StateVariable name="m">
+        <Initial>s_inf</Initial>
+      </StateVariable>
+      <StateVariable name="h">
+        <Initial>u_inf</Initial>
+      </StateVariable>
+      <Alias name="Faraday">
+        <Value units="C/mol">96485.309</Value>
+      </Alias>
+      <Alias name="UniversalGasConstant">
+        <Value units="J/(K * mol)">8.314472</Value>
+      </Alias>
+      <Alias name="AbsoluteZero">
+        <Value units="K">−273.15</Value>
+      </Alias>
+      <Alias name="IonicValence">
+        <Value>2</Value>
+      </Alias>
+      <Alias name="zeroConc">
+        <Value units="mM">0.0</Value>
+      </Alias>
+      <Alias name="nerstPotential">
+        <MathInline>  
+          log[caExternal / caInternal] * UniversalGasConstant * 
+          (celsius - AbsoluteZero) / (Faraday * IonicValence)
+        </MathInline>
+      </Alias>
+      <Alias name="nernstLowerLimit">
+        <Value units="mV">-1e6</Value>
+      </Alias>      
+      <Alias name="nernstUpperLimit">
+        <Value units="mV">1e6</Value>
+      </Alias>
+      <Regime>
+        <AnalogOut port="i">
+          <MathInline>gbar * m * m * h * (v - e_reversal)</MathInline>
+        </AnalogOut>
+        <TimeDerivative variable="m">
+          <MathInline>(m_inf - m) / m_tau</MathInline>
+        </TimeDerivative>
+        <TimeDerivative variable="h">
+          <MathInline>(h_inf - h) / h_tau</MathInline>
+        </TimeDerivative>
+        <Alias name="m_inf">
+          <MathInline>s_inf</MathInline>
+        </Alias>
+        <Alias name="m_tau">
+          <MathInline>tau_s</MathInline>
+        </Alias>
+        <Alias name="h_inf">
+          <MathInline>u_inf</MathInline>
+        </Alias>
+        <Alias name="h_tau">
+          <MathInline>tau_u</MathInline>
+        </Alias>
+        <Alias name="Q10">
+          <MathInline>pow(3, (celsius - 20) / 10)</MathInline>
+        </Alias>
+        <Alias name="s_inf">
+          <MathInline>alpha_s / (alpha_s + beta_s)</MathInline>
+        </Alias>
+        <Alias name="tau_s">
+          <MathInline>1 / (alpha_s + beta_s)</MathInline>
+        </Alias>
+        <Alias name="u_inf">
+          <MathInline>alpha_u / (alpha_u + beta_u)</MathInline>
+        </Alias>
+        <Alias name="tau_u">
+          <MathInline>1 / (alpha_u + beta_u)</MathInline>
+        </Alias>
+        <Alias name="alpha_s">
+          <MathInline>Q10 * Aalpha_s * exp((v - V0alpha_s) / Kalpha_s)</MathInline>
+        </Alias>
+        <Alias name="beta_s">
+          <MathInline>Q10 * Abeta_s * exp((v - V0beta_s) / Kbeta_s)</MathInline>
+        </Alias>
+        <Alias name="alpha_u">
+          <MathInline>Q10 * Aalpha_u * exp((v - V0alpha_u) / Kalpha_u)</MathInline>
+        </Alias>
+        <Alias name="beta_u">
+          <MathInline>Q10 * Abeta_u * exp((v - V0beta_u) / Kbeta_u)</MathInline>
+        </Alias>
+        <Alias name="e_reversal">
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <piecewise>
+              <piece>
+                <ci>nerstLowerLimit</ci>
+                <apply><leq/><ci>caExternal</ci><ci>zeroConc</ci></apply>
+              </piece>            
+              <piece>
+                <ci>nerstUpperLimit</ci>
+                <apply>
+                  <and/>
+                  <apply><leq/><ci>caInternal</ci><ci>zeroConc</ci></apply>
+                  <apply><gt/><ci>caExternal</ci><ci>zeroConc</ci></apply>
+                </apply>
+              </piece>
+              <otherwise>
+                <ci>nerstPotential</ci>
+              </otherwise>
+            </piecewise>
+          </math>
+        </Alias>
+      </Regime>
+    </Dynamics>
+  </ComponentClass>
+</NineML>
