@@ -27,8 +27,18 @@
             <StateVariable name="o_fast">
                 <Initial>o_fast_inf</Initial>
             </StateVariable>
-            <Alias name="g">
-                <MathInline>gbar * o_slow * o_fast</MathInline>
+            <Regime>            
+                <TimeDerivative variable="o_slow">
+                    <MathInline>(o_slow_inf - o_slow) / tau_slow</MathInline>
+                </TimeDerivative>
+                <TimeDerivative variable="o_fast">
+                    <MathInline>(o_fast_inf - o_fast) / tau_fast</MathInline>
+                </TimeDerivative>
+            </Regime>
+            <Alias name="i">
+                <MathInline>
+                    gbar * o_slow * o_fast * (v - e_reversal)
+                </MathInline>
             </Alias>
             <Alias name="tau_slow">
                 <MathInline>exp(tEs * (tCs * v - tDs))</MathInline>
@@ -44,10 +54,7 @@
             </Alias>
             <Alias name="o_inf">
                 <MathInline>1 / (1 + exp((v - Ehalf) * c))</MathInline>
-            </Alias>
-            <Alias name="r">
-                <MathInline>(rA * v) + rB</MathInline>
-            </Alias>
+            </Alias>            
             <Alias name="trunc_r">
                 <MathML xmlns="http://www.w3.org/1998/Math/MathML">
                     <piecewise>
@@ -73,17 +80,9 @@
                     </piecewise>
                 </MathML>
             </Alias>
-            <Alias name="i">
-                 <MathInline>g * (v - e_reversal)</MathInline>
-              </Alias>
-              <Regime>            
-                <TimeDerivative variable="o_slow">
-                    <MathInline>(o_slow_inf - o_slow) / tau_slow</MathInline>
-                </TimeDerivative>
-                <TimeDerivative variable="o_fast">
-                    <MathInline>(o_fast_inf - o_fast) / tau_fast</MathInline>
-                </TimeDerivative>
-            </Regime>            
+            <Alias name="r">
+                <MathInline>(rA * v) + rB</MathInline>
+            </Alias>
         </Dynamics>
     </ComponentClass>
 </NineML>

@@ -20,8 +20,6 @@
     <Parameter name="V0_binf" dimension="voltage"/>
     <Parameter name="K_binf" dimension="voltage"/>
     <Parameter name="gbar" dimension="conductance_density"/>
-    <AnalogPort mode="recv" name="internalK" dimension="current_density"/>
-    <AnalogPort mode="recv" name="externalK" dimension="current_density"/>
     <AnalogPort mode="recv" name="e_reversal" dimension="voltage"/>
     <AnalogPort mode="recv" name="celsius" dimension="temperature"/>
     <AnalogPort mode="recv" name="v" dimension="voltage"/>
@@ -34,7 +32,7 @@
         <Initial>h_inf</Initial>
       </StateVariable>
       <Alias name="i">
-       <MathInline>gbar * m * m * m * h * (v - e_reversal)</MathInline>
+        <MathInline>gbar * m * m * m * h * (v - e_reversal)</MathInline>
       </Alias>
       <Regime>
         <TimeDerivative variable="m">
@@ -44,36 +42,6 @@
           <MathInline>(h_inf - h) / h_tau</MathInline>
         </TimeDerivative>
       </Regime>
-      <Alias name="Faraday">
-        <Value units="C/mol">96485.309</Value>
-      </Alias>
-      <Alias name="UniversalGasConstant">
-        <Value units="J/(K * mol)">8.314472</Value>
-      </Alias>
-      <Alias name="AbsoluteZero">
-        <Value units="K">−273.15</Value>
-      </Alias>
-      <Alias name="IonicValence">
-        <Value>2</Value>
-      </Alias>
-      <Alias name="zeroConc">
-        <Value units="mM">0.0</Value>
-      </Alias>
-      <Alias name="nernstPotential">
-        <MathInline>  
-          log(externalK / internalK) * UniversalGasConstant * 
-          (celsius - AbsoluteZero) / (Faraday * IonicValence)
-        </MathInline>
-      </Alias>
-      <Alias name="nernstLowerLimit">
-        <Value units="mV">-1e6</Value>
-      </Alias>      
-      <Alias name="nernstUpperLimit">
-        <Value units="mV">1e6</Value>
-      </Alias>
-      <Alias name="m_tau">
-        <MathInline>tau_a</MathInline>
-      </Alias>
       <Alias name="Q10">
         <MathInline>pow(3, ((celsius - 25.5) / 10))</MathInline>
       </Alias>
@@ -103,27 +71,6 @@
       </Alias>
       <Alias name="beta_b">
         <MathInline>Q10 * Abeta_b * sigm((v - V0beta_b) Kbeta_b)</MathInline>
-      </Alias>
-      <Alias name="e_reversal">
-        <MathML xmlns="http://www.w3.org/1998/Math/MathML">
-          <piecewise>
-            <piece>
-              <ci>nerstLowerLimit</ci>
-              <apply><leq/><ci>externalK</ci><ci>zeroConc</ci></apply>
-            </piece>            
-            <piece>
-              <ci>nerstUpperLimit</ci>
-              <apply>
-                <and/>
-                <apply><leq/><ci>internalK</ci><ci>zeroConc</ci></apply>
-                <apply><gt/><ci>externalK</ci><ci>zeroConc</ci></apply>
-              </apply>
-            </piece>
-            <otherwise>
-              <ci>nernstPotential</ci>
-            </otherwise>
-          </piecewise>
-        </MathML>
       </Alias>
     </Dynamics>
   </ComponentClass>
