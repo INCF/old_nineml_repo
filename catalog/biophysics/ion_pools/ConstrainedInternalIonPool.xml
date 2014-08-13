@@ -19,10 +19,22 @@
         <AnalogOut port="concentration">c</AnalogOut>
         <TimeDerivative variable="c">
           <MathInline>
-            -i / (2 * Faraday * diameter) - beta * (c - steadyState)
+            -i / (2 * Faraday * diameter) - beta * (c - constrainedCa)
           </MathInline>
         </TimeDerivative>
       </Regime>
+      <Alias name="constrainedCa">
+      	 <MathML>
+      	   <piecewise>
+      	     <piece>
+      	        <ci>steadyState</ci>
+      	        <apply><lt/><ci>ca</ci><ci>steadyState</ci></apply>
+      	     </piece>
+      	     <otherwise>
+      	        <ci>ca</ci>
+      	     </otherwise>
+      	   </piecewise>
+      	 </MathML>
     </Dynamics>
   </ComponentClass>
 </NineML>

@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<NineML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="http://nineml.incf.org/9ML/0.3"
+  xsi:schemaLocation="http://nineml.incf.org/9ML/NineML_v0.3.xsd">
+  <ComponentClass name="Nadef">
+    <Parameter name="Aalfa" dimension="frequency"/>
+    <Parameter name="Valfa" dimension="voltage"/>
+    <Parameter name="Abeta" dimension="frequency"/>
+    <Parameter name="Vbeta" dimension="voltage"/>
+    <Parameter name="Agamma" dimension="frequency"/>
+    <Parameter name="Adelta" dimension="frequency"/>
+    <Parameter name="Aepsilon" dimension="frequency"/>
+    <Parameter name="Ateta" dimension="frequency"/>
+    <Parameter name="Vteta" dimension="voltage"/>
+    <Parameter name="ACon" dimension="frequency"/>
+    <Parameter name="ACoff" dimension="frequency"/>
+    <Parameter name="AOon" dimension="frequency"/>
+    <Parameter name="AOoff" dimension="frequency"/>
+    <Parameter name="n1" dimension=""/>
+    <Parameter name="n2" dimension=""/>
+    <Parameter name="n3" dimension=""/>
+    <Parameter name="n4" dimension=""/>
+    <Parameter name="gbar" dimension="conductance_density"/>
+    <Parameter name="e" dimension=""/>
+    <AnalogPort mode="recv" name="celsius" dimension="temperature"/>
+    <AnalogPort mode="recv" name="v" dimension="voltage"/>
+    <AnalogPort mode="send" name="i" dimension="current_density"/>
+    <Dynamics>
+      <Alias name="i">
+       <MathInline>gbar * sum(O)(v - e_revseral)</MathInline>
+      </Alias>
+      <Regime>
+        <Alias name="parity_check">
+          <MathInline> (C1 + C2 + C3 + C4 + C5 + O + B + I1 + I2 + I3 + I4 + I5
+            + I6) </MathInline>
+        </Alias>
+        <TimeDerivative variable="C1">
+          <MathInline>from_C2_to_C1 + from_I1_to_C1 - from_C1_to_C2 - from_C1_to_I1</MathInline>
+        </TimeDerivative>
+        <TimeDerivative variable="C2">
+          <MathInline>from_C1_to_C2 + from_C3_to_C2 + from_I2_to_C2 - from_C2_to_C1 - from_C2_to_C3 - from_C2_to_I2</MathInline>
+        </TimeDerivative>
+        <TimeDerivative variable="C3">
+          <MathInline>from_C2_to_C3 + from_C4_to_C3 + from_I3_to_C3 - from_C3_to_C2 - from_C3_to_C4 - from_C3_to_I3</MathInline>
+        </TimeDerivative>
+        <TimeDerivative variable="C4">
+          <MathInline> + from_C3_to_C4</MathInline>
+        </TimeDerivative>
+        <TimeDerivative variable="C4">
+          <MathInline> - from_C4_to_C3</MathInline>
+        </TimeDerivative>
+        <TimeDerivative variable="C4">
+          <MathInline> - from_C4_to_C5</MathInline>
+        </TimeDerivative>
+        <TimeDerivative variable="C5">
+          <MathInline> + from_C4_to_C5</MathInline>
+        </TimeDerivative>
+        <TimeDerivative variable="C5">
+          <MathInline> - from_C5_to_C4</MathInline>
+        </TimeDerivative>
+        <TimeDerivative variable="C4">
+          <MathInline> + from_C5_to_C4</MathInline>
+        </TimeDerivative>
+        <TimeDerivative variable="C5">
+          <MathInline> - from_C5_to_O</MathInline>
+        </TimeDerivative>
+        <TimeDerivative variable="O">
+          <MathInline> + from_C5_to_O</MathInline>
+        </TimeDerivative>
+        <TimeDerivative variable="O">
+          <MathInline> - from_O_to_C5</MathInline>
+        </TimeDerivative>
+        <TimeDerivative variable="C5">
+          <MathInline> + from_O_to_C5</MathInline>
+        </TimeDerivative>
+        <TimeDerivative variable="O">
+          <MathInline> - from_O_to_B</MathInline>
+        </TimeDerivative>
+        <TimeDerivative variable="B">
+          <MathInline> + from_O_to_B</MathInline>
+        </TimeDerivative>
+        <TimeDerivative variable="B">
+          <MathInline> - from_B_to_O</MathInline>
+        </TimeDerivative>
+        <TimeDerivative variable="O">
+          <MathInline> + from_B_to_O</MathInline>
+        </TimeDerivative>
+        <TimeDerivative variable="I1">
+          <MathInline> - from_I1_to_I2</MathInline>
+        </TimeDerivative>
+        <TimeDerivative variable="I2">
+          <MathInline> + from_I1_to_I2</MathInline>
+        </TimeDerivative>
+        <TimeDerivative variable="I2">
+          <MathInline> - from_I2_to_I1</MathInline>
+        </TimeDerivative>
+        <TimeDerivative variable="I1">
+          <MathInline> + from_I2_to_I1</MathInline>
+        </TimeDerivative>
+        <TimeDerivative variable="I2">
+          <MathInline> - from_I2_to_I3</MathInline>
+        </TimeDerivative>
+        <TimeDerivative variable="I3">
+          <MathInline> + from_I2_to_I3</MathInline>
+        </TimeDerivative>
+        <TimeDerivative variable="I3">
+          <MathInline> - from_I3_to_I2</MathInline>
+        </TimeDerivative>
+        <TimeDerivative variable="I2">
+          <MathInline> + from_I3_to_I2</MathInline>
+        </TimeDerivative>
+        <TimeDerivative variable="I3">
+          <MathInline> - from_I3_to_I4</MathInline>
+        </TimeDerivative>
+        <TimeDerivative variable="I4">
+          <MathInline> + from_I3_to_I4</MathInline>
+        </TimeDerivative>
+        <TimeDerivative variable="I4">
+          <MathInline> - from_I4_to_I3</MathInline>
+        </TimeDerivative>
+        <TimeDerivative variable="I3">
+          <MathInline> + from_I4_to_I3</MathInline>
+        </TimeDerivative>
+        <TimeDerivative variable="I4">
+          <MathInline> - from_I4_to_I5</MathInline>
+        </TimeDerivative>
+        <TimeDerivative variable="I5">
+          <MathInline> + from_I4_to_I5</MathInline>
+        </TimeDerivative>
+        <TimeDerivative variable="I5">
+          <MathInline> - from_I5_to_I4</MathInline>
+        </TimeDerivative>
+        <TimeDerivative variable="I4">
+          <MathInline> + from_I5_to_I4</MathInline>
+        </TimeDerivative>
+        <TimeDerivative variable="I5">
+          <MathInline> - from_I5_to_I6</MathInline>
+        </TimeDerivative>
+        <TimeDerivative variable="I6">
+          <MathInline> + from_I5_to_I6</MathInline>
+        </TimeDerivative>
+        <TimeDerivative variable="I6">
+          <MathInline> - from_I6_to_I5</MathInline>
+        </TimeDerivative>
+        <TimeDerivative variable="I5">
+          <MathInline> + from_I6_to_I5</MathInline>
+        </TimeDerivative>
+        <TimeDerivative variable="I1">
+          <MathInline> + from_C1_to_I1</MathInline>
+        </TimeDerivative>
+        <TimeDerivative variable="I1">
+          <MathInline> - from_I1_to_C1</MathInline>
+        </TimeDerivative>
+        <TimeDerivative variable="I2">
+          <MathInline> + from_C2_to_I2</MathInline>
+        </TimeDerivative>
+        <TimeDerivative variable="I2">
+          <MathInline> - from_I2_to_C2</MathInline>
+        </TimeDerivative>
+        <TimeDerivative variable="I3">
+          <MathInline> + from_C3_to_I3</MathInline>
+        </TimeDerivative>
+        <TimeDerivative variable="I3">
+          <MathInline> - from_I3_to_C3</MathInline>
+        </TimeDerivative>
+        <TimeDerivative variable="C4">
+          <MathInline> - from_C4_to_I4</MathInline>
+        </TimeDerivative>
+        <TimeDerivative variable="I4">
+          <MathInline> + from_C4_to_I4</MathInline>
+        </TimeDerivative>
+        <TimeDerivative variable="I4">
+          <MathInline> - from_I4_to_C4</MathInline>
+        </TimeDerivative>
+        <TimeDerivative variable="C4">
+          <MathInline> + from_I4_to_C4</MathInline>
+        </TimeDerivative>
+        <TimeDerivative variable="C5">
+          <MathInline> - from_C5_to_I5</MathInline>
+        </TimeDerivative>
+        <TimeDerivative variable="I5">
+          <MathInline> + from_C5_to_I5</MathInline>
+        </TimeDerivative>
+        <TimeDerivative variable="I5">
+          <MathInline> - from_I5_to_C5</MathInline>
+        </TimeDerivative>
+        <TimeDerivative variable="C5">
+          <MathInline> + from_I5_to_C5</MathInline>
+        </TimeDerivative>
+        <TimeDerivative variable="O">
+          <MathInline> - from_O_to_I6</MathInline>
+        </TimeDerivative>
+        <TimeDerivative variable="I6">
+          <MathInline> + from_O_to_I6</MathInline>
+        </TimeDerivative>
+        <TimeDerivative variable="I6">
+          <MathInline> - from_I6_to_O</MathInline>
+        </TimeDerivative>
+        <TimeDerivative variable="O">
+          <MathInline> + from_I6_to_O</MathInline>
+        </TimeDerivative>
+        <Alias name="from_C1_to_C2">
+          <MathInline>(n1 * alfa) * C1</MathInline>
+        </Alias>
+        <Alias name="from_C2_to_C1">
+          <MathInline>(n4 * beta) * C2</MathInline>
+        </Alias>
+        <Alias name="from_C2_to_C3">
+          <MathInline>(n2 * alfa) * C2</MathInline>
+        </Alias>
+        <Alias name="from_C3_to_C2">
+          <MathInline>(n3 * beta) * C3</MathInline>
+        </Alias>
+        <Alias name="from_C3_to_C4">
+          <MathInline>(n3 * alfa) * C3</MathInline>
+        </Alias>
+        <Alias name="from_C4_to_C3">
+          <MathInline>(n2 * beta) * C4</MathInline>
+        </Alias>
+        <Alias name="from_C4_to_C5">
+          <MathInline>(n4 * alfa) * C4</MathInline>
+        </Alias>
+        <Alias name="from_C5_to_C4">
+          <MathInline>(n1 * beta) * C5</MathInline>
+        </Alias>
+        <Alias name="from_C5_to_O">
+          <MathInline>gamma * C5</MathInline>
+        </Alias>
+        <Alias name="from_O_to_C5">
+          <MathInline>delta * O</MathInline>
+        </Alias>
+        <Alias name="from_O_to_B">
+          <MathInline>epsilon * O</MathInline>
+        </Alias>
+        <Alias name="from_B_to_O">
+          <MathInline>(teta) * B</MathInline>
+        </Alias>
+        <Alias name="from_I1_to_I2">
+          <MathInline>(n1 * alfa * a) * I1</MathInline>
+        </Alias>
+        <Alias name="from_I2_to_I1">
+          <MathInline>(n4 * beta * b) * I2</MathInline>
+        </Alias>
+        <Alias name="from_I2_to_I3">
+          <MathInline>(n2 * alfa * a) * I2</MathInline>
+        </Alias>
+        <Alias name="from_I3_to_I2">
+          <MathInline>(n3 * beta * b) * I3</MathInline>
+        </Alias>
+        <Alias name="from_I3_to_I4">
+          <MathInline>(n3 * alfa * a) * I3</MathInline>
+        </Alias>
+        <Alias name="from_I4_to_I3">
+          <MathInline>(n2 * beta * b) * I4</MathInline>
+        </Alias>
+        <Alias name="from_I4_to_I5">
+          <MathInline>(n4 * alfa * a) * I4</MathInline>
+        </Alias>
+        <Alias name="from_I5_to_I4">
+          <MathInline>(n1 * beta * b) * I5</MathInline>
+        </Alias>
+        <Alias name="from_I5_to_I6">
+          <MathInline>gamma * I5</MathInline>
+        </Alias>
+        <Alias name="from_I6_to_I5">
+          <MathInline>delta * I6</MathInline>
+        </Alias>
+        <Alias name="from_C1_to_I1">
+          <MathInline>Con * C1</MathInline>
+        </Alias>
+        <Alias name="from_I1_to_C1">
+          <MathInline>Coff * I1</MathInline>
+        </Alias>
+        <Alias name="from_C2_to_I2">
+          <MathInline>(Con * a) * C2</MathInline>
+        </Alias>
+        <Alias name="from_I2_to_C2">
+          <MathInline>(Coff * b) * I2</MathInline>
+        </Alias>
+        <Alias name="from_C3_to_I3">
+          <MathInline>(Con * a^2) * C3</MathInline>
+        </Alias>
+        <Alias name="from_I3_to_C3">
+          <MathInline>(Coff * b^2) * I3</MathInline>
+        </Alias>
+        <Alias name="from_C4_to_I4">
+          <MathInline>(Con * a^3) * C4</MathInline>
+        </Alias>
+        <Alias name="from_I4_to_C4">
+          <MathInline>(Coff * b^3) * I4</MathInline>
+        </Alias>
+        <Alias name="from_C5_to_I5">
+          <MathInline>(Con * a^4) * C5</MathInline>
+        </Alias>
+        <Alias name="from_I5_to_C5">
+          <MathInline>(Coff * b^4) * I5</MathInline>
+        </Alias>
+        <Alias name="from_O_to_I6">
+          <MathInline>Oon * O</MathInline>
+        </Alias>
+        <Alias name="from_I6_to_O">
+          <MathInline>Ooff * I6</MathInline>
+        </Alias>
+        <Alias name="Q10">
+          <MathInline>pow(3, ((celsius - 20) / 10))</MathInline>
+        </Alias>
+        <Alias name="gamma">
+          <MathInline>Q10 * Agamma</MathInline>
+        </Alias>
+        <Alias name="delta">
+          <MathInline>Q10 * Adelta</MathInline>
+        </Alias>
+        <Alias name="epsilon">
+          <MathInline>Q10 * Aepsilon</MathInline>
+        </Alias>
+        <Alias name="Con">
+          <MathInline>Q10 * ACon</MathInline>
+        </Alias>
+        <Alias name="Coff">
+          <MathInline>Q10 * ACoff</MathInline>
+        </Alias>
+        <Alias name="Oon">
+          <MathInline>Q10 * AOon</MathInline>
+        </Alias>
+        <Alias name="Ooff">
+          <MathInline>Q10 * AOoff</MathInline>
+        </Alias>
+        <Alias name="a">
+          <MathInline>pow((Oon / Con) (1.0 / 4.0))</MathInline>
+        </Alias>
+        <Alias name="b">
+          <MathInline>pow((Ooff / Coff) (1.0 / 4.0))</MathInline>
+        </Alias>
+        <Alias name="alfa">
+          <MathInline>Q10 * Aalfa * exp(v / Valfa)</MathInline>
+        </Alias>
+        <Alias name="beta">
+          <MathInline>Q10 * Abeta * exp(-v / Vbeta)</MathInline>
+        </Alias>
+        <Alias name="teta">
+          <MathInline>Q10 * Ateta * exp(-v / Vteta)</MathInline>
+        </Alias>
+        <Alias name="e_reversal">
+          <MathInline>log(nao / nai) * 8.314 * (celsius + 273.15) /
+            (96485)</MathInline>
+        </Alias>
+      </Regime>
+    </Dynamics>
+  </ComponentClass>
+</NineML>
