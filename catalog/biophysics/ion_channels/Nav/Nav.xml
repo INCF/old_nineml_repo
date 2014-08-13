@@ -18,8 +18,7 @@
         <Parameter name="Kbeta_h" dimension="voltage"/>
         <Parameter name="V0beta_h" dimension="voltage"/>
         <AnalogPort mode="recv" name="v" dimension="voltage"/>
-        <AnalogPort mode="recv" name="internalNa" dimension="concentration"/>
-        <AnalogPort mode="recv" name="externalNa" dimension="concentration"/>
+        <AnalogPort mode="recv" name="e_reversal" dimension="voltage"/>
         <AnalogPort mode="recv" name="celsius" dimension="temperature"/>
         <AnalogPort mode="send" name="i" dimension="current"/>
         <Dynamics>
@@ -29,34 +28,18 @@
             <StateVariable name="h">
                 <Initial>h_inf</Initial>
             </StateVariable>
-            <Alias name="Faraday">
-                <Value units="C/mol">96485.309</Value>
-            </Alias>
-            <Alias name="UniversalGasConstant">
-                <Value units="J/(K * mol)">8.314472</Value>
-            </Alias>
-            <Alias name="AbsoluteZero">
-                <Value units="K">−273.15</Value>
-            </Alias>
-            <Alias name="IonicValence">
-                <Value>2</Value>
-            </Alias>
-            <Alias name="zeroConc">
-                <Value units="mM">0.0</Value>
-            </Alias>
-            <Alias name="nernstPotential">
-                <MathInline>  
-                    log(externalNa / internalNa) * UniversalGasConstant * 
-                    (celsius - AbsoluteZero) / (Faraday * IonicValence)
-                </MathInline>
-            </Alias>
-            <Alias name="nernstLowerLimit">
-                <Value units="mV">-1e6</Value>
-            </Alias>      
-            <Alias name="nernstUpperLimit">
-                <Value units="mV">1e6</Value>
-            </Alias>
-            <Alias name="linoi_test">
+            <Regime>                
+                <TimeDerivative variable="m">
+                    <MathInline>(m_inf - m) / m_tau</MathInline>
+                </TimeDerivative>
+                <TimeDerivative variable="h">
+                    <MathInline>(h_inf - h) / h_tau</MathInline>
+                </TimeDerivative>
+            </Regime>
+            <Alias name="i">
+                <MathInline>gbar * m * m * m * h * (v - e_reversal)</MathInline>
+            </Alias>            
+            <Alias name="linoid_test">
                 <MathInline>abs((v - V0alpha_m) / Kalpha_m)</MathInline>
             </Alias>
             <Alias name="linoid_bounded">
@@ -112,38 +95,6 @@
             <Alias name="tau_h">
                 <MathInline>1 / (alpha_h + beta_h)</MathInline>
             </Alias>
-            <Alias name="e_reversal">
-                <MathML xmlns="http://www.w3.org/1998/Math/MathML">
-                    <piecewise>
-                        <piece>
-                            <ci>nerstLowerLimit</ci>
-                            <apply><leq/><ci>externalNa</ci><ci>zeroConc</ci></apply>
-                        </piece>            
-                        <piece>
-                            <ci>nerstUpperLimit</ci>
-                            <apply>
-                                <and/>
-                                <apply><leq/><ci>internalNa</ci><ci>zeroConc</ci></apply>
-                                <apply><gt/><ci>externalNa</ci><ci>zeroConc</ci></apply>
-                            </apply>
-                        </piece>
-                        <otherwise>
-                            <ci>nernstPotential</ci>
-                        </otherwise>
-                    </piecewise>
-                </MathML>
-            </Alias>
-            <Alias name="i">
-                 <MathInline>gbar * m * m * m * h * (v - e_reversal)</MathInline>
-              </Alias>
-              <Regime>                
-                <TimeDerivative variable="m">
-                    <MathInline>(m_inf - m) / m_tau</MathInline>
-                </TimeDerivative>
-                <TimeDerivative variable="h">
-                    <MathInline>(h_inf - h) / h_tau</MathInline>
-                </TimeDerivative>
-            </Regime>
         </Dynamics>
     </ComponentClass>
 </NineML>
