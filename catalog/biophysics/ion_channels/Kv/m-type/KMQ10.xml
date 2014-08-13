@@ -12,7 +12,7 @@
     <Parameter name="V0_ninf" dimension="voltage"/>
     <Parameter name="B_ninf" dimension="concentration"/>
     <Parameter name="gbar" dimension="conductance_density"/>
-    <Parameter name="e" dimension=""/>
+    <AnalogPort mode="recv" name="e_reversal" dimension="voltage"/>
     <AnalogPort mode="recv" name="celsius" dimension="temperature"/>
     <AnalogPort mode="recv" name="v" dimension="voltage"/>
     <AnalogPort mode="send" name="i" dimension="current_density"/>
@@ -20,35 +20,31 @@
       <StateVariable name="m">
         <Initial>1 / (1 + exp((neg(v - V0_ninf)) / B_ninf))</Initial>
       </StateVariable>
-      <Alias name="i">
-       <MathInline>gbar * m * pow(h, 0) * (v - e_reversal)</MathInline>
-      </Alias>
       <Regime>
         <TimeDerivative variable="m">
           <MathInline>(m_inf - m) / m_tau</MathInline>
         </TimeDerivative>
-        <Alias name="m_inf">
-          <MathInline>1 / (1 + exp((neg(v - V0_ninf)) / B_ninf))</MathInline>
-        </Alias>
-        <Alias name="m_tau">
-          <MathInline>1 / (alpha_n + beta_n)</MathInline>
-        </Alias>
-        <Alias name="Q10">
-          <MathInline>pow(3, ((celsius - 22) / 10))</MathInline>
-        </Alias>
-        <Alias name="alpha_n">
-          <MathInline>Q10 * Aalpha_n * exp((v - V0alpha_n) /
-            Kalpha_n)</MathInline>
-        </Alias>
-        <Alias name="beta_n">
-          <MathInline>Q10 * Abeta_n * exp((v - V0beta_n) /
-            Kbeta_n)</MathInline>
-        </Alias>
-        <Alias name="e_reversal">
-          <MathInline>log(ko / ki) * 8.314 * (celsius + 273.15) /
-            (96485)</MathInline>
-        </Alias>
       </Regime>
+      <Alias name="i">
+        <MathInline>gbar * m * (v - e_reversal)</MathInline>
+      </Alias>
+      <Alias name="m_inf">
+        <MathInline>1 / (1 + exp((neg(v - V0_ninf)) / B_ninf))</MathInline>
+      </Alias>
+      <Alias name="m_tau">
+        <MathInline>1 / (alpha_n + beta_n)</MathInline>
+      </Alias>
+      <Alias name="Q10">
+        <MathInline>pow(3, (celsius - 22) / 10)</MathInline>
+      </Alias>
+      <Alias name="alpha_n">
+        <MathInline>Q10 * Aalpha_n * exp((v - V0alpha_n) /
+          Kalpha_n)</MathInline>
+      </Alias>
+      <Alias name="beta_n">
+        <MathInline>Q10 * Abeta_n * exp((v - V0beta_n) /
+          Kbeta_n)</MathInline>
+      </Alias>
     </Dynamics>
   </ComponentClass>
 </NineML>
