@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<NineML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="http://nineml.incf.org/9ML/0.3"
+  xsi:schemaLocation="http://nineml.incf.org/9ML/NineML_v0.3.xsd">
+  <ComponentClass name="NaPdef">
+    <Parameter name="Aalpha_m" dimension="frequency"/>
+    <Parameter name="Kalpha_m" dimension="voltage"/>
+    <Parameter name="V0alpha_m" dimension="voltage"/>
+    <Parameter name="Abeta_m" dimension="frequency"/>
+    <Parameter name="Kbeta_m" dimension="voltage"/>
+    <Parameter name="V0beta_m" dimension="voltage"/>
+    <Parameter name="V0_minf" dimension="voltage"/>
+    <Parameter name="B_minf" dimension="concentration"/>
+    <Parameter name="gbar" dimension="conductance_density"/>
+    <AnalogPort mode="recv" name="e_reversal" dimension="voltage"/>
+    <AnalogPort mode="recv" name="celsius" dimension="temperature"/>
+    <AnalogPort mode="recv" name="v" dimension="voltage"/>
+    <AnalogPort mode="send" name="i" dimension="current_density"/>
+    <Dynamics>
+      <StateVariable name="m">
+        <Initial>(1 / (1 + exp((neg(v - V0_minf)) / B_minf)))</Initial>
+      </StateVariable>
+      <Alias name="i">
+       <MathInline>gbar * m * (v - e_reversal)</MathInline>
+      </Alias>
+      <Regime>
+        <TimeDerivative variable="m">
+          <MathInline>(m_inf - m) / m_tau</MathInline>
+        </TimeDerivative>
+        <Alias name="m_inf">
+          <MathInline>(1 / (1 + exp((neg(v - V0_minf)) / B_minf)))</MathInline>
+        </Alias>
+        <Alias name="m_tau">
+          <MathInline>(5 / (alpha_m + beta_m))</MathInline>
+        </Alias>
+        <Alias name="Q10">
+          <MathInline>pow(3, ((celsius - 30) / 10))</MathInline>
+        </Alias>
+        <Alias name="alpha_m">
+          <MathInline>Q10 * Aalpha_m * linoid((v - V0alpha_m)
+            Kalpha_m)</MathInline>
+        </Alias>
+        <Alias name="beta_m">
+          <MathInline>Q10 * Abeta_m * linoid((v - V0beta_m)
+            Kbeta_m)</MathInline>
+        </Alias>
+        <Alias name="linoid_test">
+          <MathInline>abs((v - V0alpha_m) / Kalpha_m)</MathInline>
+        </Alias>
+        <Alias name="linoid_bounded">
+          <MathInline>Kalpha_m * (1 - ((v - V0alpha_m) / Kalpha_m) / 2)</MathInline>
+        </Alias>            
+        <Alias name="linoid_unbounded">
+          <MathInline>(v - V0alpha_m) / (1 - exp((v - V0alpha_m) / Kalpha_m))</MathInline>
+        </Alias>
+        <Alias name="linoid_voltage_bound">
+          <Value>1e-6</Value>
+        </Alias>
+        <Alias name="linoid">
+          <MathML xmlns="http://www.w3.org/1998/Math/MathML">
+            <piecewise>
+              <piece>
+                <ci>linoid_bounded</ci>
+                <apply>
+                  <lt/>
+                  <ci>linoid_test</ci>
+                  <ci>linoid_voltage_bound</ci>
+                </apply>
+              </piece>
+              <otherwise>
+                <ci>linoid_unbounded</ci>
+              </otherwise>
+            </piecewise>
+          </MathML>
+        </Alias>        
+      </Regime>
+    </Dynamics>
+  </ComponentClass>
+</NineML>

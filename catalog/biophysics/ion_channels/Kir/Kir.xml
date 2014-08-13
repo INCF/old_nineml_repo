@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<NineML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="http://nineml.incf.org/9ML/0.3"
+  xsi:schemaLocation="http://nineml.incf.org/9ML/NineML_v0.3.xsd">
+  <ComponentClass name="Kirdef">
+    <Parameter name="Aalpha_d" dimension="frequency"/>
+    <Parameter name="Kalpha_d" dimension="voltage"/>
+    <Parameter name="V0alpha_d" dimension="voltage"/>
+    <Parameter name="Abeta_d" dimension="frequency"/>
+    <Parameter name="Kbeta_d" dimension="voltage"/>
+    <Parameter name="V0beta_d" dimension="voltage"/>
+    <Parameter name="gbar" dimension="conductance_density"/>
+    <AnalogPort mode="recv" name="e_reversal" dimension="voltage"/>
+    <AnalogPort mode="recv" name="celsius" dimension="temperature"/>
+    <AnalogPort mode="recv" name="v" dimension="voltage"/>
+    <AnalogPort mode="send" name="i" dimension="current_density"/>
+    <Dynamics>
+      <StateVariable name="m">
+        <Initial>d_inf</Initial>
+      </StateVariable>
+      <Alias name="i">
+       <MathInline>gbar * m * (v - e_reversal)</MathInline>
+      </Alias>
+      <Regime>
+        <TimeDerivative variable="m">
+          <MathInline>(m_inf - m) / m_tau</MathInline>
+        </TimeDerivative>
+        <Alias name="m_inf">
+          <MathInline>d_inf</MathInline>
+        </Alias>
+        <Alias name="m_tau">
+          <MathInline>tau_d</MathInline>
+        </Alias>
+        <Alias name="Q10">
+          <MathInline>pow(3, (celsius - 20) / 10)</MathInline>
+        </Alias>
+        <Alias name="d_inf">
+          <MathInline>alpha_d / (alpha_d + beta_d)</MathInline>
+        </Alias>
+        <Alias name="tau_d">
+          <MathInline>1 / (alpha_d + beta_d)</MathInline>
+        </Alias>
+        <Alias name="alpha_d">
+          <MathInline>
+            Q10 * Aalpha_d * exp((v - V0alpha_d) / Kalpha_d)
+          </MathInline>
+        </Alias>
+        <Alias name="beta_d">
+          <MathInline>
+            Q10 * Abeta_d * exp((v - V0beta_d) / Kbeta_d)</MathInline>
+        </Alias>
+      </Regime>
+    </Dynamics>
+  </ComponentClass>
+</NineML>

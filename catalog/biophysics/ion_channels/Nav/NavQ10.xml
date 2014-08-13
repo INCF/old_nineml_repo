@@ -67,7 +67,7 @@
                         </otherwise>
                     </piecewise>
                 </MathML>
-            </Alias>          
+            </Alias>   
             <Alias name="Q10">
                 <MathInline>pow(3, (celsius - 20) / 10)</MathInline>
             </Alias>
