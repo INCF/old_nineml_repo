@@ -22,6 +22,7 @@
     <Parameter name="gbar" dimension="conductance_density"/>
     <AnalogPort mode="recv" name="internalK" dimension="current_density"/>
     <AnalogPort mode="recv" name="externalK" dimension="current_density"/>
+    <AnalogPort mode="recv" name="e_reversal" dimension="voltage"/>
     <AnalogPort mode="recv" name="celsius" dimension="temperature"/>
     <AnalogPort mode="recv" name="v" dimension="voltage"/>
     <AnalogPort mode="send" name="i" dimension="current_density"/>
