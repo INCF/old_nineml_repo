@@ -23,6 +23,54 @@
           </MathInline>
         </TimeDerivative>
       </Regime>
+      <Alias name="reversalK">
+        <MathML xmlns="http://www.w3.org/1998/Math/MathML">
+          <piecewise>
+            <piece>
+              <ci>KLowerLimit</ci>
+              <apply><leq/><ci>externalK</ci><ci>zeroConc</ci></apply>
+            </piece>            
+            <piece>
+              <ci>KUpperLimit</ci>
+              <apply>
+                <and/>
+                <apply><leq/><ci>internalK</ci><ci>zeroConc</ci></apply>
+                <apply><gt/><ci>externalK</ci><ci>zeroConc</ci></apply>
+              </apply>
+            </piece>
+            <otherwise>
+              <ci>kNernst</ci>
+            </otherwise>
+          </piecewise>
+        </MathML>
+      </Alias>
+      <Alias name="zeroConc">
+        <Value units="mM">0.0</Value>
+      </Alias>            
+      <Alias name="KLowerLimit">
+        <Value units="mV">-1e6</Value>
+      </Alias>      
+      <Alias name="KUpperLimit">
+        <Value units="mV">1e6</Value>
+      </Alias>            
+      <Alias name="kNernst">
+        <MathInline>  
+          log(externalK / internalK) * UniversalGasConstant * 
+          (celsius - AbsoluteZero) / (Faraday * KValence)
+        </MathInline>
+      </Alias>
+      <Alias name="Faraday">
+        <Value units="C/mol">96485.309</Value>
+      </Alias>
+      <Alias name="UniversalGasConstant">
+        <Value units="J/(K * mol)">8.314472</Value>
+      </Alias>
+      <Alias name="AbsoluteZero">
+        <Value units="K">−273.15</Value>
+      </Alias>
+      <Alias name="KValence">
+        <Value>1</Value>
+      </Alias>
     </Dynamics>
   </ComponentClass>
 </NineML>

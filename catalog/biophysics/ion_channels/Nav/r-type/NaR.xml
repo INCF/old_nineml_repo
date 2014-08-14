@@ -39,9 +39,12 @@
       </Regime>
       <Alias name="i">
         <MathInline>gbar * m * h * (v - e_reversal)</MathInline>
-      </Alias>      
+      </Alias>
+      <Alias name="Q10Denom">
+        <Value units="degC">10.0</Value>
+      </Alias>
       <Alias name="Q10">
-        <MathInline>pow(3, (celsius - 20) / 10)</MathInline>
+        <MathInline>pow(3, (celsius - 20) / Q10Denom)</MathInline>
       </Alias>
       <Alias name="m_inf">
         <MathInline>alpha_m / (alpha_m + beta_m)</MathInline>
@@ -63,24 +66,24 @@
       </Alias>
       <Alias name="beta_m">
         <MathInline>
-          Q10 * (Shiftbeta_m + Abeta_m * (v + V0beta_m) / (exp(boundedX1) - 1))
+          Q10 * (Shiftbeta_m + Abeta_m * (v + V0beta_m) / (exp(boundedX) - 1))
         </MathInline>
       </Alias>
-      <Alias name="x1">
+      <Alias name="x">
         <MathInline>(v + V0beta_m) / Kbeta_m</MathInline>
       </Alias>
-      <Alias name="x1Bound">
+      <Alias name="xBound">
         <Value>200.0</Value>
       </Alias>
-      <Alias name="boundedX1">
+      <Alias name="boundedX">
         <MathML  xmlns="http://www.w3.org/1998/Math/MathML">
           <piecewise>
             <piece>
-              <cn>x1Bound</cn>
-              <apply><gt/><ci>x1</ci><ci>x1Bound</ci></apply>
+              <cn>xBound</cn>
+              <apply><gt/><ci>x</ci><ci>xBound</ci></apply>
             </piece>
             <otherwise>
-              <ci>x1</ci>
+              <ci>x</ci>
             </otherwise>
           </piecewise>
         </MathML>
