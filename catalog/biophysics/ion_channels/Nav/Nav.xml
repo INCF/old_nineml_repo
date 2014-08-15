@@ -19,7 +19,7 @@
         <Parameter name="V0beta_h" dimension="voltage"/>
         <AnalogPort mode="recv" name="v" dimension="voltage"/>
         <AnalogPort mode="recv" name="e_reversal" dimension="voltage"/>
-        <AnalogPort mode="recv" name="celsius" dimension="temperature"/>
+        <AnalogPort mode="recv" name="temperature" dimension="absolute_temperature"/>
         <AnalogPort mode="send" name="i" dimension="current"/>
         <Dynamics>
             <StateVariable name="m">
@@ -69,7 +69,7 @@
                 </MathML>
             </Alias>   
             <Alias name="Q10">
-                <MathInline>pow(3, (celsius - 20) / 10)</MathInline>
+                <MathInline>pow(3, (temperature - 20) / 10)</MathInline>
             </Alias>
             <Alias name="alpha_m">
                 <MathInline>Q10 * Aalpha_m * linoid</MathInline>

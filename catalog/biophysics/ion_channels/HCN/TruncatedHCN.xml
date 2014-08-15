@@ -6,16 +6,16 @@
                     xmlns="http://nineml.incf.org/9ML/0.3">
         <Parameter name="gbar" dimension="membrane_conductance"/>
         <Parameter name="e_reversal" dimension="voltage"/>
-        <Parameter name="Ehalf"/>
-        <Parameter name="c"/>
-        <Parameter name="rA"/>
+        <Parameter name="Ehalf" dimension="voltage"/>
+        <Parameter name="c" dimension="inverse_voltage"/>
+        <Parameter name="rA" dimension="inverse_voltage"/>
         <Parameter name="rB"/>
         <Parameter name="tCs"/>
-        <Parameter name="tDs"/>
-        <Parameter name="tEs"/>
+        <Parameter name="tDs" dimension="voltage"/>
+        <Parameter name="tEs" dimension="inverse_voltage"/>
         <Parameter name="tCf"/>
-        <Parameter name="tDf"/>
-        <Parameter name="tEf"/>
+        <Parameter name="tDf" dimension="inverse_voltage"/>
+        <Parameter name="tEf" dimension="voltage"/>
         <Paramater name="upperTruncationVoltage" dimension="voltage"/>
         <Paramater name="lowerTruncationVoltage" dimension="voltage"/>      
         <AnalogPort mode="recv" name="v" dimension="voltage"/>

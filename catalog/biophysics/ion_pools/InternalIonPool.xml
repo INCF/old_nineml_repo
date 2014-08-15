@@ -2,7 +2,7 @@
 <NineML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns="http://nineml.incf.org/9ML/0.3"
   xsi:schemaLocation="http://nineml.incf.org/9ML/NineML_v0.3.xsd">
-  <ComponentClass name="ionConcentration">
+  <ComponentClass name="InternalIonPool">
     <Parameter name="diameter" dimension="length"/>
     <Parameter name="steadyState" dimension="concentration"/>
     <Parameter name="beta" dimension="frequency"/>
@@ -29,7 +29,7 @@
             <piece>
               <ci>KLowerLimit</ci>
               <apply><leq/><ci>externalK</ci><ci>zeroConc</ci></apply>
-            </piece>            
+            </piece>
             <piece>
               <ci>KUpperLimit</ci>
               <apply>
@@ -56,7 +56,7 @@
       <Alias name="kNernst">
         <MathInline>  
           log(externalK / internalK) * UniversalGasConstant * 
-          (celsius - AbsoluteZero) / (Faraday * KValence)
+          (temperature - AbsoluteZero) / (Faraday * KValence)
         </MathInline>
       </Alias>
       <Alias name="Faraday">

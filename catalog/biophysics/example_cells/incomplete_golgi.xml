@@ -8,7 +8,7 @@
         <Parameter name="C" dimension="membrane_capcitance"/>
         <Parameter name="diameter" dimension="length"/>
         <Parameter name="initialVoltage" dimension="voltage"/>
-        <AnalogPort mode="recv" name="celsius" dimension="temperature"/>
+        <AnalogPort mode="recv" name="temperature" dimension="absolute_temperature"/>
         <EventPort name="spike" mode="send"/>
         <Component name="Nav">
             <Definition link="../ion_channels/Nav/Nav.xml">
@@ -100,21 +100,21 @@
                 <ReceivePort name="e_reversal">
                     <ComponentPort compDynamics="NaIonsDyn" port="e_reversal"/>
                 </ReceivePort>
-                <ReceivePort name="celsius">celsius</ReceivePort>
+                <ReceivePort name="temperature">temperature</ReceivePort>
             </ComponentDynamics>
             <ComponentDynamics name="NaPDyn" component="Na">
                 <ReceivePort name="v">v</ReceivePort>
                 <ReceivePort name="e_reversal">
                     <ComponentPort compDynamics="NaIonsDyn" port="e_reversal"/>
                 </ReceivePort>
-                <ReceivePort name="celsius">celsius</ReceivePort>
+                <ReceivePort name="temperature">temperature</ReceivePort>
             </ComponentDynamics>            
             <ComponentDynamics name="KvDyn" component="Na">
                 <ReceivePort name="v">v</ReceivePort>
                 <ReceivePort name="e_reversal">
                     <ComponentPort compDynamics="KIonsDyn" port="e_reversal"/>
                 </ReceivePort>
-                <ReceivePort name="celsius">celsius</ReceivePort>
+                <ReceivePort name="temperature">temperature</ReceivePort>
             </ComponentDynamics>            
             <ComponentDynamics name="HCN1Dyn" component="HCN1">
                 <ReceivePort name="v">v</ReceivePort>

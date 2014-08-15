@@ -16,7 +16,7 @@
     <Parameter name="gbar" dimension="conductance_density"/>
     <AnalogPort mode="recv" name="internalCa" dimension="current_density"/>
     <AnalogPort mode="recv" name="k_reversal" dimension="voltage" />
-    <AnalogPort mode="recv" name="celsius" dimension="temperature"/>
+    <AnalogPort mode="recv" name="temperature" dimension="absolute_temperature"/>
     <AnalogPort mode="recv" name="v" dimension="voltage"/>
     <AnalogPort mode="send" name="i" dimension="current_density"/>
     <Dynamics>
@@ -83,7 +83,7 @@
           <MathInline>invo2_t * o2</MathInline>
         </Alias>
         <Alias name="Q10">
-          <MathInline>pow(3, ((celsius - 23) / 10))</MathInline>
+          <MathInline>pow(3, ((temperature - 23) / 10))</MathInline>
         </Alias>
         <Alias name="invc1_t">
           <MathInline>invc1 * Q10</MathInline>

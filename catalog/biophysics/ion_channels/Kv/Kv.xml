@@ -11,7 +11,7 @@
     <Parameter name="V0beta" dimension="voltage"/>
     <Parameter name="gbar" dimension="conductance_density"/>
     <AnalogPort mode="recv" name="e_reversal" dimension="current_density"/>
-    <AnalogPort mode="recv" name="celsius" dimension="temperature"/>
+    <AnalogPort mode="recv" name="temperature" dimension="absolute_temperature"/>
     <AnalogPort mode="recv" name="v" dimension="voltage"/>
     <AnalogPort mode="send" name="i" dimension="current_density"/>
     <Dynamics>
@@ -27,7 +27,7 @@
         </TimeDerivative>
       </Regime>
       <Alias name="Q10">
-        <MathInline>pow(3, (celsius - 6.3) / 10)</MathInline>
+        <MathInline>pow(3, (temperature - 6.3) / 10)</MathInline>
       </Alias>
       <Alias name="n_inf">
         <MathInline>(alpha) / (alpha + beta)</MathInline>
