@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<NineML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="http://nineml.incf.org/9ML/0.3"
+  xsi:schemaLocation="http://nineml.incf.org/9ML/NineML_v0.3.xsd">
+  <ComponentClass name="Cav_HA">
+    <Parameter name="Aalpha_s" dimension="frequency"/>
+    <Parameter name="Kalpha_s" dimension="voltage"/>
+    <Parameter name="V0alpha_s" dimension="voltage"/>
+    <Parameter name="Abeta_s" dimension="frequency"/>
+    <Parameter name="Kbeta_s" dimension="voltage"/>
+    <Parameter name="V0beta_s" dimension="voltage"/>
+    <Parameter name="Aalpha_u" dimension="frequency"/>
+    <Parameter name="Kalpha_u" dimension="voltage"/>
+    <Parameter name="V0alpha_u" dimension="voltage"/>
+    <Parameter name="Abeta_u" dimension="frequency"/>
+    <Parameter name="Kbeta_u" dimension="voltage"/>
+    <Parameter name="V0beta_u" dimension="voltage"/>
+    <Parameter name="gbar" dimension="conductance_density"/>
+    <AnalogPort mode="recv" name="e_reversal" dimension="voltage"/>
+    <AnalogPort mode="recv" name="temperature" dimension="absolute_temperature"/>
+    <AnalogPort mode="recv" name="v" dimension="voltage"/>
+    <AnalogPort mode="send" name="i" dimension="current_density"/>
+    <Dynamics>
+      <StateVariable name="m">
+        <Initial>s_inf</Initial>
+      </StateVariable>
+      <StateVariable name="h">
+        <Initial>u_inf</Initial>
+      </StateVariable>
+      <Alias name="i">
+       <MathInline>gbar * m * m * h * (v - e_reversal)</MathInline>
+      </Alias>
+      <Regime>
+        <TimeDerivative variable="m">
+          <MathInline>(m_inf - m) / m_tau</MathInline>
+        </TimeDerivative>
+        <TimeDerivative variable="h">
+          <MathInline>(h_inf - h) / h_tau</MathInline>
+        </TimeDerivative>
+      </Regime>
+      <Alias name="m_inf">
+        <MathInline>s_inf</MathInline>
+      </Alias>
+      <Alias name="m_tau">
+        <MathInline>tau_s</MathInline>
+      </Alias>
+      <Alias name="h_inf">
+        <MathInline>u_inf</MathInline>
+      </Alias>
+      <Alias name="h_tau">
+        <MathInline>tau_u</MathInline>
+      </Alias>
+      <Alias name="Q10">
+        <MathInline>pow(3, (temperature - 20) / 10)</MathInline>
+      </Alias>
+      <Alias name="s_inf">
+        <MathInline>alpha_s / (alpha_s + beta_s)</MathInline>
+      </Alias>
+      <Alias name="tau_s">
+        <MathInline>1 / (alpha_s + beta_s)</MathInline>
+      </Alias>
+      <Alias name="u_inf">
+        <MathInline>alpha_u / (alpha_u + beta_u)</MathInline>
+      </Alias>
+      <Alias name="tau_u">
+        <MathInline>1 / (alpha_u + beta_u)</MathInline>
+      </Alias>
+      <Alias name="alpha_s">
+        <MathInline>Q10 * Aalpha_s * exp((v - V0alpha_s) / Kalpha_s)</MathInline>
+      </Alias>
+      <Alias name="beta_s">
+        <MathInline>Q10 * Abeta_s * exp((v - V0beta_s) / Kbeta_s)</MathInline>
+      </Alias>
+      <Alias name="alpha_u">
+        <MathInline>Q10 * Aalpha_u * exp((v - V0alpha_u) / Kalpha_u)</MathInline>
+      </Alias>
+      <Alias name="beta_u">
+        <MathInline>Q10 * Abeta_u * exp((v - V0beta_u) / Kbeta_u)</MathInline>
+      </Alias>
+    </Dynamics>
+  </ComponentClass>
+</NineML>

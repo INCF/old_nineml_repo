@@ -2,7 +2,7 @@
 <NineML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns="http://nineml.incf.org/9ML/0.3"
   xsi:schemaLocation="http://nineml.incf.org/9ML/NineML_v0.3.xsd">
-  <ComponentClass name="NaPdef">
+  <ComponentClass name="Nav_Pdef">
     <Parameter name="Aalpha_m" dimension="frequency"/>
     <Parameter name="Kalpha_m" dimension="voltage"/>
     <Parameter name="V0alpha_m" dimension="voltage"/>
