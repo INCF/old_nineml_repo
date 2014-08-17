@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<NineML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="http://nineml.incf.org/9ML/0.3"
+  xsi:schemaLocation="http://nineml.incf.org/9ML/NineML_v0.3.xsd">
+  <ComponentClass name="IonDynamics">
+    <Parameter name="diameter" dimension="length"/>
+    <Parameter name="steadyStateInternal" dimension="concentration"/>
+    <Parameter name="steadyStateExternal" dimension="concentration"/>
+    <Parameter name="beta" dimension="frequency"/>
+    <AnalogPort mode="recv" name="temperature" dimension="absolute_temperature"/>
+    <AnalogPort mode="recv" name="g" dimension="membrane_conductance"/>
+    <AnalogPort mode="send" name="i" dimension="membrane_current"/>
+    <Dynamics>
+      <StateVariable name="internalC">
+        <Initial>steadyStateInternal</Initial>
+      </StateVariable>
+      <StateVariable name="externalC">
+        <Initial>steadyStateExternal</Initial>
+      </StateVariable>
+      <Alias name="i">
+        g * (v - e_reversal)
+      </Alias>
+      <Regime>
+        <TimeDerivative variable="internalC">
+          <MathInline>
+            -i / (2 * Faraday * diameter) - 
+            beta * (internalC - steadyStateInternal)
+          </MathInline>
+        </TimeDerivative>
+        <TimeDerivative variable="externalC">
+          <MathInline>
+            i / (2 * Faraday * diameter) -  
+            beta * (externalC - steadyStateExternal)
+          </MathInline>
+        </TimeDerivative>
+      </Regime>
+      <Alias name="e_reversal">
+        <MathML xmlns="http://www.w3.org/1998/Math/MathML">
+          <piecewise>
+            <piece>
+              <ci>nerstLowerLimit</ci>
+              <apply><leq/><ci>externalC</ci><ci>zeroConc</ci></apply>
+            </piece>            
+            <piece>
+              <ci>nerstUpperLimit</ci>
+              <apply>
+                <and/>
+                <apply><leq/><ci>internalC</ci><ci>zeroConc</ci></apply>
+                <apply><gt/><ci>externalC</ci><ci>zeroConc</ci></apply>
+              </apply>
+            </piece>
+            <otherwise>
+              <ci>nerstPotential</ci>
+            </otherwise>
+          </piecewise>
+        </MathML>
+      </Alias>
+      <Alias name="nernstPotential">
+        <MathInline>  
+          log(externalC / internalC) * UniversalGasConstant * 
+          (temperature - AbsoluteZero) / (Faraday * KValence)
+        </MathInline>
+      </Alias>
+      <Alias name="Faraday">
+        <Value units="C/mol">96485.309</Value>
+      </Alias>
+      <Alias name="UniversalGasConstant">
+        <Value units="J/(K * mol)">8.314472</Value>
+      </Alias>
+      <Alias name="AbsoluteZero">
+        <Value units="K">−273.15</Value>
+      </Alias>
+      <Alias name="KValence">
+        <Value>1</Value>
+      </Alias>
+      <Alias name="zeroConc">
+        <Value units="mM">0.0</Value>
+      </Alias>            
+      <Alias name="nernstLowerLimit">
+        <Value units="mV">-1e6</Value>
+      </Alias>      
+      <Alias name="nernstUpperLimit">
+        <Value units="mV">1e6</Value>
+      </Alias>
+    </Dynamics>
+  </ComponentClass>
+</NineML>
