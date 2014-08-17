@@ -17,10 +17,9 @@
         <Parameter name="Abeta_h" dimension="frequency"/>
         <Parameter name="Kbeta_h" dimension="voltage"/>
         <Parameter name="V0beta_h" dimension="voltage"/>
+        <AnalogPort mode="recv" name="temperature" dimension="absolute_temperature"/>        
         <AnalogPort mode="recv" name="v" dimension="voltage"/>
-        <AnalogPort mode="recv" name="e_reversal" dimension="voltage"/>
-        <AnalogPort mode="recv" name="temperature" dimension="absolute_temperature"/>
-        <AnalogPort mode="send" name="i" dimension="current"/>
+        <AnalogPort mode="send" name="g" dimension="membrane_conductance"/>
         <Dynamics>
             <StateVariable name="m">
                 <Initial>m_inf</Initial>
@@ -36,8 +35,8 @@
                     <MathInline>(h_inf - h) / h_tau</MathInline>
                 </TimeDerivative>
             </Regime>
-            <Alias name="i">
-                <MathInline>gbar * m * m * m * h * (v - e_reversal)</MathInline>
+            <Alias name="g">
+                <MathInline>gbar * m * m * m * h</MathInline>
             </Alias>            
             <Alias name="linoid_test">
                 <MathInline>abs((v - V0alpha_m) / Kalpha_m)</MathInline>

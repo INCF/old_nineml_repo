@@ -17,7 +17,7 @@
         <Parameter name="tDf" dimension="inverse_voltage"/>
         <Parameter name="tEf" dimension="voltage"/>
         <AnalogPort mode="recv" name="v" dimension="voltage"/>
-        <AnalogPort mode="send" name="i" dimension="current"/>
+        <AnalogPort mode="send" name="g" dimension="membrane_conductance"/>
         <Dynamics>
             <StateVariable name="o_slow">
                 <Initial>o_slow_inf</Initial>

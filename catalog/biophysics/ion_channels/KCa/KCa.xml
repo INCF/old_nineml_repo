@@ -9,19 +9,16 @@
     <Parameter name="Abeta" dimension="frequency"/>
     <Parameter name="Bbeta" dimension="concentration"/>
     <Parameter name="Kbeta" dimension="voltage"/>
-    <Parameter name="gbar" dimension="conductance_density"/>
+    <Parameter name="gbar" dimension="membrane_conductance"/>
     <AnalogPort mode="recv" name="internalCa" dimension="current_density"/>
-    <AnalogPort mode="recv" name="internalK" dimension="current_density"/>
-    <AnalogPort mode="recv" name="externalK" dimension="current_density"/>
     <AnalogPort mode="recv" name="temperature" dimension="absolute_temperature"/>
-    <AnalogPort mode="recv" name="v" dimension="voltage"/>
-    <AnalogPort mode="send" name="i" dimension="current_density"/>
+    <AnalogPort mode="send" name="g" dimension="membrane_conductance"/>
     <Dynamics>
       <StateVariable name="m">
         <Initial>m_inf</Initial>
       </StateVariable>
-      <Alias name="i">
-       <MathInline>gbar * m * (v - e_reversal)</MathInline>
+      <Alias name="g">
+        <MathInline>gbar * m</MathInline>
       </Alias>
       <Regime>
         <TimeDerivative variable="m">
@@ -44,10 +41,6 @@
       <Alias name="beta">
         <MathInline>(Q10 * Abeta / (1 + (internalCa / (Bbeta * exp(v /
           Kbeta))))) </MathInline>
-      </Alias>
-      <Alias name="e_reversal">
-        <MathInline>log(externalK / internalK) * 8.314 * (temperature + 273.15) /
-          (96485)</MathInline>
       </Alias>
     </Dynamics>
   </ComponentClass>

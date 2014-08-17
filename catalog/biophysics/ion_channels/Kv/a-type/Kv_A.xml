@@ -19,11 +19,10 @@
     <Parameter name="K_ainf" dimension="voltage"/>
     <Parameter name="V0_binf" dimension="voltage"/>
     <Parameter name="K_binf" dimension="voltage"/>
-    <Parameter name="gbar" dimension="conductance_density"/>
-    <AnalogPort mode="recv" name="e_reversal" dimension="voltage"/>
+    <Parameter name="gbar" dimension="membrane_conductance"/>
     <AnalogPort mode="recv" name="temperature" dimension="absolute_temperature"/>
     <AnalogPort mode="recv" name="v" dimension="voltage"/>
-    <AnalogPort mode="send" name="i" dimension="current_density"/>
+    <AnalogPort mode="send" name="g" dimension="membrane_conductance"/>
     <Dynamics>
       <StateVariable name="m">
         <Initial>m_inf</Initial>
@@ -31,8 +30,8 @@
       <StateVariable name="h">
         <Initial>h_inf</Initial>
       </StateVariable>
-      <Alias name="i">
-        <MathInline>gbar * m * m * m * h * (v - e_reversal)</MathInline>
+      <Alias name="g">
+        <MathInline>gbar * m * m * m * h</MathInline>
       </Alias>
       <Regime>
         <TimeDerivative variable="m">

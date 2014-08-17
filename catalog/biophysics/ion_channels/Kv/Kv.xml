@@ -9,30 +9,29 @@
     <Parameter name="Abeta" dimension="frequency"/>
     <Parameter name="Kbeta" dimension="voltage"/>
     <Parameter name="V0beta" dimension="voltage"/>
-    <Parameter name="gbar" dimension="conductance_density"/>
-    <AnalogPort mode="recv" name="e_reversal" dimension="current_density"/>
+    <Parameter name="gbar" dimension="membrane_conductance"/>
     <AnalogPort mode="recv" name="temperature" dimension="absolute_temperature"/>
     <AnalogPort mode="recv" name="v" dimension="voltage"/>
-    <AnalogPort mode="send" name="i" dimension="current_density"/>
+    <AnalogPort mode="send" name="g" dimension="membrane_conductance"/>
     <Dynamics>
-      <StateVariable name="n">
-        <Initial>n_inf</Initial>
+      <StateVariable name="m">
+        <Initial>m_inf</Initial>
       </StateVariable>
-      <Alias name="i">
-       <MathInline>gbar * n * n * n * n * (v - e_reversal)</MathInline>
+      <Alias name="g">
+        <MathInline>gbar * m * m * m * m</MathInline>
       </Alias>
       <Regime>
-        <TimeDerivative variable="n">
-          <MathInline>(n_inf - n) / n_tau</MathInline>
+        <TimeDerivative variable="m">
+          <MathInline>(m_inf - m) / m_tau</MathInline>
         </TimeDerivative>
       </Regime>
       <Alias name="Q10">
         <MathInline>pow(3, (temperature - 6.3) / 10)</MathInline>
       </Alias>
-      <Alias name="n_inf">
+      <Alias name="m_inf">
         <MathInline>(alpha) / (alpha + beta)</MathInline>
       </Alias>
-      <Alias name="tau_n">
+      <Alias name="m_tau">
         <MathInline>1 / (alpha + beta)</MathInline>
       </Alias>
       <Alias name="linoid">

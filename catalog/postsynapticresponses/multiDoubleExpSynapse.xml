@@ -7,8 +7,8 @@
         <Parameter name="tau2" dimension="time"/>
         <Parameter name="e_reversal" dimension="voltage"/>
         <AnalogPort mode="recv" name="v" dimension="voltage"/>
-        <EventPort mode="recv" name="wSpike" dimension="conductance_density"/>
-        <AnalogPort mode="send" name="i" dimension="current_density"/>
+        <EventPort mode="recv" name="wSpike" dimension="membrane_conductance"/>
+        <AnalogPort mode="send" name="g" dimension="membrane_conductance"/>
         <Dynamics>
             <StateVariable name="g1">
                 <Initial>

@@ -3,48 +3,47 @@
   xmlns="http://nineml.incf.org/9ML/0.3"
   xsi:schemaLocation="http://nineml.incf.org/9ML/NineML_v0.3.xsd">
   <ComponentClass name="KMdef">
-    <Parameter name="Aalpha_n" dimension="frequency"/>
-    <Parameter name="Kalpha_n" dimension="voltage"/>
-    <Parameter name="V0alpha_n" dimension="voltage"/>
-    <Parameter name="Abeta_n" dimension="frequency"/>
-    <Parameter name="Kbeta_n" dimension="voltage"/>
-    <Parameter name="V0beta_n" dimension="voltage"/>
-    <Parameter name="V0_ninf" dimension="voltage"/>
-    <Parameter name="B_ninf" dimension="concentration"/>
-    <Parameter name="gbar" dimension="conductance_density"/>
-    <AnalogPort mode="recv" name="e_reversal" dimension="voltage"/>
+    <Parameter name="Aalpha" dimension="frequency"/>
+    <Parameter name="Kalpha" dimension="voltage"/>
+    <Parameter name="V0alpha" dimension="voltage"/>
+    <Parameter name="Abeta" dimension="frequency"/>
+    <Parameter name="Kbeta" dimension="voltage"/>
+    <Parameter name="V0beta" dimension="voltage"/>
+    <Parameter name="V0inf" dimension="voltage"/>
+    <Parameter name="Binf" dimension="concentration"/>
+    <Parameter name="gbar" dimension="membrane_conductance"/>
     <AnalogPort mode="recv" name="temperature" dimension="absolute_temperature"/>
     <AnalogPort mode="recv" name="v" dimension="voltage"/>
-    <AnalogPort mode="send" name="i" dimension="current_density"/>
+    <AnalogPort mode="send" name="g" dimension="membrane_conductance"/>
     <Dynamics>
       <StateVariable name="m">
-        <Initial>1 / (1 + exp(-(v - V0_ninf) / B_ninf))</Initial>
+        <Initial>1 / (1 + exp(-(v - V0inf) / Binf))</Initial>
       </StateVariable>
       <Regime>
         <TimeDerivative variable="m">
           <MathInline>(m_inf - m) / m_tau</MathInline>
         </TimeDerivative>
       </Regime>
-      <Alias name="i">
-        <MathInline>gbar * m * (v - e_reversal)</MathInline>
+      <Alias name="g">
+        <MathInline>gbar * m</MathInline>
       </Alias>
       <Alias name="m_inf">
-        <MathInline>1 / (1 + exp(-(v - V0_ninf) / B_ninf))</MathInline>
+        <MathInline>1 / (1 + exp(-(v - V0inf) / Binf))</MathInline>
       </Alias>
       <Alias name="m_tau">
-        <MathInline>1 / (alpha_n + beta_n)</MathInline>
+        <MathInline>1 / (alpha + beta)</MathInline>
       </Alias>
       <Alias name="Q10">
         <MathInline>pow(3, (temperature - 22) / 10)</MathInline>
       </Alias>
-      <Alias name="alpha_n">
+      <Alias name="alpha">
         <MathInline>
-          Q10 * Aalpha_n * exp((v - V0alpha_n) / Kalpha_n)
+          Q10 * Aalpha * exp((v - V0alpha) / Kalpha)
         </MathInline>
       </Alias>
-      <Alias name="beta_n">
+      <Alias name="beta">
         <MathInline>
-          Q10 * Abeta_n * exp((v - V0beta_n) / Kbeta_n)
+          Q10 * Abeta * exp((v - V0beta) / Kbeta)
         </MathInline>
       </Alias>
     </Dynamics>

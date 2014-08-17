@@ -13,12 +13,10 @@
     <Parameter name="dirc2"/>
     <Parameter name="dirc3"/>
     <Parameter name="dirc4"/>
-    <Parameter name="gbar" dimension="conductance_density"/>
-    <AnalogPort mode="recv" name="internalCa" dimension="current_density"/>
-    <AnalogPort mode="recv" name="k_reversal" dimension="voltage" />
+    <Parameter name="gbar" dimension="membrane_conductance"/>
     <AnalogPort mode="recv" name="temperature" dimension="absolute_temperature"/>
-    <AnalogPort mode="recv" name="v" dimension="voltage"/>
-    <AnalogPort mode="send" name="i" dimension="current_density"/>
+    <AnalogPort mode="send" name="g" dimension="membrane_conductance"/>
+    <AnalogPort mode="recv" name="internalCa" dimension="current_density"/>    
     <Dynamics>
       <Alias name="i">
         <MathInline>gbar * (o1 + o2)(v - e_revseral)</MathInline>

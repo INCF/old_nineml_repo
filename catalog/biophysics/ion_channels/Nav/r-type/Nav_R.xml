@@ -17,11 +17,10 @@
     <Parameter name="Abeta_h" dimension="frequency"/>
     <Parameter name="V0beta_h" dimension="voltage"/>
     <Parameter name="Kbeta_h" dimension="voltage"/>
-    <Parameter name="gbar" dimension="conductance_density"/>
-    <AnalogPort mode="recv" name="e_reversal" dimension="voltage"/>
+    <Parameter name="gbar" dimension="membrane_conductance"/>
     <AnalogPort mode="recv" name="temperature" dimension="absolute_temperature"/>
     <AnalogPort mode="recv" name="v" dimension="voltage"/>
-    <AnalogPort mode="send" name="i" dimension="current_density"/>
+    <AnalogPort mode="send" name="g" dimension="membrane_conductance"/>
     <Dynamics>
       <StateVariable name="m">
         <Initial>m_inf</Initial>
@@ -37,8 +36,8 @@
           <MathInline>(h_inf - h) / h_tau</MathInline>
         </TimeDerivative>
       </Regime>
-      <Alias name="i">
-        <MathInline>gbar * m * h * (v - e_reversal)</MathInline>
+      <Alias name="g">
+        <MathInline>gbar * m * h</MathInline>
       </Alias>
       <Alias name="Q10Denom">
         <Value units="degC">10.0</Value>

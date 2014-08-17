@@ -11,17 +11,16 @@
     <Parameter name="V0beta_m" dimension="voltage"/>
     <Parameter name="V0_minf" dimension="voltage"/>
     <Parameter name="B_minf" dimension="concentration"/>
-    <Parameter name="gbar" dimension="conductance_density"/>
-    <AnalogPort mode="recv" name="e_reversal" dimension="voltage"/>
+    <Parameter name="gbar" dimension="membrane_conductance"/>
     <AnalogPort mode="recv" name="temperature" dimension="absolute_temperature"/>
     <AnalogPort mode="recv" name="v" dimension="voltage"/>
-    <AnalogPort mode="send" name="i" dimension="current_density"/>
+    <AnalogPort mode="send" name="g" dimension="membrane_conductance"/>
     <Dynamics>
       <StateVariable name="m">
         <Initial>(1 / (1 + exp((neg(v - V0_minf)) / B_minf)))</Initial>
       </StateVariable>
-      <Alias name="i">
-       <MathInline>gbar * m * (v - e_reversal)</MathInline>
+      <Alias name="g">
+        <MathInline>gbar * m</MathInline>
       </Alias>
       <Regime>
         <TimeDerivative variable="m">

@@ -20,14 +20,13 @@
     <Parameter name="n2"/>
     <Parameter name="n3"/>
     <Parameter name="n4"/>
-    <Parameter name="gbar" dimension="conductance_density"/>
-    <AnalogPort mode="recv" name="e_reversal" dimension="voltage"/>
+    <Parameter name="gbar" dimension="membrane_conductance"/>
     <AnalogPort mode="recv" name="temperature" dimension="absolute_temperature"/>
     <AnalogPort mode="recv" name="v" dimension="voltage"/>
-    <AnalogPort mode="send" name="i" dimension="current_density"/>
+    <AnalogPort mode="send" name="g" dimension="membrane_conductance"/>
     <Dynamics>
-      <Alias name="i">
-       <MathInline>gbar * O * (v - e_revseral)</MathInline>
+      <Alias name="g">
+       <MathInline>gbar * O</MathInline>
       </Alias>
       <Regime>
         <TimeDerivative variable="C1">
