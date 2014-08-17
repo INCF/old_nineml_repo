@@ -202,10 +202,10 @@
         <MathInline>Q10 * AOoff</MathInline>
       </Alias>
       <Alias name="a">
-        <MathInline>pow((Oon / Con) (1.0 / 4.0))</MathInline>
+        <MathInline>pow((Oon / Con), (1.0 / 4.0))</MathInline>
       </Alias>
       <Alias name="b">
-        <MathInline>pow((Ooff / Coff) (1.0 / 4.0))</MathInline>
+        <MathInline>pow((Ooff / Coff), (1.0 / 4.0))</MathInline>
       </Alias>
       <Alias name="alfa">
         <MathInline>Q10 * Aalfa * exp(v / Valfa)</MathInline>

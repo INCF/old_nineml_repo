@@ -9,10 +9,8 @@
     <AnalogPort mode="send" name="i" dimension="current_density"/>
     <Dynamics>
       <Alias name="i">
-       <MathInline>g * (v - e_reversal)</MathInline>
+        <MathInline>g * (v - e_reversal)</MathInline>
       </Alias>
-      <Regime>
-      </Regime>
     </Dynamics>
   </ComponentClass>
 </NineML>

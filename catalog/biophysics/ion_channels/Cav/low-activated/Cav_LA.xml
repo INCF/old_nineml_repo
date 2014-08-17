@@ -62,21 +62,23 @@
         <MathInline>pow(3.0, (temperature - 24) / 10)</MathInline>
       </Alias>
       <Alias name="m_inf">
-        <MathInline>1.0 / (1 + exp((v + shift - v0_m_inf) /
-          k_m_inf))</MathInline>
+        <MathInline>
+          1.0 / (1 + exp((v + shift - v0_m_inf) / k_m_inf))</MathInline>
       </Alias>
       <Alias name="h_inf">
-        <MathInline>1.0 / (1 + exp((v + shift - v0_h_inf) /
-          k_h_inf))</MathInline>
+        <MathInline>
+          1.0 / (1 + exp((v + shift - v0_h_inf) / k_h_inf))</MathInline>
       </Alias>
       <Alias name="tau_m">
-        <MathInline>(C_tau_m + A_tau_m / (exp((v + shift - v0_tau_m1) /
-          k_tau_m1) + exp((v + shift - v0_tau_m2) / k_tau_m2))) / phi_m
+        <MathInline>
+          (C_tau_m + A_tau_m / (exp((v + shift - v0_tau_m1) / k_tau_m1) + 
+          exp((v + shift - v0_tau_m2) / k_tau_m2))) / phi_m
         </MathInline>
       </Alias>
       <Alias name="tau_h">
-        <MathInline>(C_tau_h + A_tau_h / (exp((v + shift - v0_tau_h1) /
-          k_tau_h1) + exp((v + shift - v0_tau_h2) / k_tau_h2))) / phi_h
+        <MathInline>
+          (C_tau_h + A_tau_h / (exp((v + shift - v0_tau_h1) / k_tau_h1) + 
+          exp((v + shift - v0_tau_h2) / k_tau_h2))) / phi_h
         </MathInline>
       </Alias>      
     </Dynamics>
