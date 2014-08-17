@@ -15,8 +15,8 @@
       <Alias name="Faraday">
         <Value units="C/mol">96485.309</Value>
       </Alias>
+      <Alias name="concentration">c</Alias>      
       <Regime>
-        <Alias port="concentration">c</Alias>
         <TimeDerivative variable="c">
           <MathInline>
             -i / (2 * Faraday * diameter) - beta * (c - steadyState)

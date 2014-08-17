@@ -15,8 +15,8 @@
       <Alias name="Faraday">
         <Value units="C/mol">96485.309</Value>
       </Alias>
+      <Alias name="concentration">c</Alias>
       <Regime>
-        <AnalogOut port="concentration">c</AnalogOut>
         <TimeDerivative variable="c">
           <MathInline>
             -i / (2 * Faraday * diameter) - beta * (c - constrainedCa)
