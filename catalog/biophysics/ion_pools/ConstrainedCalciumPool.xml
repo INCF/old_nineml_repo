@@ -4,22 +4,22 @@
   xsi:schemaLocation="http://nineml.incf.org/9ML/NineML_v0.3.xsd">
   <ComponentClass name="ConstrainedCalciumPool">
     <Parameter name="diameter" dimension="length"/>
-    <Parameter name="steadyState" dimension="concentration"/>
+    <Parameter name="steadyStateInternal" dimension="concentration"/>
+    <Parameter name="external" dimension="concentration"/>
     <Parameter name="beta" dimension="frequency"/>
     <AnalogPort mode="recv" name="g" dimension="membrane_conductance"/>
-    <AnalogPort mode="send" name="concentration" dimension="concentration"/>
+    <AnalogPort mode="recv" name="temperature" dimension="absolute_temperature"/>
+    <AnalogPort mode="recv" name="v" dimension="voltage"/>
+    <AnalogPort mode="send" name="i" dimension="membrane_current"/>
+    <AnalogPort mode="send" name="internal" dimension="concentration"/>
     <Dynamics>
-      <StateVariable name="c">
-        <Initial>steadyState</Initial>
+      <StateVariable name="internal">
+        <Initial>steadyStateInternal</Initial>
       </StateVariable>
-      <Alias name="Faraday">
-        <Value units="C/mol">96485.309</Value>
-      </Alias>
-      <Alias name="concentration">c</Alias>
       <Regime>
-        <TimeDerivative variable="c">
+        <TimeDerivative variable="internal">
           <MathInline>
-            -i / (2 * Faraday * diameter) - beta * (c - constrainedCa)
+            -i / (2 * Faraday * diameter) - beta * (internal - steadyStateInternal)
           </MathInline>
         </TimeDerivative>
       </Regime>
@@ -35,6 +35,9 @@
       	     </otherwise>
       	   </piecewise>
       	 </MathML>
+      </Alias>
+      <Alias name="Faraday">
+        <Value units="C/mol">96485.309</Value>
       </Alias>
     </Dynamics>
   </ComponentClass>
