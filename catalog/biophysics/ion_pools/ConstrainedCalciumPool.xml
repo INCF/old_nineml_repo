@@ -19,19 +19,20 @@
       <Regime>
         <TimeDerivative variable="internal">
           <MathInline>
-            -i / (2 * Faraday * diameter) - beta * (internal - steadyStateInternal)
+            -i / (2 * Faraday * diameter) - 
+            beta * (constrainedInternal - steadyStateInternal)
           </MathInline>
         </TimeDerivative>
       </Regime>
-      <Alias name="constrainedCa">
+      <Alias name="constrainedInternal">
       	 <MathML>
       	   <piecewise>
       	     <piece>
       	        <ci>steadyState</ci>
-      	        <apply><lt/><ci>ca</ci><ci>steadyState</ci></apply>
+      	       <apply><lt/><ci>internal</ci><ci>steadyState</ci></apply>
       	     </piece>
       	     <otherwise>
-      	        <ci>ca</ci>
+      	       <ci>internal</ci>
       	     </otherwise>
       	   </piecewise>
       	 </MathML>
