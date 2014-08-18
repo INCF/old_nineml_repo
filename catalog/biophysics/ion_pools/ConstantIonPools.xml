@@ -2,7 +2,7 @@
 <NineML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns="http://nineml.incf.org/9ML/0.3"
     xsi:schemaLocation="http://nineml.incf.org/9ML/NineML_v0.3.xsd">
-    <ComponentClass name="ConstantIonPool">
+    <ComponentClass name="ConstantIonPools">
         <Parameter name="g" dimension="membrane_conductance"/>
         <Parameter name="e_reversal" dimension="voltage"/>
         <AnalogPort mode="recv" name="v" dimension="voltage"/>
