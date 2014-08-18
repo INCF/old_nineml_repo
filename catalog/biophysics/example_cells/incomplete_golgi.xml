@@ -60,7 +60,7 @@
             </Property>
         </Component> 
         <Component name="NaIons">
-            <Definition link="../../nineml_catalog/ion_pools/CrossMembraneIonDynamics.xml">
+            <Definition link="../../nineml_catalog/ion_pools/CrossMembraneTransmembraneIonDynamics.xml">
                 ExternalIonPool
             </Definition>
             <Property name="internalSteadyState">
@@ -71,7 +71,7 @@
             </Property>
         </Component>
         <Component name="KIons">
-            <Definition link="../../nineml_catalog/ion_pools/CrossMembraneIonDynamics.xml">
+            <Definition link="../../nineml_catalog/ion_pools/CrossMembraneTransmembraneIonDynamics.xml">
                 ExternalIonPool
             </Definition>
             <Property name="internalSteadyState">

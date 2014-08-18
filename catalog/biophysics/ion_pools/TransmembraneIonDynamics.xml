@@ -2,11 +2,12 @@
 <NineML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns="http://nineml.incf.org/9ML/0.3"
   xsi:schemaLocation="http://nineml.incf.org/9ML/NineML_v0.3.xsd">
-  <ComponentClass name="IonDynamics">
+  <ComponentClass name="TransmembraneIonDynamics">
     <Parameter name="diameter" dimension="length"/>
     <Parameter name="steadyStateInternal" dimension="concentration"/>
     <Parameter name="steadyStateExternal" dimension="concentration"/>
-    <Parameter name="beta" dimension="frequency"/>
+    <Parameter name="ionValence"/>
+    <Parameter name="beta" dimension="frequency"/>    
     <AnalogPort mode="recv" name="temperature" dimension="absolute_temperature"/>
     <AnalogPort mode="recv" name="g" dimension="membrane_conductance"/>
     <AnalogPort mode="send" name="i" dimension="membrane_current"/>
@@ -23,13 +24,13 @@
       <Regime>
         <TimeDerivative variable="internalC">
           <MathInline>
-            -i / (2 * Faraday * diameter) - 
+            -i / (ionValence * Faraday * diameter) - 
             beta * (internalC - steadyStateInternal)
           </MathInline>
         </TimeDerivative>
         <TimeDerivative variable="externalC">
           <MathInline>
-            i / (2 * Faraday * diameter) -  
+            i / (ionValence * Faraday * diameter) -  
             beta * (externalC - steadyStateExternal)
           </MathInline>
         </TimeDerivative>
