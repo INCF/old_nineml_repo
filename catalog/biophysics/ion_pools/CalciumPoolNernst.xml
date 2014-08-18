@@ -24,8 +24,45 @@
           </MathInline>
         </TimeDerivative>
       </Regime>
+      <Alias name="i">
+        <MathInline>g * (v - e_reversal)</MathInline>
+      </Alias>
+      <Alias name="e_reversal">
+        <MathML xmlns="http://www.w3.org/1998/Math/MathML">
+          <piecewise>    
+            <piece>
+              <ci>nerstUpperLimit</ci>
+              <apply><leq/><ci>internalC</ci><ci>zeroC</ci></apply>
+            </piece>
+            <otherwise>
+              <ci>nerstPotential</ci>
+            </otherwise>
+          </piecewise>
+        </MathML>
+      </Alias>
+      <Alias name="nernstPotential">
+        <MathInline>  
+          log(externalC / internalC) * UniversalGasConstant * 
+          (temperature - AbsoluteZero) / (Faraday * KValence)
+        </MathInline>
+      </Alias>
       <Alias name="Faraday">
         <Value units="C/mol">96485.309</Value>
+      </Alias>
+      <Alias name="UniversalGasConstant">
+        <Value units="J/(K * mol)">8.314472</Value>
+      </Alias>
+      <Alias name="AbsoluteZero">
+        <Value units="degC">−273.15</Value>
+      </Alias>
+      <Alias name="KValence">
+        <Value>1</Value>
+      </Alias>
+      <Alias name="zeroC">
+        <Value units="mM">0.0</Value>
+      </Alias>
+      <Alias name="nernstUpperLimit">
+        <Value units="mV">1e6</Value>
       </Alias>
     </Dynamics>
   </ComponentClass>
