@@ -283,28 +283,44 @@ def build_context(component, weight_variables,
 
 def write_nmodl(nineml_file, weight_variables={}, hierarchical_mode=False):
 
-    from nineml.abstraction_layer.readers import XMLReader
+    from nineml.abstraction_layer.dynamics.readers import XMLReader
     components = XMLReader.read_components(nineml_file)
 
+    output_dir = os.path.dirname(nineml_file)
+    basename = os.path.basename(nineml_file)
     if len(components) == 0:
         print 'No components found in file!'
     elif len(components) == 1:
-        output_filename = nineml_file.replace(".xml", ".mod").replace("-", "_")
+        output_filename = basename.replace(".xml", ".mod").replace("-", "_")
         print "Converting %s to %s" % (nineml_file, output_filename)
-        write_nmodldirect(component=component, mod_filename=output_filename, weight_variables=weight_variables, hierarchical_mode=hierarchical_mode)
+        write_nmodldirect(component=components[0],
+                          mod_filename=os.path.join(output_dir,
+                                                    output_filename),
+                          weight_variables=weight_variables,
+                          hierarchical_mode=hierarchical_mode)
     else:
         for c in components:
-            output_filename = nineml_file.replace(".xml", "_%s.mod"%c.name).replace("-", "_")
+            output_filename = basename.replace(".xml",
+                                               "_%s.mod" % c.name).replace("-",
+                                                                           "_")
             print "Converting %s to %s" % (nineml_file, output_filename)
-            write_nmodldirect(component=component, mod_filename=output_filename, weight_variables=weight_variables, hierarchical_mode=hierarchical_mode)
+            write_nmodldirect(component=c,
+                              mod_filename=os.path.join(output_dir,
+                                                        output_filename),
+                              weight_variables=weight_variables,
+                              hierarchical_mode=hierarchical_mode)
 
 
-def write_nmodldirect(component, mod_filename, weight_variables={},hierarchical_mode=False):
+def write_nmodldirect(component, mod_filename, weight_variables={},
+                      hierarchical_mode=False):
 
     print "Writing Mod-File %s" % mod_filename
     with open(mod_filename, "w") as f:
-        context = build_context(component, weight_variables,hierarchical_mode=hierarchical_mode)
-        f.write(Template(tmpl_contents, context).respond().replace("**", "^"))  # this filtering of '**' should happen in the template, in case of double pointers in VERBATIM blocks
+        context = build_context(component, weight_variables,
+                                hierarchical_mode=hierarchical_mode)
+        # this filtering of '**' should happen in the template, in case of
+        # double pointers in VERBATIM blocks
+        f.write(Template(tmpl_contents, context).respond().replace("**", "^"))
 
 
 def call_nrnivmodl():
