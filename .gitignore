@@ -13,3 +13,6 @@ build
 nest_model
 test_files
 nineml_mechanisms
+*.project
+*.pydevproject
+*.settings
