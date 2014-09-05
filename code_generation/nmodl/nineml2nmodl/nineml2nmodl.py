@@ -173,7 +173,7 @@ def build_channels(component):
     for event_port in [ep for ep in component.event_ports if ep.mode=='recv']:
         channel = event_port.name.upper()
         if channel not in channels:
-             channels.add(channel)
+            channels.add(channel)
         event_port.channel_ = channel
     return channels
 
