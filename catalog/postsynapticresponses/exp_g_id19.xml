@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<nineml xmlns="http://nineml.org/9ML/0.3">
+<nineml xmlns="http://nineml.incf.org/9ML/0.3">
   <component name="CondExpSynapse">
     <parameter name="g_bar"/>
     <parameter name="tau"/>
