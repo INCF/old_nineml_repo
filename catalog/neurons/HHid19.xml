@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<nineml xmlns="http://nineml.org/9ML/0.1">
+<nineml xmlns="http://nineml.incf.org/9ML/0.1">
   <component name="HHid19">
     <parameter name="theta"/>
     <analog-port symbol="n_kn" mode="send"/>
