@@ -27,8 +27,11 @@ FIRST_REGIME_FLAG = 1001
 
 #\#include <nineml.h>
 
-tmpl_contents = open(os.path.join(os.path.dirname(__file__), "default_template.mod")).read()
-
+def load_template(filename):
+    print("Using template %s" % filename)
+    with open(os.path.join(os.path.dirname(__file__), filename)) as fp:
+        contents = fp.read()
+    return contents
 
 #$random_functions
 #
@@ -261,6 +264,8 @@ def build_context(component, weight_variables,
     #        if not libdir in os.environ[LD_LIB_PATH]:
     #            raise NineMLRuntimeError(err)
 
+    event_based = sum(len(list(r.time_derivatives)) for r in component.regimes) == 0
+
     context = {
         "input_filename": input_filename,
         "version": nineml.__version__,
@@ -277,6 +282,8 @@ def build_context(component, weight_variables,
         "weights_as_states": weights_as_states,
         'get_on_event_channel': get_on_event_channel,
         'random_functions': rand.get_modl_function_defs(),
+
+        'event_based': event_based
     }
     return context
 
@@ -320,7 +327,11 @@ def write_nmodldirect(component, mod_filename, weight_variables={},
                                 hierarchical_mode=hierarchical_mode)
         # this filtering of '**' should happen in the template, in case of
         # double pointers in VERBATIM blocks
-        f.write(Template(tmpl_contents, context).respond().replace("**", "^"))
+        if context["event_based"]:
+            template = load_template("event_based_template.mod")
+        else:
+            template = load_template("default_template.mod")
+        f.write(Template(template, context).respond().replace("**", "^"))
 
 
 def call_nrnivmodl():

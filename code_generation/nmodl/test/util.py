@@ -20,7 +20,7 @@ import matplotlib.pyplot as plt
 
 from nineml.abstraction_layer.dynamics.component_modifiers import ComponentModifier
 from nineml.abstraction_layer.dynamics.flattening import flatten
-from nineml2nmodl import write_nmodl, write_nmodldirect
+from nineml2nmodl import write_nmodldirect
 
 
 BUILD_DIR = "build/"
@@ -136,11 +136,13 @@ class TestFixture(object):
             setattr(self.cell, variable, value)
 
     def setup_recording(self):
-        self.Vm = h.Vector()
         self.times = h.Vector()
-        self.Vm.record(self.cell._ref_V)
         self.times.record(h._ref_t)
-
+        self.traces = {}
+        for state_variable in self.component.state_variables:
+            hoc_var = getattr(self.cell, "_ref_%s" % state_variable.name)
+            self.traces[state_variable.name] = h.Vector()
+            self.traces[state_variable.name].record(hoc_var)
         self.spike_times = h.Vector()
         self.source = h.NetCon(self.cell, None)
         self.source.record(self.spike_times)
@@ -151,7 +153,11 @@ class TestFixture(object):
 
     def plot(self, filename):
         plt.clf()
-        plt.plot(self.times, self.Vm, 'bo-')
+        n_plots = len(self.traces)
+        for i, (name, vec) in enumerate(self.traces.items()):
+            plt.subplot(n_plots, 1, i)
+            plt.plot(self.times, self.traces[name], 'bo-', label=name)
+            plt.legend()
         plt.savefig(filename)
 
     def calculate_errors(self):

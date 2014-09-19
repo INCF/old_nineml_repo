@@ -66,19 +66,6 @@ class TestIFCondExp(TestFixture):
         nc.weight[1] = SYN_TYPES[label]
         self.stimuli[label] = (stim, nc)
 
-    def setup_recording(self):
-        self.Vm = h.Vector()
-        self.gE = h.Vector()
-        self.gI = h.Vector()
-        self.times = h.Vector()
-        self.Vm.record(self.cell._ref_V)
-        self.gE.record(self.cell._ref_gE)
-        self.gI.record(self.cell._ref_gI)
-        self.times.record(h._ref_t)
-        self.spike_times = h.Vector()
-        self.source = h.NetCon(self.cell, None)
-        self.source.record(self.spike_times)
-
 
 parameters = p = {
     'cm': 1,          # nF
