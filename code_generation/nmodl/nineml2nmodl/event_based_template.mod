@@ -44,7 +44,7 @@ CONSTANT {
 INITIAL {
     : Initialise State Variables  # should we do this? They should be initialised externally
   #for var in $component.state_variables:
-    $var.name = 0
+    :$var.name = 0
   #end for
 
     : Initialise Regime
