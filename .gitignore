@@ -18,3 +18,4 @@ nineml_mechanisms
 *.settings
 *.pdf
 *.synctex.gz
+/spec/*
