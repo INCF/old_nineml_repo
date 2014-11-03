@@ -1,3 +1,4 @@
+.DS_Store
 *.pyc
 x86_64
 *.toc
@@ -7,6 +8,8 @@ x86_64
 *.bbl
 *.blg
 *.out
+*.pdf
 *.komodoproject
+*.synctex.gz*
 cover
 build
