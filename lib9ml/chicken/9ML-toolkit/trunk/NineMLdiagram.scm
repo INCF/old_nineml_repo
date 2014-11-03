@@ -2,15 +2,15 @@
 (define (Diagram:module-initialize module-name enter-module find-module eval-env )
   
   (define path-sigfun   (Pdot (Pident (ident-create "Signal")) "sigfun"))
-  (define sigfun-type   (Tcon path-sigfun '()))
+  (define sigfun-type   (Tcon (Tpath path-sigfun) '()))
   
   (define ident-diagram   (ident-create "diagram"))
   (define path-diagram    (Pident ident-diagram))
-  (define diagram-type    (Tcon path-diagram '()))
+  (define diagram-type    (Tcon (Tpath path-diagram) '()))
 
   (define ident-pure   (ident-create "pure"))
   (define path-pure    (Pident ident-pure))
-  (define pure-type    (Tcon path-pure '()))
+  (define pure-type    (Tcon (Tpath path-pure) '()))
 
   (define-values (type-variables reset-type-variables
 				 find-type-variable 
@@ -75,7 +75,7 @@
 	 (list
 
 	  (Type_def ident-diagram (make-kind 0) 
-		    (make-deftype '() (Tcon path-diagram '()) ))
+		    (make-deftype '() (Tcon (Tpath path-diagram) '()) ))
 
 	  (datacon 'diagram 'SENSE   2)
 	  (datacon 'diagram 'ACTUATE 2)

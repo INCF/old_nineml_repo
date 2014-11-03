@@ -2,7 +2,7 @@
 ;;  NineML library collection.
 ;;
 ;;
-;; Copyright 2010-2011 Ivan Raikov and the Okinawa Institute of
+;; Copyright 2010-2012 Ivan Raikov and the Okinawa Institute of
 ;; Science and Technology.
 ;;
 ;; This program is free software: you can redistribute it and/or
@@ -24,6 +24,8 @@
 
 	(
 	 datacon
+	 Real:module-initialize   
+	 Random:module-initialize
 	 Signal:module-initialize   
 	 Diagram:module-initialize  
 	 Interval:module-initialize 
@@ -35,7 +37,7 @@
 	(import (only srfi-1 list-tabulate)
 		(only data-structures ->string)
 		)
-	(require-extension static-modules miniML miniMLsyntax miniMLvalue miniMLeval)
+	(require-extension  static-modules miniML miniMLsyntax miniMLvalue miniMLeval)
 
 
 (define-values (env-binding? env-empty env-add-signature env-add-module env-add-type env-add-spec env-add-value
@@ -51,6 +53,8 @@
 
 
 (include "NineMLcore.scm")
+(include "NineMLreal.scm")
+(include "NineMLrandom.scm")
 (include "NineMLsignal.scm")
 (include "NineMLdiagram.scm")
 (include "NineMLinterval.scm")

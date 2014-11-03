@@ -2,7 +2,7 @@
 ;;  NineML IVP code generator for MLton.
 ;;
 ;;
-;; Copyright 2010-2011 Ivan Raikov and the Okinawa Institute of
+;; Copyright 2010-2012 Ivan Raikov and the Okinawa Institute of
 ;; Science and Technology.
 ;;
 ;; This program is free software: you can redistribute it and/or
@@ -29,7 +29,7 @@
 (import (only files make-pathname pathname-directory pathname-file)
 	(only data-structures conc alist-ref intersperse)
 	(only srfi-13 string-concatenate))
-(require-extension setup-api datatype signal-diagram 9ML-repr)
+(require-extension make datatype signal-diagram 9ML-eval setup-api)
 
 
 (define nl "\n")

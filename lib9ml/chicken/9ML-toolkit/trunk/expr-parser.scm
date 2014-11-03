@@ -58,7 +58,7 @@
   (and (pair? lst) (box lst)))
 
 
-(define (make-char-lexer port errorp)
+(define (make-char-lexer port errorp loc)
   (lambda ()
     (letrec ((skip-spaces
               (lambda ()
@@ -102,20 +102,20 @@
          ((char=? c #\*)       '*)
          ((char=? c #\/)       '/)
          ((char=? c #\=)       '=)
-         ((char=? c #\?)       (tok (QUESTION)))
-         ((char=? c #\:)       (tok (COLON)))
-         ((char=? c #\,)       (tok (COMMA)))
-         ((char=? c #\()       (tok (LPAREN)))
-         ((char=? c #\))       (tok (RPAREN)))
+         ((char=? c #\?)       (tok loc QUESTION))
+         ((char=? c #\:)       (tok loc COLON))
+         ((char=? c #\,)       (tok loc COMMA))
+         ((char=? c #\()       (tok loc LPAREN))
+         ((char=? c #\))       (tok loc RPAREN))
          ((or (char-numeric? c)  (eq? c #\.))
-	  (tok (NUM ,(read-number (list c) #f #f))))
+	  (tok loc NUM (read-number (list c) #f #f)))
          ((char-alphabetic? c)  (let ((id (read-id (list c))))
 				  (case id
-				    ((if IF If) (tok  (IF)))
-				    ((then THEN Then) (tok (THEN)))
-				    ((else ELSE Else) (tok (ELSE)))
+				    ((if IF If) (tok loc  IF))
+				    ((then THEN Then) (tok loc THEN))
+				    ((else ELSE Else) (tok loc ELSE))
 				    (else
-				     (tok (ID  ,id))))))
+				     (tok loc ID  id)))))
          (else
           (errorp "illegal character: " c)
           (skip-spaces)
@@ -123,16 +123,24 @@
 
 (include "expr.grm.scm")
 
+(define (port-line port) 
+  (let-values (((line _) (port-position port)))
+    line))
+  
+(define (port-column port)
+  (let-values (((_ column) (port-position port)))
+    column))
+
 (define (parse-string-expr s #!optional loc)
   (or (and (string? s) (string-null? s) '())
       (let ((port
 	     (cond ((string? s)  (open-input-string s))
 		   ((port? s)    s)
 		   (else (error 'nemo:parse-string-expr "bad argument type: not a string or a port: " s)))))
-	(expr-parser  (make-char-lexer port (make-parse-error loc)) 
+	(expr-parser  (make-char-lexer port (make-parse-error loc) (make-source-location loc (port-line port) (port-column port) -1 -1))
 		      (make-parse-error loc)))))
 
-(define (make-sym-lexer lst errorp)
+(define (make-sym-lexer lst errorp loc)
   (if (not (list? lst)) (errorp "illegal list: " lst))
   (let ((is (make-stack)))
     (stack-push! is lst)
@@ -144,17 +152,17 @@
 			    (begin (stack-push! is (cdr p))
 				   (match x
 					  ((or '< '> '<= '>= '^ '+ '- '* '/ '= )      x)
-					  ('?                 (tok (QUESTION)))
-					  (':                 (tok (COLON)))
-					  ((or 'if  'IF)      (tok (IF)))
-					  ((or 'then 'THEN)   (tok (THEN)))
-					  ((or 'else 'ELSE)   (tok (ELSE)))
-					  ((? number?)        (tok (NUM ,x)))
-					  ((? symbol?)        (tok (ID ,x)))
+					  ('?                 (tok loc QUESTION))
+					  (':                 (tok loc COLON))
+					  ((or 'if  'IF)      (tok loc IF))
+					  ((or 'then 'THEN)   (tok loc THEN))
+					  ((or 'else 'ELSE)   (tok loc ELSE))
+					  ((? number?)        (tok loc NUM x))
+					  ((? symbol?)        (tok loc ID x))
 					  ((? list?)          (begin (stack-push! is x)
-								     (tok (LPAREN))))
+								     (tok loc LPAREN)))
 					  (else (errorp "invalid input: " x))))
-			    (if (not (stack-empty? is)) (tok (RPAREN)) '*eoi*))))
+			    (if (not (stack-empty? is)) (tok loc RPAREN) '*eoi*))))
 	    t)))))
 	    
   
@@ -163,7 +171,7 @@
   (let ((ret (cond ((number? lst)  lst)
 		   ((symbol? lst)  lst)
 		   ((and (list? lst) (null? lst) '()))
-		   (else (expr-parser  (make-sym-lexer lst (make-parse-error loc)) 
+		   (else (expr-parser  (make-sym-lexer lst (make-parse-error loc) (make-source-location loc 0 0 -1 -1))
 				       (make-parse-error loc))))))
     ret))
     

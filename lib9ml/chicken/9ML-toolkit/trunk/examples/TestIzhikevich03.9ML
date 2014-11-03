@@ -40,14 +40,16 @@ component S = Signal
 component TestIzhikevich03 =
 struct
 
+
   val h = S.realsig `h (S.realconst 0.001)
 
   (* Parameters common to all spiking regimes *)
-  val k1    =    S.realsig `k1 (S.realconst 0.04)
+  val k1    =    S.realsig `k1 (S.realconst (Real.mul 4. 0.01))
   val k2    =    S.realsig `k2 (S.realconst 5.0)
   val k3    =    S.realsig `k3 (S.realconst 140.0)
   val theta =    S.realsig `theta (S.realconst 30.0)
   val Isyn  =    S.realsig `Isyn  (S.realconst 10.0)
+
   (* State initial values *)
   val t      = S.realsig `t (S.realconst 0.0)
   val V      = S.realsig `V (S.realconst -65.0)
