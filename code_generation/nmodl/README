@@ -1,26 +1,27 @@
-=========
-9ml2nmodl
-=========
+============
+nineml2nmodl
+============
 
-9ml2nmodl generates NMODL code for the NEURON simulator (http://www.neuron.yale.edu/neuron/)
-from 9ML descriptions (http://nineml.incf.org).
+nineml2nmodl generates NMODL code for the NEURON simulator (http://www.neuron.yale.edu/neuron/)
+from NineML descriptions (http://nineml.incf.org).
 
-To convert a 9ML xml file to NMODL, run
+To convert a NineML xml file to NMODL, run
 
 $ bin/9ml2nmodl filename.xml
 
 This will produce filename.mod
 This may then be compiled using nrnivmodl, and then tested using one of the test scripts, e.g.
 
-$ python test_Izhikevich.py
+$ python test_izhikevich.py
 
-which will pop-up a graph (if you have pylab installed) showing the membrane potential trace.
+which will create a graph (if you have matplotlib installed) showing the membrane potential trace.
 
-Dependencies:
+Dependencies
+------------
 
-  Python packages (Python >= 2.5):
+  Python packages (Python >= 2.7):
       nineml
       numpy - for tests
       matplotlib - for tests
   NEURON - http://www.neuron.yale.edu/neuron/
-  GNU Scientific Library (GSL)
+  (optional) GNU Scientific Library (GSL)

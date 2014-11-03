@@ -5,6 +5,7 @@ from __future__ import print_function
 import nineml
 from nineml.user_layer import Model, Definition, Parameter, ParameterSet, SpikingNodeType, SynapseType, CurrentSourceType
 from nineml.abstraction_layer.testing_utils import TestableComponent
+from nineml.abstraction_layer.writers import XMLWriter
 import sys, collections, json
 from PyQt4 import QtCore, QtGui
 from PyQt4.QtCore import Qt
@@ -1020,7 +1021,7 @@ class nineml_component_inspector:
         :raises: IOError
         """
         f = StringIO()
-        nineml.al.writers.XMLWriter.write(self.ninemlComponent, f, flatten)
+        XMLWriter.write(self.ninemlComponent, f, flatten)
         xmlSource = f.getvalue()
         return xmlSource
 
@@ -1039,7 +1040,7 @@ class nineml_component_inspector:
         """
         if not self.ninemlComponent or not isinstance(self.ninemlComponent, nineml.abstraction_layer.ComponentClass):
             raise RuntimeError('Invalid input NineML component')
-        nineml.al.writers.XMLWriter.write(self.ninemlComponent, filename, flatten)
+        XMLWriter.write(self.ninemlComponent, filename, flatten)
 
     def generateHTMLForm(self):
         """

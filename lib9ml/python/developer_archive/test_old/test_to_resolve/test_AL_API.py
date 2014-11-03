@@ -120,7 +120,7 @@ class ComponentTestCase(unittest.TestCase):
         ]
         r = nineml.Regime("dV/dt = 0.04*V*V + 5*V + 140.0 - U + Isyn + v1(v3(x))")
 
-        c1 = nineml.Component("Izhikevich", regimes=[r], aliases=aliases)
+        c1 = nineml.ComponentClass("Izhikevich", regimes=[r], aliases=aliases)
         c1.backsub_aliases()
         c1.backsub_equations()
 
@@ -178,7 +178,7 @@ class ComponentTestCase(unittest.TestCase):
         ports = [nineml.RecvPort("V"),
                  nineml.SendPort("Isyn = g(E-V)")]
 
-        coba_syn = nineml.Component("CoBaSynapse", regimes=regimes, ports=ports)
+        coba_syn = nineml.ComponentClass("CoBaSynapse", regimes=regimes, ports=ports)
 
         assert sorted(parameters) == sorted(coba_syn.parameters)
 
@@ -189,7 +189,7 @@ class ComponentTestCase(unittest.TestCase):
             transitions=[nineml.On(nineml.SpikeInputEvent, do="V+=10"),
                          nineml.On("V>Vth", do=["V=c", "U+=d", nineml.SpikeOutputEvent])])
 
-        c1 = nineml.Component("Izhikevich", regimes=[r], ports=[nineml.AnalogPort("V")])
+        c1 = nineml.ComponentClass("Izhikevich", regimes=[r], ports=[nineml.AnalogSendPort("V")])
         ap = list(c1.analog_ports)
 
         assert sorted([p.symbol for p in ap]) == sorted(['V', 'U', 't'])
@@ -201,7 +201,7 @@ class ComponentTestCase(unittest.TestCase):
             transitions=[nineml.On(nineml.SpikeInputEvent, do="V+=10"),
                          nineml.On("V>Vth", do=["V=c", "U+=d", nineml.SpikeOutputEvent])])
 
-        c1 = nineml.Component("Izhikevich", regimes=[r], ports=[nineml.AnalogPort("V")])
+        c1 = nineml.ComponentClass("Izhikevich", regimes=[r], ports=[nineml.AnalogSendPort("V")])
         ep = list(c1.event_ports)
         assert len(ep) == 2
 
@@ -217,20 +217,20 @@ class ComponentTestCase(unittest.TestCase):
         assert nineml.SpikeOutputEvent in ep
 
         # get just the "recv" EventPort
-        ep = list(c1.filter_ports(mode="recv", cls=nineml.EventPort))
+        ep = list(c1.filter_ports(mode="recv", cls=nineml.EventReceivePort))
         assert len(ep) == 1
         assert ep[0] == nineml.SpikeInputEvent
 
         # check that Transition catches condition in mode="send"
         self.assertRaises(ValueError, nineml.On, nineml.SpikeOutputEvent, do="V+=10")
-        # check that it won't accept a simple Port
-        self.assertRaises(ValueError, nineml.On, nineml.Port("hello", mode="recv"), do="V+=10")
+        # check that it won't accept an analogport
+        self.assertRaises(ValueError, nineml.On, nineml.AnalogReceivePort("hello", dimension="voltage"), do="V+=10")
         # check that it won't accept an AnalogPort
         self.assertRaises(
-            ValueError, nineml.On, nineml.AnalogPort("hello", mode="recv"), do="V+=10")
+            ValueError, nineml.On, nineml.AnalogReceivePort("hello", dimension="voltage"), do="V+=10")
 
         # user defined EventPort should be ok.
-        e = nineml.On(nineml.EventPort("hello", mode="recv"), do="V+=10")
+        e = nineml.On(nineml.EventReceivePort("hello"), do="V+=10")
 
         r = nineml.Regime(
             "_q10(V):=exp(V)",
@@ -241,20 +241,20 @@ class ComponentTestCase(unittest.TestCase):
         # TODO: read from alias
         # c1 = nineml.Component("Izhikevich", regimes = [r], ports=[nineml.AnalogPort("_q10","send")] )
         # may not write to a alias
-        self.assertRaises(ValueError, nineml.Component, "Izhikevich",
-                          regimes=[r], ports=[nineml.AnalogPort("_q10", "recv")])
+        self.assertRaises(ValueError, nineml.ComponentClass, "Izhikevich",
+                          regimes=[r], ports=[nineml.AnalogReceivePort("_q10")])
 
         # may not read from an undefined symbol
-        self.assertRaises(ValueError, nineml.Component, "Izhikevich",
-                          regimes=[r], ports=[nineml.AnalogPort("_q11", "send")])
+        self.assertRaises(ValueError, nineml.ComponentClass, "Izhikevich",
+                          regimes=[r], ports=[nineml.AnalogSendPort("_q11")])
 
         # Should be AnalogPort
-        self.assertRaises(ValueError, nineml.Component, "Izhikevich",
-                          regimes=[r], ports=[nineml.Port("_q10", "send")])
+        self.assertRaises(ValueError, nineml.ComponentClass, "Izhikevich",
+                          regimes=[r], ports=[nineml.AnalogSendPort("_q10")])
 
         # Should be AnalogPort
-        self.assertRaises(ValueError, nineml.Component, "Izhikevich",
-                          regimes=[r], ports=[nineml.EventPort("_q10", "send")])
+        self.assertRaises(ValueError, nineml.ComponentClass, "Izhikevich",
+                          regimes=[r], ports=[nineml.EventSendPort("_q10")])
 
         # EventPorts as nodes in Transitions
         # multiple EventPorts
@@ -263,7 +263,7 @@ class ComponentTestCase(unittest.TestCase):
             "dV/dt = 0.04*V*V + 5*V + 140.0 - U + Isyn",
             transitions=nineml.On("V>Vth", do=[nineml.SpikeOutputEvent, myeventport]))
 
-        c1 = nineml.Component("Izhikevich", regimes=[r])
+        c1 = nineml.ComponentClass("Izhikevich", regimes=[r])
         ep = list(c1.event_ports)
         assert len(ep) == 2
 
@@ -271,10 +271,10 @@ class ComponentTestCase(unittest.TestCase):
         assert ep[1] == myeventport
 
         # ok
-        e = nineml.On("V>Vth", do=nineml.EventPort("hello", mode="send"))
+        e = nineml.On("V>Vth", do=nineml.EventSendPort("hello", mode="send"))
         # not ok: do=EventPort cannot recv
         self.assertRaises(
-            ValueError, nineml.On, "V>Vth", do=nineml.EventPort("hello", mode="recv"))
+            ValueError, nineml.On, "V>Vth", do=nineml.EventReceivePort("hello", mode="recv"))
 
     def test_regime_basic(self):
 
@@ -384,7 +384,7 @@ class ComponentTestCase(unittest.TestCase):
         # TODO: ok to read from a alias, where function aliases are most interesting.
         # p_q10 = nineml.AnalogPort("_q10(V)","send")
         # ports = [p_q10]
-        c1 = nineml.Component("Izhikevich", regimes=[r])
+        c1 = nineml.ComponentClass("Izhikevich", regimes=[r])
 
         # attribute lookup for ports and user parameters:
 

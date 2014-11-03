@@ -10,6 +10,15 @@ x86_64
 *.out
 *.pdf
 *.komodoproject
+.idea
 *.synctex.gz*
 cover
 build
+nest_model
+test_files
+nineml_mechanisms
+*.project
+*.pydevproject
+*.settings
+*.pdf
+*.synctex.gz

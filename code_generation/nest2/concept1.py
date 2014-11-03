@@ -39,7 +39,6 @@ Copyright (C) 2011 Eilif Muller. All Rights Reserved.
 
 
 from iaf_cond_exp_9ML import iaf_cond_exp_9ML
-import nineml.abstraction_layer as nineml
 import os
 
 iaf_cond_exp_9ML.long_description = """
@@ -54,7 +53,7 @@ iaf_cond_exp_9ML.short_description = "Standard integrate and fire with exponenti
 synapse_ports = ['excitatory', 'inhibitory']
 AP_port = 'spike_output'
 V_port = 'V_m'
-initial_regime = "sub-threshold-regime"
+initial_regime = "sub_threshold_regime"
 
 initial_values = {
     'V_m': -70.0,
