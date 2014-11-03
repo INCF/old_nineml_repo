@@ -11,6 +11,8 @@ import os
 import shutil
 from StringIO import StringIO
 from subprocess import check_call, STDOUT, CalledProcessError
+import platform
+import os.path
 
 from neuron import h, load_mechanisms
 import numpy
@@ -22,6 +24,30 @@ from nineml.abstraction_layer.dynamics.component_modifiers import ComponentModif
 from nineml.abstraction_layer.dynamics.flattening import flatten
 from nineml2nmodl import write_nmodldirect
 
+
+def path_to_exec(exec_name):
+    """
+    Returns the full path to an executable by searching the $PATH environment
+    variable
+
+    Parameters:
+       -- exec_name: Name of executable to search the execution path for [str]
+    Returns:
+      Full path to executable [str]
+    """
+    if platform.system() == 'Windows':
+        exec_name += '.exe'
+    # Check the system path for the 'nrnivmodl' command
+    exec_path = None
+    for dr in os.environ['PATH'].split(os.pathsep):
+        path = os.path.join(dr, exec_name)
+        if os.path.exists(path):
+            exec_path = path
+            break
+    if not exec_path:
+        raise Exception("Could not find executable '{}' on the system path"
+                        "'{}'".format(exec_name, os.environ['PATH']))
+    return exec_path
 
 BUILD_DIR = "build/"
 
@@ -38,8 +64,9 @@ def compile_nmodl(dir_name):
     os.chdir(dir_name)
     print 'Compiling nmodl in', os.getcwd()
     stdout = open("stdout.txt", "wb")
+    nrnivmodlpath = path_to_exec('nrnivmodl')
     try:
-        check_call('nrnivmodl', stdout=stdout, stderr=STDOUT)
+        check_call(nrnivmodlpath, stdout=stdout, stderr=STDOUT)
     except CalledProcessError:
         stdout.close()
         stdout = open("stdout.txt", "rb")

@@ -5,10 +5,10 @@ from operator import and_
 from ..base import BaseULObject, E, NINEML
 from ..utility import check_tag
 from ..random import RandomDistribution
-from .base import get_or_create_component
+from .base import BaseComponent, Reference
 
 
-class Parameter(BaseULObject):
+class Property(BaseULObject):
 
     """
     Representation of a numerical- or string-valued parameter.
@@ -19,23 +19,28 @@ class Parameter(BaseULObject):
     Numerical values may either be numbers, or a component that generates
     numbers, e.g. a RandomDistribution instance.
     """
-    element_name = "property"
-    defining_attributes = ("name", "value", "unit")
+    element_name = "Property"
+    defining_attributes = ("name", "quantity")
 
-    def __init__(self, name, value, unit=None):
+    def __init__(self, name, quantity):
+        if not isinstance(Quantity, quantity):
+            raise Exception("Value must be provided as a Quantity object")
         self.name = name
-        if (not isinstance(value, (Number, list, RandomDistribution, str)) or
-            isinstance(value, bool)):
-            raise TypeError("Parameter values may not be of type %s" %
-                            type(value))
-        self.value = value
-        self.unit = unit
+        self.quantity = quantity
+
+    @property
+    def value(self):
+        return self.quantity.value
+
+    @property
+    def unit(self):
+        return self.quantity.units
 
     def __repr__(self):
         units = self.unit
         if u"µ" in units:
             units = units.replace(u"µ", "u")
-        return "Parameter(name=%s, value=%s, unit=%s)" % (self.name,
+        return "Property(name=%s, value=%s, unit=%s)" % (self.name,
                                                           self.value, units)
 
     def __eq__(self, other):
@@ -51,37 +56,49 @@ class Parameter(BaseULObject):
         return isinstance(self.value, RandomDistribution)
 
     def to_xml(self):
-        if isinstance(self.value, RandomDistribution):
-            value_element = E.reference(self.value.name)
-        elif (isinstance(self.value, collections.Iterable) and
-              isinstance(self.value[0], Number)):
-            value_element = E.array(" ".join(repr(x) for x in self.value))
-        else:  # need to handle Function
-            value_element = E.scalar(repr(self.value))
-        return E(Parameter.element_name,
-                 E.quantity(
-                 E.value(   # this extra level of tags is pointless, no?
-                 value_element,
-                 E.unit(self.unit or "dimensionless"))),
+        return E(self.element_name,
+                 self.quantity.to_xml(),
                  name=self.name)
 
     @classmethod
     def from_xml(cls, element, components):
         check_tag(element, cls)
-        quantity_element = element.find(NINEML +
-                                        "quantity").find(NINEML + "value")
-        value, unit = Value.from_xml(quantity_element, components)
-        return Parameter(name=element.attrib["name"],
-                         value=value,
-                         unit=unit)
+        quantity = Quantity.from_xml(element.find(NINEML + "Quantity"),
+                                     components)
+        return Property(name=element.attrib["name"],
+                         value=quantity.value,
+                         unit=quantity.unit)
 
 
-class Value(object):
+class Quantity(object):
 
     """
-    Not intended to be instantiated: just provides the from_xml() classmethod.
+    Represents a "quantity", a single value, random distribution or function
+    with associated units
     """
-    element_name = "value"
+    element_name = "Quantity"
+
+    def __init__(self, value, units):
+        if not (isinstance(value, float) or isinstance(value, Reference) or
+                isinstance(value, BaseComponent)):
+            raise Exception("Invalid type '{}' for value, can be one of "
+                            "'Value', 'Reference', 'Component', 'ValueList', "
+                            "'ExternalValueList'"
+                            .format(value.__class__.__name__))
+        if not isinstance(units, basestring):
+            raise Exception("Units ({}) must be a string".format(units))
+        self.value = value
+        self.units = units
+
+    def to_xml(self):
+        if isinstance(self.value, float):
+            value_element = E('Value', self.value)
+        else:
+            value_element = self.value.to_xml()
+        kwargs = {'units': self.units} if self.units else {}
+        return E(self.element_name,
+                 value_element,
+                 **kwargs)
 
     @classmethod
     def from_xml(cls, element, components):
@@ -92,27 +109,26 @@ class Value(object):
 
         `element` - should be an ElementTree Element instance.
         """
-        for name in ("reference", "scalar", "array", "function"):
-            value_element = element.find(NINEML + name)
-            if value_element is not None:
-                break
-        if value_element is None:
-            raise ValueError("No value found")
+        value_element = element.getchildren()[0]
+        if value_element.tag == 'Value':
+            try:
+                value = float(value_element.text)
+            except ValueError:
+                raise Exception("Provided value '{}' is not numeric"
+                                .format(value_element.text))
+        elif value_element.tag == 'Reference':
+            # FIXME: Need to add option to read Function component type
+            value = Reference.from_xml(value_element, components)
+        elif value_element.tag == 'Component':
+            value = BaseComponent.from_xml(value_element, components)
+        elif value_element.tag in ('ValueList', 'ExternalValueList'):
+            raise NotImplementedError()
         else:
-            if name == "reference":
-                value = get_or_create_component(value_element.text,
-                                                RandomDistribution, components)
-            elif name == "scalar":
-                try:
-                    value = float(value_element.text)
-                except ValueError:
-                    value = value_element.text
-            elif name == "array":
-                value = [float(x) for x in value_element.text.split(" ")]
-            elif name == "function":
-                raise NotImplementedError
-        unit = element.find(NINEML + "unit").text
-        return value, unit
+            raise Exception("Unrecognised element '{}' was expecting one of "
+                            "'Value', 'Reference', 'Component', 'ValueList', "
+                            "'ExternalValueList'".format(element.tag))
+        units = element.attrib.get('units')
+        return Quantity(value, units)
 
 
 class StringValue(object):
@@ -120,7 +136,7 @@ class StringValue(object):
     """
     Not intended to be instantiated: just provides the from_xml() classmethod.
     """
-    element_name = "value"
+    element_name = "Value"
 
     @classmethod
     def from_xml(cls, element):
@@ -137,7 +153,7 @@ class InitialValue(BaseULObject):
     """
     temporary, longer-term plan is to use SEDML or something similar
     """
-    element_name = "initial"
+    element_name = "Initial"
     defining_attributes = ("name", "value", "unit")
 
     def __init__(self, name, value, unit=None):
@@ -187,42 +203,42 @@ class InitialValue(BaseULObject):
     def from_xml(cls, element, components):
         check_tag(element, cls)
         quantity_element = element.find(NINEML +
-                                        "quantity").find(NINEML + "value")
-        value, unit = Value.from_xml(quantity_element, components)
+                                        "Quantity").find(NINEML + "Quantity")
+        value, unit = Quantity.from_xml(quantity_element, components)
         return InitialValue(name=element.attrib["name"],
                             value=value,
                             unit=unit)
 
 
-class ParameterSet(dict):
+class PropertySet(dict):
 
     """
-    Container for the set of parameters for a component.
+    Container for the set of properties for a component.
     """
 
-    def __init__(self, *parameters, **kwparameters):
+    def __init__(self, *properties, **kwproperties):
         """
-        `*parameters` - should be Parameter instances
-        `**kwparameters` - should be name=(value,unit)
+        `*properties` - should be Property instances
+        `**kwproperties` - should be name=(value,unit)
         """
         dict.__init__(self)
-        for parameter in parameters:
-            self[parameter.name] = parameter  # should perhaps do a copy
-        for name, (value, unit) in kwparameters.items():
-            self[name] = Parameter(name, value, unit)
+        for prop in properties:
+            self[prop.name] = prop  # should perhaps do a copy
+        for name, (value, unit) in kwproperties.items():
+            self[name] = Property(name, value, unit)
 
     def __hash__(self):
         return hash(tuple(self.items()))
 
     def __repr__(self):
-        return "ParameterSet(%s)" % dict(self)
+        return "PropertySet(%s)" % dict(self)
 
-    def complete(self, other_parameter_set):
+    def complete(self, other_property_set):
         """
-        Pull parameters from another parameter set into this one, if they do
+        Pull properties from another property set into this one, if they do
         not already exist in this one.
         """
-        for name, parameter in other_parameter_set.items():
+        for name, parameter in other_property_set.items():
             if name not in self:
                 self[name] = parameter  # again, should perhaps copy
 
@@ -235,14 +251,14 @@ class ParameterSet(dict):
 
     @classmethod
     def from_xml(cls, elements, components):
-        parameters = []
+        properties = []
         for parameter_element in elements:
-            parameters.append(Parameter.from_xml(parameter_element,
+            properties.append(Property.from_xml(parameter_element,
                                                  components))
-        return cls(*parameters)
+        return cls(*properties)
 
 
-class InitialValueSet(ParameterSet):
+class InitialValueSet(PropertySet):
 
     def __init__(self, *ivs, **kwivs):
         """

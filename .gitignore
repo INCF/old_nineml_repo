@@ -16,3 +16,6 @@ nineml_mechanisms
 *.project
 *.pydevproject
 *.settings
+*.pdf
+*.synctex.gz
+/spec/*

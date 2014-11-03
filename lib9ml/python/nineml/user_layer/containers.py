@@ -82,15 +82,16 @@ class Model(BaseULObject):
             http://docs.python.org/library/xml.etree.elementtree.html
             http://codespeak.net/lxml/
         """
-        assert element.tag == NINEML + 'nineml'
-        model = cls(element.attrib["name"])
+        assert element.tag == NINEML + 'NineML'
+        model = cls(element.get("name"))
         # Note that the components dict initially contains elementtree
         # elements, but is modified within Group.from_xml(), and at the end
         # contains Component instances.
         components = {}
         groups = {}
         for child in element.findall(NINEML + BaseComponent.element_name):
-            components[child.attrib["name"]] = child
+            components[child.attrib["name"]] = BaseComponent.from_xml(child,
+                                                                      [])
         for child in element.findall(NINEML + Group.element_name):
             group = Group.from_xml(child, components, groups)
             model.groups[group.name] = group
@@ -172,7 +173,7 @@ class Group(BaseULObject):
     used as the node prototype within a population, allowing hierarchical
     structures.
     """
-    element_name = "group"
+    element_name = "Group"
     defining_attributes = ("name", "populations", "projections", "selections")
     children = ("populations", "projections", "selections")
 

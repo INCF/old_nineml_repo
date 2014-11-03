@@ -4,8 +4,9 @@ from operator import and_
 from ...abstraction_layer import BaseComponentClass
 from ..base import BaseULObject, E, NINEML
 from ... import abstraction_layer
+from ...utility import valid_uri_re
 # This line is imported at the end of the file to avoid recursive imports
-# from .interface import Parameter, InitialValue, InitialValueSet, ParameterSet
+# from .interface import Property, InitialValue, InitialValueSet, PropertySet
 
 
 class Definition(BaseULObject):
@@ -16,7 +17,7 @@ class Definition(BaseULObject):
     For now, this holds only the URI of an abstraction layer file, but this
     could be expanded later to include definitions external to 9ML.
     """
-    element_name = "definition"
+    element_name = "Definition"
     defining_attributes = ("url",)
 
     def __init__(self, component, abstraction_layer_module=None):
@@ -89,22 +90,22 @@ class BaseComponent(BaseULObject):
     """
     Base class for model components that are defined in the abstraction layer.
     """
-    element_name = "component"
-    defining_attributes = ("name", "definition", "parameters")
-    children = ("parameters",)
+    element_name = "Component"
+    defining_attributes = ("name", "definition", "properties")
+    children = ("properties",)
 
     # initial_values is temporary, the idea longer-term is to use a separate
     # library such as SEDML
-    def __init__(self, name, definition=None, parameters={}, reference=None,
+    def __init__(self, name, definition=None, properties={}, reference=None,
                  initial_values={}):
         """
-        Create a new component with the given name, definition and parameters,
+        Create a new component with the given name, definition and properties,
         or create a reference to another component that will be resolved later.
 
         `name` - a name for the component that can be used to reference it.
         `definition` - a Definition instance, the URL of a component
                        definition, or None if creating a reference.
-        `parameters` - a ParameterSet instance or a dictionary containing
+        `properties` - a PropertySet instance or a dictionary containing
                        (value,unit) pairs.
         `reference` - the name of another component in the model, or None.
         """
@@ -127,12 +128,12 @@ class BaseComponent(BaseULObject):
         else:
             raise TypeError("definition must be a Definition, a Component or "
                             "a url")
-        if isinstance(parameters, ParameterSet):
-            self.parameters = parameters
-        elif isinstance(parameters, dict):
-            self.parameters = ParameterSet(**parameters)
+        if isinstance(properties, PropertySet):
+            self.properties = properties
+        elif isinstance(properties, dict):
+            self.properties = PropertySet(**properties)
         else:
-            raise TypeError("parameters must be a ParameterSet or a dict")
+            raise TypeError("properties must be a PropertySet or a dict")
         self.reference = reference
         if isinstance(initial_values, InitialValueSet):
             self.initial_values = initial_values
@@ -142,7 +143,7 @@ class BaseComponent(BaseULObject):
             raise TypeError("initial_values must be an InitialValueSet or a "
                             "dict, not a %s" % type(initial_values))
         if not self.unresolved:
-            self.check_parameters()
+            self.check_properties()
             if self.abstraction_layer_module == "dynamics":
                 self.check_initial_values()
 
@@ -152,12 +153,12 @@ class BaseComponent(BaseULObject):
         assert not (self.unresolved or other.unresolved)
         return reduce(and_, (self.name == other.name,
                              self.definition == other.definition,
-                             self.parameters == other.parameters))
+                             self.properties == other.properties))
 
     def __hash__(self):
         assert not self.unresolved
         return (hash(self.__class__) ^ hash(self.name) ^
-                hash(self.definition) ^ hash(self.parameters))
+                hash(self.definition) ^ hash(self.properties))
 
     def __repr__(self):
         if self.definition:
@@ -173,8 +174,8 @@ class BaseComponent(BaseULObject):
             d += ["name: %s != %s" % (self.name, other.name)]
         if self.definition != other.definition:
             d += ["definition: %s != %s" % (self.definition, other.definition)]
-        if self.parameters != other.parameters:
-            d += ["parameters: %s != %s" % (self.parameters, other.parameters)]
+        if self.properties != other.properties:
+            d += ["properties: %s != %s" % (self.properties, other.properties)]
         return "\n".join(d)
 
     @property
@@ -184,38 +185,36 @@ class BaseComponent(BaseULObject):
     def resolve(self, other_component):
         """
         If the component is unresolved (contains a reference to another
-        component), copy the definition and parameters from the other
-        component, and update those parameters with the parameters from this
+        component), copy the definition and properties from the other
+        component, and update those properties with the properties from this
         component.
         """
         assert other_component.__class__ == self.__class__
         assert self.reference == other_component.name
         self.definition = other_component.definition
         # note that this behaves oppositely to dict.update
-        self.parameters.complete(other_component.parameters)
-        self.check_parameters()
+        self.properties.complete(other_component.properties)
+        self.check_properties()
 
     def get_definition(self):
         if not self.definition.component:
             self.definition.retrieve()
         return self.definition.component
 
-    def check_parameters(self):
+    def check_properties(self):
         # First check the names
-        user_parameters = set(self.parameters.iterkeys())
-        definition_parameters = set(
-                                 p.name
-                                 for p in self.definition.component.parameters)
+        properties = set(self.properties.iterkeys())
+        parameters = set(p.name for p in self.definition.component.parameters)
         msg = []
-        diff_a = user_parameters.difference(definition_parameters)
-        diff_b = definition_parameters.difference(user_parameters)
+        diff_a = properties.difference(parameters)
+        diff_b = parameters.difference(properties)
         if diff_a:
-            msg.append("User parameters contains the following parameters "
+            msg.append("User properties contains the following parameters "
                        "that are not present in the definition: %s" %
                        ",".join(diff_a))
         if diff_b:
             msg.append("Definition contains the following parameters that are "
-                       "not present in the user parameters: %s" %
+                       "not present in the user properties: %s" %
                        ",".join(diff_b))
         if msg:
             # need a more specific type of Exception
@@ -224,13 +223,13 @@ class BaseComponent(BaseULObject):
         # TODO
 
     def to_xml(self):
-        parameters_and_initial_values = (self.parameters.to_xml() +
+        properties_and_initial_values = (self.properties.to_xml() +
                                          [iv.to_xml()
                                           for iv in
                                                  self.initial_values.values()])
         element = E(self.element_name,
                     self.definition.to_xml(),
-                    *parameters_and_initial_values,
+                    *properties_and_initial_values,
                     name=self.name)
         return element
 
@@ -240,25 +239,89 @@ class BaseComponent(BaseULObject):
             raise Exception("Expecting tag name %s%s, actual tag name %s" % (
                 NINEML, cls.element_name, element.tag))
         name = element.attrib.get("name", None)
-        parameters = ParameterSet.from_xml(
-            element.findall(NINEML + Parameter.element_name), components)
+        properties = PropertySet.from_xml(
+            element.findall(NINEML + Property.element_name), components)
         initial_values = InitialValueSet.from_xml(
             element.findall(NINEML + InitialValue.element_name), components)
         definition_element = element.find(NINEML + Definition.element_name)
         if definition_element is not None:
             definition = Definition.from_xml(definition_element,
                                              cls.abstraction_layer_module)
-            return cls(name, definition, parameters,
+            return cls(name, definition, properties,
                        initial_values=initial_values)
         else:
-            reference_element = element.find(NINEML + "reference")
+            reference_element = element.find(NINEML + "Reference")
             if reference_element is not None:
-                return cls(name, None, parameters,
+                return cls(name, None, properties,
                            reference=reference_element.text,
                            initial_values=initial_values)
             else:
                 raise Exception("A component must contain either a defintion "
                                 "or a reference")
+
+
+class Reference(BaseULObject):
+
+    """
+    Base class for model components that are defined in the abstraction layer.
+    """
+    element_name = "Reference"
+    defining_attributes = ("url")
+
+    # initial_values is temporary, the idea longer-term is to use a separate
+    # library such as SEDML
+    def __init__(self, component_name, url=None):
+        """
+        Create a new component with the given name, definition and properties,
+        or create a reference to another component that will be resolved later.
+
+        `component_name` - a name of an existing component to refer to
+        `url`            - a url of the file containing the exiting component
+        """
+        if not isinstance(component_name, basestring):
+            raise Exception("Component name '{}' was not a valid string")
+        if url is not None:
+            try:
+                valid_uri = valid_uri_re.match(url)
+            except:
+                valid_uri = False
+            if not valid_uri:
+                raise Exception("Provided url ('{}') is not a valid URI"
+                                    .format(url))
+        self.component_name = component_name
+        self.url = url
+
+    def __eq__(self, other):
+        if not isinstance(other, self.__class__):
+            return False
+        return reduce(and_, (self.component_name == other.component_name,
+                             self.url == other.url))
+
+    def __hash__(self):
+        assert not self.unresolved
+        return (hash(self.__class__) ^ hash(self.component_name) ^
+                hash(self.url))
+
+    def __repr__(self):
+            return ('{}(refers_to="{}"{})'
+                    .format(self.__class__.__name__, self.component_name,
+                            ' in "{}"'.format(self.url) if self.url else ''))
+
+    def to_xml(self):
+        kwargs = {'url': self.url} if self.url else {}
+        element = E(self.element_name,
+                    self.component_name,
+                    **kwargs)
+        return element
+
+    @classmethod
+    def from_xml(cls, element):
+        if element.tag != NINEML + cls.element_name:
+            raise Exception("Expecting tag name %s%s, actual tag name %s" % (
+                NINEML, cls.element_name, element.tag))
+        component_name = element.text
+        url = element.attrib.get("url", None)
+        return cls(component_name, url)
 
 
 def get_or_create_component(ref, cls, components):
@@ -275,4 +338,4 @@ def get_or_create_component(ref, cls, components):
     return components[ref]
 
 # This is imported at the end to avoid recursive imports
-from .interface import Parameter, InitialValue, InitialValueSet, ParameterSet
+from .interface import Property, InitialValue, InitialValueSet, PropertySet
