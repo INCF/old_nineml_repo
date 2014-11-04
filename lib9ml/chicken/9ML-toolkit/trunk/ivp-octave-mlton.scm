@@ -2,7 +2,7 @@
 ;;  NineML IVP code generator for Octave/MLton.
 ;;
 ;;
-;; Copyright 2010-2011 Ivan Raikov and the Okinawa Institute of
+;; Copyright 2010-2012 Ivan Raikov and the Okinawa Institute of
 ;; Science and Technology.
 ;;
 ;; This program is free software: you can redistribute it and/or
@@ -31,7 +31,7 @@
 	(only posix current-directory)
 	(only srfi-1 filter list-index)
 	(only srfi-13 string-concatenate))
-(require-extension setup-api datatype signal-diagram 9ML-repr 9ML-ivp-mlton)
+(require-extension make datatype signal-diagram 9ML-eval 9ML-ivp-mlton setup-api)
 
 
 (define nl "\n")

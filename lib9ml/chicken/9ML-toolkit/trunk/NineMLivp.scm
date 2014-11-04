@@ -3,16 +3,16 @@
 
   (define ident-ivp        (ident-create "ivp"))
   (define path-ivp         (Pident ident-ivp))
-  (define ivp-type         (Tcon path-ivp '()))
+  (define ivp-type         (Tcon (Tpath path-ivp) '()))
 
   (define path-real        (Pident (ident-create "real")))
-  (define real-type        (Tcon path-real '()))
+  (define real-type        (Tcon (Tpath path-real) '()))
 
   (define path-label       (Pident (ident-create "label")))
-  (define label-type       (Tcon path-label '()))
+  (define label-type       (Tcon (Tpath path-label) '()))
 
   (define path-diagram   (Pdot (Pident (ident-create "Diagram")) "diagram"))
-  (define diagram-type   (Tcon path-diagram '()))
+  (define diagram-type   (Tcon (Tpath path-diagram) '()))
   
   (define-values (type-variables reset-type-variables
 				 find-type-variable 
@@ -45,7 +45,7 @@
 	    (list 
 	     
 	     (Type_def ident-ivp (make-kind 0) 
-		       (make-deftype '() (Tcon path-ivp '()) ))
+		       (make-deftype '() (Tcon (Tpath path-ivp) '()) ))
 	     
 	     (datacon 'ivp 'construct 5)
 	     

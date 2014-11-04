@@ -1,3 +1,4 @@
+.DS_Store
 *.pyc
 x86_64
 *.toc
@@ -7,7 +8,10 @@ x86_64
 *.bbl
 *.blg
 *.out
+*.pdf
 *.komodoproject
+.idea
+*.synctex.gz*
 cover
 build
 nest_model
@@ -18,4 +22,3 @@ nineml_mechanisms
 *.settings
 *.pdf
 *.synctex.gz
-/spec/*

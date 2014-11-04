@@ -2,7 +2,7 @@
 ;;  An IVP solver for NineML.
 ;;
 ;;
-;; Copyright 2010-2011 Ivan Raikov and the Okinawa Institute of
+;; Copyright 2010-2012 Ivan Raikov and the Okinawa Institute of
 ;; Science and Technology.
 ;;
 ;; This program is free software: you can redistribute it and/or
@@ -19,10 +19,10 @@
 ;; <http://www.gnu.org/licenses/>.
 ;;
 
-(require-extension setup-api srfi-13 datatype static-modules miniML miniMLsyntax miniMLvalue miniMLeval)
+(require-extension posix srfi-13 datatype static-modules miniML miniMLsyntax miniMLvalue miniMLeval)
 (require-extension getopt-long ssax sxml-transforms sxpath sxpath-lolevel object-graph signal-diagram)
-(require-extension 9ML-parse 9ML-repr )
-(require-extension 9ML-ivp-chicken 9ML-ivp-mlton 9ML-ivp-octave-mlton )
+(require-extension 9ML-parse 9ML-eval 9ML-plot)
+(require-extension 9ML-ivp-octave 9ML-ivp-chicken 9ML-ivp-mlton 9ML-ivp-octave-mlton )
 	
 
 
@@ -42,6 +42,8 @@
 
 
 (include "NineMLcore.scm")
+(include "NineMLreal.scm")
+(include "NineMLrandom.scm")
 (include "NineMLsignal.scm")
 (include "NineMLdiagram.scm")
 (include "NineMLinterval.scm")
@@ -138,13 +140,13 @@
     (xml            "reads canonical NineML XML representation of each operand"
 		    (single-char #\x))
 
-    (platform        "simulation platform (one of chicken, mlton, octave, octave/mlton)"
+    (platform        "simulation platform (one of chicken, chicken/cvode, mlton, octave, octave/mlton)"
 		     (value (required PLATFORM)
 			    (predicate 
 			     ,(lambda (x) 
 				(let ((s (string->symbol (string-downcase x))))
 				  (case s
-				    ((chicken mlton octave octave/mlton) s)
+				    ((chicken chicken/cvode mlton octave octave/mlton) s)
 				    (else (error 'ivp "unrecognized platform" x))))))
 			    (transformer ,string->symbol)
 			     ))
@@ -206,7 +208,7 @@
 ;; Use args:usage to generate a formatted list of options (from OPTS),
 ;; suitable for embedding into help text.
 (define (ivp:usage)
-  (print "Usage: " (car (argv)) " [options...] file1... ")
+  (print "Usage: " (car (argv)) " file1... [options...] ")
   (newline)
   (print "The following options are recognized: ")
   (newline)
@@ -245,25 +247,37 @@
 		      (dvars (lset-difference eq?
 					      (lset-intersection eq? (alist-ref 'in dfe) (alist-ref 'out dfe))
 					      (list ivar)))
-		      (pvars (lset-difference eq? (alist-ref 'in dfe) (cons ivar dvars))))
+		      (pvars (lset-difference eq? (alist-ref 'in dfe) (cons ivar dvars)))
+		      (events (events sd))
+		      )
 
 
 		 (case platform
 		   
-		   ((octave/mlton octave-mlton)
-		    (ivp-octave-mlton prefix ivp-id hvar ivar dvars pvars start end ic sd)
+		   ((octave)
+		    (process-fork
+		     (lambda () (ivp-octave prefix ivp-id hvar ivar dvars pvars events start end ic sd)))
 		    (list ivp-id ivar dvars) )
 
+		   ((octave/mlton octave-mlton)
+		    (process-fork
+		     (lambda () (ivp-octave-mlton prefix ivp-id hvar ivar dvars pvars start end ic sd)))
+		    (list ivp-id ivar dvars) )
 		   
 		   ((mlton)
-		    (ivp-mlton  prefix ivp-id ivar dvars pvars start end ic sd)
+		    (process-fork
+		     (lambda () (ivp-mlton  prefix ivp-id ivar dvars pvars start end ic sd)))
 		    (list ivp-id ivar dvars) )
-
 
 		   ((chicken)
-		    (ivp-chicken  prefix ivp-id ivar dvars pvars start end ic sd)
+		    (process-fork
+		     (lambda () (ivp-chicken prefix ivp-id ivar dvars pvars events start end ic sd)))
 		    (list ivp-id ivar dvars) )
 
+		   ((chicken/cvode)
+		    (process-fork
+		     (lambda () (ivp-chicken/cvode prefix ivp-id hvar ivar dvars pvars events start end ic sd)))
+		    (list ivp-id ivar dvars) )
 
 		   (else (error 'generate-ivp-table "unknown platform"  platform))
 		   
@@ -272,44 +286,8 @@
   )
 
 
-(define (generate-ivp-plot prefix ivp-info #!key (format 'png) (index #f))
-  (let ((ivp-id (car ivp-info))
-	(dvars (caddr ivp-info)))
-    (let* ((n (+ 1 (length dvars)))
-	   (range (if (and index (integer? index)) (number->string index) (sprintf "2:~A" n)))
-	   (linewidth 3)
-	   (dir (or (pathname-directory prefix) "."))
-	   (log-path (make-pathname dir (sprintf "~A_~A.log" (pathname-file prefix) ivp-id)))
-	   (png-path (make-pathname dir (sprintf "~A_~A.png" (pathname-file prefix) ivp-id)))
-	   (eps-path (make-pathname dir (sprintf "~A_~A.eps" (pathname-file prefix) ivp-id)))
-	   )
-      (case format
-	     ((png)
-	      (run (octave -q --eval 
-			   #\'
-			   log = load (,(sprintf "\"~A\"" log-path)) #\; 
-			   h = plot ("log(:,1)" #\, ,(sprintf "log(:,~A)" range)) #\; 
-			   ,@(if index 
-				 (concatenate (list-tabulate 1 (lambda (i) `(set (h(,(+ 1 i)) #\, "\"linewidth\"" #\, ,linewidth) #\;))))
-				 (concatenate (list-tabulate (- n 1) (lambda (i) `(set (h(,(+ 1 i)) #\, "\"linewidth\"" #\, ,linewidth) #\;)))))
-			   print (,(sprintf "\"~A\"" png-path) #\, "\"-dpng\"") #\; 
-			   #\')))
-	     ((eps)
-	      (run (octave -q --eval 
-			   #\'
-			   log = load (,(sprintf "\"~A\"" log-path)) #\; 
-			   h = plot ("log(:,1)" #\, ,(sprintf "log(:,~A)" range)) #\; 
-			   ,@(if index 
-				 (concatenate (list-tabulate 1 (lambda (i) `(set (h(,(+ 1 i)) #\, "\"linewidth\"" #\, ,linewidth) #\;))))
-				 (concatenate (list-tabulate (- n 1) (lambda (i) `(set (h(,(+ 1 i)) #\, "\"linewidth\"" #\, ,linewidth) #\;)))))
-			   print (,(sprintf "\"~A\"" eps-path) #\, "\"-depsc2\"") #\; 
-			   #\')))
-	     (else (error 'generate-ivp-plot "unrecognized format" format)))
-      )))
 
-
-
-(define (make-ivp-hook #!key (ivp #f) (diagram #f) (ivp-plot #f) (plot-format 'png) (plot-index #f))
+(define (make-ivp-data-hook #!key (ivp #f) (diagram #f))
   (lambda (prefix name label value)
     (cond
      ((and diagram
@@ -317,17 +295,33 @@
 	       (and (pair? label) (string=? (car label) "diagram")))) ;; value is a diagram
       (let* ((diagram-id (gensym 'diagram))
 	     (diagram-link `(img (@ (src ,(sprintf "~A.png" diagram-id))) (alt "NineML diagram"))))
-	(generate-diagram prefix diagram-id value)
+	(plot-diagram prefix diagram-id value)
 	diagram-link
 	))
      
      ((and ivp (or (and (string? label) (string=? label "ivp"))
 		   (and (pair? label) (string=? (car label) "ivp")))) ;; value is an IVP
+      (let ((ivp-id (gensym (string->symbol (string-append (->string name) "ivp")))))
+	(let ((ivp-info (generate-ivp-table prefix ivp-id value platform: (simulation-platform))))
+	  ivp-info
+	))
+      )
+     
+     (else #f))))
+	    
+
+(define (make-ivp-plot-hook #!key (ivp #f) (plot-format 'png) (plot-index #f))
+  (lambda (prefix name label value)
+    (cond
+
+     ((and ivp (or (and (string? label) (string=? label "ivp"))
+		   (and (pair? label) (string=? (car label) "ivp")))) ;; value is an IVP
       (let* ((ivp-id (gensym 'ivp))
-	     (ivp-plot-link `(img (@ (src ,(sprintf "~A_~A.png" (pathname-file prefix) ivp-id)) (alt "NineML IVP plot"))))
-	     (ivp-info (generate-ivp-table prefix ivp-id value platform: (simulation-platform))))
-	(if ivp-plot (generate-ivp-plot prefix ivp-info format: plot-format index: plot-index))
-	(and ivp-plot ivp-plot-link)
+	     (ivp-plot-link `(img (@ (src ,(sprintf "~A_~A.png" (pathname-file prefix) ivp-id)) (alt "NineML IVP plot")))))
+
+	(let ((ivp-info (generate-ivp-table prefix ivp-id value platform: (simulation-platform))))
+	  (plot-ivp prefix ivp-info format: plot-format index: plot-index)
+	  ivp-plot-link)
 	))
      
      (else #f))))
@@ -370,12 +364,14 @@
 
   (let ((find-module (lambda (x) (env-find-module x (init-type-env)))))
     (for-each (lambda (init name) (init name enter-module find-module init-eval-env))
-	      (list Signal:module-initialize   
+	      (list Real:module-initialize   
+		    Random:module-initialize   
+		    Signal:module-initialize   
 		    Diagram:module-initialize  
 		    Interval:module-initialize 
 		    Graph:module-initialize
 		    IVP:module-initialize )
-	      (list "Signal" "Diagram" "Interval" "Graph" "IVP" )) )
+	      (list "Real" "Random" "Signal" "Diagram" "Interval" "Graph" "IVP" )) )
 
   (if (null? operands)
       (ivp:usage)
@@ -383,7 +379,7 @@
 			       ((options 'output-sxml) 'sxml)
 			       (else #f)))
 	    (unified-envs (map (lambda (x) (interpreter x xml: (options 'xml))) operands)))
-	(if (options 'verbose) (begin (repr-verbose 1) (ivp-verbose 1)))
+	(if (options 'verbose) (begin (eval-verbose 1) (ivp-verbose 1)))
 	(simulation-platform (or (options 'platform) (defopt 'platform) ))
 	(for-each
 	 (lambda (operand uenv)
@@ -402,7 +398,7 @@
 	     (let ((eval-env-opt (options 'print-eval-env)))
 	       (if eval-env-opt
 		   (if (and (string? eval-env-opt) (string=? eval-env-opt "all"))
-		     (print-eval-env eval-env output-eval)
+		     (print-eval-env eval-env)
 		     (let ((fc (lambda (x) (and (member (ident-name (car x)) eval-env-opt) x))))
 		       (print-eval-env eval-env output-type fc)))
 		   ))
@@ -411,16 +407,18 @@
 		 (print-source-defs source-defs output-type))
 
 	     (if (options 'html-report)
-		 (html-report operand uenv value-hook: (make-ivp-hook diagram: #t ivp: #t ivp-plot: #t)))
+		 (html-report operand uenv value-hook: (make-ivp-data-hook diagram: #t ivp: #t )))
 
-	     (if (options 'data)
-		 (traverse-definitions operand uenv value-hook: (make-ivp-hook ivp: #t)))
+	     (if (or (options 'data) (options 'plot) (options 'plot-eps))
+		 (begin
+		   (traverse-definitions operand uenv value-hook: (make-ivp-data-hook ivp: #t))
+		   (process-wait) ))
 
 	     (if (options 'plot)
-		    (traverse-definitions operand uenv value-hook: (make-ivp-hook ivp: #t ivp-plot: #t plot-index: (options 'plot-index))))
+		    (traverse-definitions operand uenv value-hook: (make-ivp-plot-hook ivp: #t plot-index: (options 'plot-index))))
 
 	     (if (options 'plot-eps)
-		 (traverse-definitions operand uenv value-hook: (make-ivp-hook ivp: #t ivp-plot: #t plot-format: 'eps plot-index: (options 'plot-index))))
+		 (traverse-definitions operand uenv value-hook: (make-ivp-plot-hook ivp: #t plot-format: 'eps plot-index: (options 'plot-index))))
 
 	     ))
 	 operands unified-envs))))

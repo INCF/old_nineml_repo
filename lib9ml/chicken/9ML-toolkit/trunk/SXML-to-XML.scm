@@ -5,20 +5,22 @@
 
 (define (sxml-transform content rulesets)
    (fold (lambda (ruleset content)
-		     (pre-post-order* content ruleset))
+		     (sxml:pre-post-order* content ruleset))
 	 content rulesets))
 
 (define (generate-XML content #!key (rulesets '()) (protect #f))
+  (print "rulesets = " rulesets)
+  (print "content = " content)
   (let*
       (
        (content (fold (lambda (ruleset content)
-			(pre-post-order* content ruleset))
+			(sxml:pre-post-order* content ruleset))
 		      content rulesets))
        )
 
-   (post-order content
+   (sxml:post-order content
    `(
-     ,@(if protect universal-protected-rules universal-conversion-rules)
+     ,@(if protect sxml:universal-protected-rules sxml:universal-conversion-rules)
 
      (begin
       . ,(lambda (tag . body)

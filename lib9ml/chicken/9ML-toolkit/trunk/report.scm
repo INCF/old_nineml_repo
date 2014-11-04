@@ -2,7 +2,7 @@
 ;;  A type checker and test report generator for NineML.
 ;;
 ;;
-;; Copyright 2010-2011 Ivan Raikov and the Okinawa Institute of
+;; Copyright 2010-2012 Ivan Raikov and the Okinawa Institute of
 ;; Science and Technology.
 ;;
 ;; This program is free software: you can redistribute it and/or
@@ -19,9 +19,13 @@
 ;; <http://www.gnu.org/licenses/>.
 ;;
 
-(require-extension setup-api srfi-13 datatype static-modules miniML miniMLsyntax miniMLeval )
-(require-extension getopt-long ssax sxml-transforms sxpath sxpath-lolevel object-graph)
-(require-extension 9ML-parse 9ML-repr )
+(require-extension srfi-13 datatype static-modules miniML miniMLsyntax miniMLeval )
+(require-extension getopt-long object-graph sxpath sxpath-lolevel ssax)
+(require-extension 9ML-parse 9ML-eval )
+
+(require-library sxml-transforms)
+(import (prefix sxml-transforms sxml:))
+
 
 (include "SXML.scm")
 (include "SXML-to-XML.scm")
@@ -37,6 +41,8 @@
   (make-mod-typing core-syntax core-typing))
 
 (include "NineMLcore.scm")
+(include "NineMLreal.scm")
+(include "NineMLrandom.scm")
 (include "NineMLsignal.scm")
 (include "NineMLdiagram.scm")
 (include "NineMLinterval.scm")
@@ -208,7 +214,7 @@
 ;; Use args:usage to generate a formatted list of options (from OPTS),
 ;; suitable for embedding into help text.
 (define (report:usage)
-  (print "Usage: " (car (argv)) " [options...] file1... ")
+  (print "Usage: " (car (argv)) " file1... [options...] ")
   (newline)
   (print "The following options are recognized: ")
   (newline)
@@ -254,7 +260,7 @@
   (and (pair? label) (string=? (car label) "diagram") ;; value is a diagram
        (let* ((diagram-id (gensym 'diagram))
 	      (diagram-link `(img (@ (src ,(string-append (->string diagram-id) ".png"))) (alt "NineML diagram"))))
-	 (generate-diagram prefix diagram-id value)
+	 (plot-diagram prefix diagram-id value)
 	 `(,(line "binding " `(b ,name) " = ") ,diagram-link))))
 
 
@@ -264,11 +270,13 @@
 
   (let ((find-module (lambda (x) (env-find-module x (init-type-env)))))
     (for-each (lambda (init name) (init name enter-module find-module init-eval-env))
-	      (list Signal:module-initialize   
+	      (list Real:module-initialize   
+		    Random:module-initialize   
+		    Signal:module-initialize   
 		    Diagram:module-initialize  
 		    Interval:module-initialize 
 		    Graph:module-initialize )
-	      (list "Signal" "Diagram" "Interval" "Graph" )))
+	      (list "Real" "Random" "Signal" "Diagram" "Interval" "Graph" )))
 
   (let ((output-type (cond ((options 'output-xml)  'xml)
 			   ((options 'output-sxml) 'sxml)

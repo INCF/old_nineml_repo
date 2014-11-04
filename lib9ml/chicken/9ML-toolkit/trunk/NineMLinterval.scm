@@ -3,10 +3,10 @@
 
   (define ident-interval   (ident-create "interval"))
   (define path-interval    (Pident ident-interval))
-  (define interval-type    (Tcon path-interval `()))
+  (define interval-type    (Tcon (Tpath path-interval) `()))
 
   (define path-nat   (Pident (ident-create "nat")))
-  (define nat-type   (Tcon path-nat '()))
+  (define nat-type   (Tcon (Tpath path-nat) '()))
 
   (define-values (type-variables reset-type-variables
 				 find-type-variable 
@@ -49,7 +49,7 @@
 	  (list 
 	   
 	   (Type_def ident-interval (make-kind 0) 
-		     (make-deftype '() (Tcon path-interval '()) ))
+		     (make-deftype '() (Tcon (Tpath path-interval) '()) ))
 
 	   (datacon 'graph 'empty 0)
 	   (datacon 'graph 'singleton 1)
