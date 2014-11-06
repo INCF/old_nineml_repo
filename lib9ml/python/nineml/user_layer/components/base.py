@@ -1,6 +1,6 @@
 # encoding: utf-8
+import os.path
 from operator import and_
-from itertools import chain
 import nineml
 from ..base import BaseULObject, E, NINEML
 # This line is imported at the end of the file to avoid recursive imports
@@ -198,7 +198,8 @@ class BaseReference(BaseULObject):
         """
         self.url = url
         if self.url:
-            context = nineml.read(url)
+            context = nineml.read(url,
+                                  relative_to=os.path.dirname(context.url))
         self._referred_to = context[name]
 
     def __eq__(self, other):

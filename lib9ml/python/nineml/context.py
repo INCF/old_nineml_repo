@@ -29,19 +29,19 @@ class Context(dict):
     ## Valid top-level NineML element names
     top_level_abstraction = ['ComponentClass']
     top_level_user = ['UnitDimension', 'Unit', 'Component', 'PositionList',
-                      'Population', 'PopulationGroup', 'Projection']
+                      'Population', 'PopulationSelection', 'Projection']
 
     # A tuple to hold the unresolved elements
     _Unloaded = collections.namedtuple('_Unloaded', 'name xml cls')
 
     def __init__(self, *args, **kwargs):
+        self.url = kwargs.pop('_url')
         super(Context, self).__init__(*args, **kwargs)
         # Stores the list of elements that are being loaded to check for
         # circular references
         self._loading = []
-        self.url = None
 
-    def resolve_ref(self, containing_elem, expected_type):
+    def resolve_ref(self, containing_elem, inline_type=None):
         """
         This method is used for resolving a member element that can either be
         defined in the current file (i.e. within a 'Reference' tag without a
@@ -50,21 +50,27 @@ class Context(dict):
 
         `containing_elem` -- the XML element that contains the Reference or
                              inline object
-        `expected_type`   -- the expected type of the object to be referenced.
+        `inline_type`     -- the expected type of the object to be referenced.
                              This is used to check the referene points to the
                              correct object and also to convert inline objects.
+                             If it is not provided in-line definitions are not
+                             permitted.
         """
         elem = expect_single(containing_elem.getchildren())
         if elem.tag == NINEML + Reference.element_name:
             ref = Reference.from_xml(elem, self)
-            if not isinstance(ref.user_layer_object, expected_type):
-                raise Exception("Type of referenced object ('{}') does not "
+            if inline_type and not isinstance(ref.user_layer_object,
+                                              inline_type):
+                raise TypeError("Type of referenced object ('{}') does not "
                                 "match expected type ('{}')"
                                 .format(ref.user_layer_object.__class__,
-                                        expected_type))
+                                        inline_type))
             obj = ref.user_layer_object
         else:
-            obj = expected_type.from_xml(elem, self)
+            if not inline_type:
+                raise Exception("This '{}' element does not permit inline "
+                                "child elements".format(containing_elem.tag))
+            obj = inline_type.from_xml(elem, self)
         return obj
 
     def __getitem__(self, name):
@@ -121,10 +127,7 @@ class Context(dict):
         if element.tag != NINEML + cls.element_name:
             raise Exception("Not a NineML root ('{}')".format(element.tag))
         # Initialise the context
-        context = cls()
-        # This isn't set in the constructor to avoid screwing up the standard
-        # dictionary constructor
-        context.url = url
+        elements = {'_url': url}
         # Loop through child elements, determine the class needed to extract
         # them and add them to the dictionary
         for child in element.getchildren():
@@ -142,5 +145,12 @@ class Context(dict):
             # Units use 'symbol' as their unique identifier (from LEMS) all
             # other elements use 'name'
             name = child.attrib.get('name', child.attrib.get('symbol'))
-            context[name] = cls._Unloaded(name, child, child_cls)
-        return context
+            if name in elements:
+                raise Exception("Conflicting identifiers '{ob1}:{name} in "
+                                "{ob2}:{name} in NineML file '{url}'"
+                                .format(name=name,
+                                        ob1=elements[name].cls.element_name,
+                                        ob2=child_cls.element_name,
+                                        url=url or ''))
+            elements[name] = cls._Unloaded(name, child, child_cls)
+        return cls(**elements)

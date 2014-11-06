@@ -7,6 +7,7 @@ A Python library for working with 9ML model descriptions.
 
 __version__ = "0.2dev"
 
+import os.path
 from urllib import urlopen
 from lxml import etree
 from lxml.builder import ElementMaker
@@ -22,17 +23,19 @@ import utility
 from context import Context
 
 
-def load(root_element):
-    return Context.from_xml(root_element)
+def load(root_element, read_from=None):
+    return Context.from_xml(root_element, url=read_from)
 
 
-def read(url):
+def read(url, relative_to=None):
     """
     Read a NineML file and parse its child elements
 
     If the URL does not have a scheme identifier, it is taken to refer to a
     local file.
     """
+    if url.startswith('.') and relative_to:
+        url = os.path.abspath(os.path.join(relative_to, url))
     try:
         if not isinstance(url, file):
             try:
@@ -47,4 +50,4 @@ def read(url):
     except:  # FIXME: Need to work out what exceptions etree raises
         raise Exception("Could not parse XML file '{}'".format(url))
     root = xml.getroot()
-    return load(root)
+    return load(root, url)
