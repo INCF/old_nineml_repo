@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<NineML xmlns="http://nineml.net/9ML/1.0">
+  <Population name="test_pop">
+    <Number>10</Number>
+    <Cell>
+      <Reference url="../neurons/HodgkinHuxley.xml">HodgkinHuxley</Reference>
+    </Cell>
+  </Population>
+</NineML>
