@@ -12,7 +12,7 @@
     <Parameter name="d"/>
     <Parameter name="theta" dimension="voltage"/>
     <!-- AnalogPort or Exposure?? -->
-    <AnalogReducePort name="iSyn" dimension="current" reduce_op="+"/>
+    <AnalogReducePort name="iSyn" dimension="current" operator="+"/>
     <AnalogSendPort name="U"/>
     <AnalogSendPort name="V" dimension="voltage"/>
     <EventSendPort name="spikeOutput" mode="send"/>
