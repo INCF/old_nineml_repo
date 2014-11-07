@@ -2,11 +2,18 @@
 <NineML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns="http://nineml.incf.org/9ML/0.3"
     xsi:schemaLocation="http://nineml.incf.org/9ML/NineML_v0.3.xsd">
+    <Dimension name="per_time" t="-1"/>
+    <Dimension name="voltage" m="1" l="2" t="-3" i="-1"/>  
+    <Dimension name="temperature" k="1"/>
+    <Dimension name="conductanceDensity" m="-1" l="-4" t="3" i="2"/>
+    <Dimension name="temperature" k="1"/>
+    <Dimension name="currentDensity" i="1" l="-2"/>
+    <Dimension name="concentration" l="-3" n="1"/>
     <ComponentClass name="ConstantIonPools">
         <Parameter name="e_reversal" dimension="voltage"/>
-        <AnalogPort mode="recv" name="g" dimension="membrane_conductance"/>
+        <AnalogPort mode="recv" name="g" dimension="conductanceDensity"/>
         <AnalogPort mode="recv" name="v" dimension="voltage"/>
-        <AnalogPort mode="send" name="i" dimension="membrane_current"/>
+        <AnalogPort mode="send" name="i" dimension="currentDensity"/>
         <Dynamics>
             <Alias name="i">
                 <MathInline>g * (v - e_reversal)</MathInline>
