@@ -2,15 +2,18 @@
 <NineML xmlns="http://nineml.net/9ML/1.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://nineml.net/9ML/1.0/schema/NineML_v0.2.xsd">
+  <Dimension name="voltage" m="1" l="2" t="-3" i="-1"/>
+  <Dimension name="current" i="1"/>
+  <Unit symbol="mV" dimension="voltage" power="-3"/>
   <ComponentClass name="IzhikevichClass">
-    <Parameter name="a" dimension="none"/>
-    <Parameter name="b" dimension="none"/>
+    <Parameter name="a"/>
+    <Parameter name="b"/>
     <Parameter name="c" dimension="voltage"/>
-    <Parameter name="d" dimension="none"/>
+    <Parameter name="d"/>
     <Parameter name="theta" dimension="voltage"/>
     <!-- AnalogPort or Exposure?? -->
     <AnalogReducePort name="iSyn" dimension="current" reduce_op="+"/>
-    <AnalogSendPort name="U" dimension="none"/>
+    <AnalogSendPort name="U"/>
     <AnalogSendPort name="V" dimension="voltage"/>
     <EventSendPort name="spikeOutput" mode="send"/>
     <Dynamics>

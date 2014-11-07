@@ -27,15 +27,16 @@ class Context(dict):
     element_name = 'NineML'
 
     ## Valid top-level NineML element names
-    top_level_abstraction = ['ComponentClass']
-    top_level_user = ['UnitDimension', 'Unit', 'Component', 'PositionList',
+    top_level_abstraction = ['Dimension', 'Unit', 'ComponentClass',
+                             'Annotation']
+    top_level_user = ['Component', 'PositionList',
                       'Population', 'PopulationSelection', 'Projection']
 
     # A tuple to hold the unresolved elements
     _Unloaded = collections.namedtuple('_Unloaded', 'name xml cls')
 
     def __init__(self, *args, **kwargs):
-        self.url = kwargs.pop('_url')
+        self.url = kwargs.pop('_url', None)
         super(Context, self).__init__(*args, **kwargs)
         # Stores the list of elements that are being loaded to check for
         # circular references
@@ -80,6 +81,10 @@ class Context(dict):
         try:
             elem = super(Context, self).__getitem__(name)
         except KeyError:
+            # FIXME: Not sure if this is a good idea or not, it allows
+            #        attributes to be omitted from XML tags for example
+            if name is None:
+                return None
             raise KeyError("'{}' was not found in the NineML context{} ("
                            "elements in the context were '{}')."
                            .format(name, self.url or '',
@@ -142,15 +147,19 @@ class Context(dict):
                 raise Exception("Invalid top-level element '{}' found in "
                                 "NineML document (valid elements are '{}')."
                                 .format(child.tag, "', '".join(top_level)))
-            # Units use 'symbol' as their unique identifier (from LEMS) all
-            # other elements use 'name'
-            name = child.attrib.get('name', child.attrib.get('symbol'))
-            if name in elements:
-                raise Exception("Conflicting identifiers '{ob1}:{name} in "
-                                "{ob2}:{name} in NineML file '{url}'"
-                                .format(name=name,
-                                        ob1=elements[name].cls.element_name,
-                                        ob2=child_cls.element_name,
-                                        url=url or ''))
-            elements[name] = cls._Unloaded(name, child, child_cls)
+            if child.tag == NINEML + 'Annotation':
+                elements['_annotation'] = child
+            else:
+                # Units use 'symbol' as their unique identifier (from LEMS) all
+                # other elements use 'name'
+                name = child.attrib.get('name', child.attrib.get('symbol'))
+                if name in elements:
+                    raise Exception("Conflicting identifiers '{ob1}:{name} in "
+                                    "{ob2}:{name} in NineML file '{url}'"
+                                    .format(
+                                           name=name,
+                                           ob1=elements[name].cls.element_name,
+                                           ob2=child_cls.element_name,
+                                           url=url or ''))
+                elements[name] = cls._Unloaded(name, child, child_cls)
         return cls(**elements)

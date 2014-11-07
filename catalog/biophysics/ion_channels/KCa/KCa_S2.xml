@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <NineML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://nineml.incf.org/9ML/NineML_v0.3.xsd">
+  <Dimension name="per_time" t="-1"/>
+  <Dimension name="voltage" m="1" l="2" t="-3" i="-1"/>  
+  <Dimension name="temperature" k="1"/>
+  <Dimension name="conductanceDensity" m="-1" l="-4" t="3" i="2"/>
+  <Dimension name="temperature" k="1"/>
+  <Dimension name="currentDensity" i="1" l="-2"/>
+  <Dimension name="concentration" l="-3" n="1"/>
   <ComponentClass name="SK2def">
     <Parameter name="diff" dimension="concentration"/>
     <Parameter name="invc1"/>
@@ -13,10 +20,10 @@
     <Parameter name="dirc2"/>
     <Parameter name="dirc3"/>
     <Parameter name="dirc4"/>
-    <Parameter name="gbar" dimension="membrane_conductance"/>
-    <AnalogPort mode="recv" name="temperature" dimension="absolute_temperature"/>
-    <AnalogPort mode="send" name="g" dimension="membrane_conductance"/>
-    <AnalogPort mode="recv" name="internalCa" dimension="current_density"/>    
+    <Parameter name="gbar" dimension="conductanceDensity"/>
+    <AnalogPort mode="recv" name="temperature" dimension="temperature"/>
+    <AnalogPort mode="send" name="g" dimension="conductanceDensity"/>
+    <AnalogPort mode="recv" name="internalCa" dimension="currentDensity"/>    
     <Dynamics>
       <Alias name="i">
         <MathInline>gbar * (o1 + o2)(v - e_revseral)</MathInline>
