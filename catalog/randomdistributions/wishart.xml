@@ -3,8 +3,6 @@
   <ComponentClass name="WishartDistribution">
     <Parameter name="degreesOfFreedom"/>
     <Parameter name="scaleMatrix"/>
-    <RandomDistribution>
-      <BuiltIn uncertml="http://www.uncertml.org/distributions/wishart.xml"/>
-    </RandomDistribution>
+    <RandomDistribution builtin="http://www.uncertml.org/distributions/wishart.xml"/>
   </ComponentClass>
 </NineML>

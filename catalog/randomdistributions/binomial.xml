@@ -3,8 +3,6 @@
   <ComponentClass name="BinomialDistribution">
     <Parameter name="numberOfTrials"/>
     <Parameter name="probabilityOfSuccess"/>
-    <RandomDistribution>
-      <BuiltIn uncertml="http://www.uncertml.org/distributions/binomial.xml"/>
-    </RandomDistribution>
+    <RandomDistribution builtin="http://www.uncertml.org/distributions/binomial.xml"/>
   </ComponentClass>
 </NineML>

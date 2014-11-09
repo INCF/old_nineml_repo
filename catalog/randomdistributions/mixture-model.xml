@@ -3,8 +3,6 @@
   <ComponentClass name="MixtureModel">
     <Parameter name="component"/>
     <Parameter name="component"/>
-    <RandomDistribution>
-      <BuiltIn uncertml="http://www.uncertml.org/distributions/mixture-model.xml"/>
-    </RandomDistribution>
+    <RandomDistribution builtin="http://www.uncertml.org/distributions/mixture-model.xml"/>
   </ComponentClass>
 </NineML>

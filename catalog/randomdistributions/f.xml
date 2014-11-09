@@ -3,8 +3,6 @@
   <ComponentClass name="FDistribution">
     <Parameter name="denominator"/>
     <Parameter name="numerator"/>
-    <RandomDistribution>
-      <BuiltIn uncertml="http://www.uncertml.org/distributions/f.xml"/>
-    </RandomDistribution>
+    <RandomDistribution builtin="http://www.uncertml.org/distributions/f.xml"/>
   </ComponentClass>
 </NineML>

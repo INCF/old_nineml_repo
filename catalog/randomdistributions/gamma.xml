@@ -3,8 +3,6 @@
   <ComponentClass name="GammaDistribution">
     <Parameter name="shape"/>
     <Parameter name="scale"/>
-    <RandomDistribution>
-      <BuiltIn uncertml="http://www.uncertml.org/distributions/gamma.xml"/>
-    </RandomDistribution>
+    <RandomDistribution builtin="http://www.uncertml.org/distributions/gamma.xml"/>
   </ComponentClass>
 </NineML>

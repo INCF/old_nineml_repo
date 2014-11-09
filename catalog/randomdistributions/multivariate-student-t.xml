@@ -4,8 +4,6 @@
     <Parameter name="mean"/>
     <Parameter name="covarianceMatrix"/>
     <Parameter name="degreesOfFreedom"/>
-    <RandomDistribution>
-      <BuiltIn uncertml="http://www.uncertml.org/distributions/multivariate-student-t.xml"/>
-    </RandomDistribution>
+    <RandomDistribution builtin="http://www.uncertml.org/distributions/multivariate-student-t.xml"/>
   </ComponentClass>
 </NineML>

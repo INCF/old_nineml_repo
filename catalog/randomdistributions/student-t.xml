@@ -4,8 +4,6 @@
     <Parameter name="location"/>
     <Parameter name="scale"/>
     <Parameter name="degreesOfFreedom"/>
-    <RandomDistribution>
-      <BuiltIn uncertml="http://www.uncertml.org/distributions/student-t.xml"/>
-    </RandomDistribution>
+    <RandomDistribution builtin="http://www.uncertml.org/distributions/student-t.xml"/>
   </ComponentClass>
 </NineML>

@@ -3,8 +3,6 @@
   <ComponentClass name="WeibullDistribution">
     <Parameter name="scale"/>
     <Parameter name="shape"/>
-    <RandomDistribution>
-      <BuiltIn uncertml="http://www.uncertml.org/distributions/weibull.xml"/>
-    </RandomDistribution>
+    <RandomDistribution builtin="http://www.uncertml.org/distributions/weibull.xml"/>
   </ComponentClass>
 </NineML>

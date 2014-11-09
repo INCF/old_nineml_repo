@@ -3,8 +3,6 @@
   <ComponentClass name="MultivariateNormalDistribution">
     <Parameter name="mean"/>
     <Parameter name="covarianceMatrix"/>
-    <RandomDistribution>
-      <BuiltIn uncertml="http://www.uncertml.org/distributions/multivariate-normal.xml"/>
-    </RandomDistribution>
+    <RandomDistribution builtin="http://www.uncertml.org/distributions/multivariate-normal.xml"/>
   </ComponentClass>
 </NineML>

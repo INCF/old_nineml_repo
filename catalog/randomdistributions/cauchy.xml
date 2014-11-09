@@ -3,8 +3,6 @@
   <ComponentClass name="CauchyDistribution">
     <Parameter name="location"/>
     <Parameter name="scale"/>
-    <RandomDistribution>
-      <BuiltIn uncertml="http://www.uncertml.org/distributions/cauchy.xml"/>
-    </RandomDistribution>
+    <RandomDistribution builtin="http://www.uncertml.org/distributions/cauchy.xml"/>
   </ComponentClass>
 </NineML>

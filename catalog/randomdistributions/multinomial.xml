@@ -3,8 +3,6 @@
   <ComponentClass name="MultinomialDistribution">
     <Parameter name="numberOfTrials"/>
     <Parameter name="probabilities"/>
-    <RandomDistribution>
-      <BuiltIn uncertml="http://www.uncertml.org/distributions/multinomial.xml"/>
-    </RandomDistribution>
+    <RandomDistribution builtin="http://www.uncertml.org/distributions/multinomial.xml"/>
   </ComponentClass>
 </NineML>

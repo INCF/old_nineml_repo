@@ -3,8 +3,6 @@
   <ComponentClass name="ParetoDistribution">
     <Parameter name="scale"/>
     <Parameter name="shape"/>
-    <RandomDistribution>
-      <BuiltIn uncertml="http://www.uncertml.org/distributions/pareto.xml"/>
-    </RandomDistribution>
+    <RandomDistribution builtin="http://www.uncertml.org/distributions/pareto.xml"/>
   </ComponentClass>
 </NineML>

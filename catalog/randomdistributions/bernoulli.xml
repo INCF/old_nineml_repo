@@ -2,8 +2,6 @@
 <NineML xmlns="http://nineml.net/9ML/1.0">
   <ComponentClass name="BernoulliDistribution">
     <Parameter name="probabilities"/>
-    <RandomDistribution>
-      <BuiltIn uncertml="http://www.uncertml.org/distributions/bernoulli.xml"/>
-    </RandomDistribution>
+    <RandomDistribution builtin="http://www.uncertml.org/distributions/bernoulli.xml"/>
   </ComponentClass>
 </NineML>

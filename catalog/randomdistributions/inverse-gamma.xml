@@ -3,8 +3,6 @@
   <ComponentClass name="InverseGammaDistribution">
     <Parameter name="shape"/>
     <Parameter name="scale"/>
-    <RandomDistribution>
-      <BuiltIn uncertml="http://www.uncertml.org/distributions/inverse-gamma.xml"/>
-    </RandomDistribution>
+    <RandomDistribution builtin="http://www.uncertml.org/distributions/inverse-gamma.xml"/>
   </ComponentClass>
 </NineML>
