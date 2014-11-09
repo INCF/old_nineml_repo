@@ -1,0 +1,11 @@
+<!-- Single value -->
+<un:UniformDistribution xmlns:un="http://www.uncertml.org/2.0">
+  <un:minimum>3.14</un:minimum>
+  <un:maximum>6.28</un:maximum>
+</un:UniformDistribution>
+
+<!-- Multiple values -->
+<un:UniformDistribution xmlns:un="http://www.uncertml.org/2.0">
+  <un:minimum>3.14 6.28 9.42</un:minimum>
+  <un:maximum>6.28 12.57 18.85</un:maximum>
+</un:UniformDistribution>

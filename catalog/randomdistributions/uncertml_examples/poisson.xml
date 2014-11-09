@@ -1,0 +1,4 @@
+<!-- Single value -->
+<un:PoissonDistribution xmlns:un="http://www.uncertml.org/2.0">
+  <un:rate>3.14</un:rate>
+</un:PoissonDistribution>

@@ -1,0 +1,11 @@
+<!-- Single value -->
+<un:LogNormalDistribution xmlns:un="http://www.uncertml.org/2.0">
+  <un:logScale>3.14</un:logScale>
+  <un:shape>3.14</un:shape>
+</un:LogNormalDistribution>
+
+<!-- Multiple values -->
+<un:LogNormalDistribution xmlns:un="http://www.uncertml.org/2.0">
+  <un:logScale>3.14 6.28 9.42</un:logScale>
+  <un:shape>3.14 6.28 9.42</un:shape>
+</un:LogNormalDistribution>

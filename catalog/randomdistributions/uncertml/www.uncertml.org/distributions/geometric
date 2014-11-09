@@ -1,0 +1,183 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+                <title>UncertML :  Exchanging uncertainty since 2006.</title>
+        <link rel="shortcut icon" href="/favicon.ico" />
+        <link rel="stylesheet" type="text/css" media="screen" href="/css/main.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/pretty.css" />
+        <script type="text/javascript" src="/js/jquery-1.5.1.min.js"></script>
+<script type="text/javascript" src="/js/prettify.js"></script>
+<script type="text/javascript" src="/js/definitions.js"></script>
+<script type="text/javascript" src="/js/jsMath/easy/load.js"></script>
+<script type="text/javascript" src="/js/jsMath/plugins/spriteImageFonts.js"></script>
+
+                <script>
+            (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+            })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+            ga('create', 'UA-43121770-1', 'uncertml.org');
+            ga('send', 'pageview');
+        </script>
+            </head>
+
+    <body>
+        <div id="page">
+            <div id="header">
+                <div id="image">
+                    <a href="http://www.uncertml.org" title="UncertML: Describing and exchanging uncertainty"><img height="75" width="338" align="left" alt="UncertML: Describing and exchanging uncertainty" src="/images/UncertML-Logo.png" /></a></div>
+                <div id="strap">
+                    describing and exchanging uncertainty...</div>
+            </div>
+            <div id="header_images">
+                <img height="156" width="300" alt="UncertML is an XML langauge for describing and exchanging uncertainty" src="/images/interp_large.jpg" />                <img height="156" width="215" alt="UncertML has numerous mechanisms for quantifying uncertainty including statistics, samples and distributions" src="/images/interp_med.jpg" />                <img height="156" width="165" alt="UncertML provides a concise representation of distributions" src="/images/interp_small.jpg" />
+            </div>
+            <div id="menu">
+                <ul>
+                    <li> | <a href="/">About UncertML</a></li>
+                    <li> | <a href="/documentation">API documentation</a></li>
+                    <li> | <a href="/dictionary">User guide</a></li>
+                </ul></div>
+            <div id="content">
+                <table class="definition">
+    <tbody>
+        <tr>
+            <th>URI:</th>
+            <td><a href="http://www.uncertml.org/distributions/geometric">http://www.uncertml.org/distributions/geometric</a></td>
+        </tr>
+        <tr>
+            <th>UncertML name:</th>
+            <td>GeometricDistribution</td>
+        </tr>
+        <tr>
+            <th>Alternative names:</th>
+            <td>
+                N/A            </td>
+        </tr>
+        <tr>
+            <th>Definition:</th>
+            <td class="definition">A random variable $$ x $$ follows a geometric distribution if the probability mass function (pmf) is of the form shown below. It is often represented as $$ x \sim \mathrm{Geom}(p) $$. It is the discrete analogue of the exponential distribution. It is used to model distribution of the number of binary (Bernoulli) trials needed to get one success, with parameter, probability $$ p $$.</td>
+        </tr>
+        <tr>
+            <th>Parameters:</th>
+            <td>
+                $$ p $$ (<code>probability</code>) a real $$ \in [0,1] $$.<br />            </td>
+        </tr>
+        <tr>
+            <th>Support:</th>
+            <td>
+                $$ x $$ positive integer, number of independent trials until the first success is achieved.<br />            </td>
+        </tr>
+        <tr>
+            <th>PDF:</th>
+            <td>
+                $$  f(x; p) = (1-p)^{x-1} p  $$.<br />            </td>
+        </tr>
+        <tr>
+            <th>Source:</th>
+            <td>
+                D.J.Wilkinson, &quot;Stochastic Modelling for Systems Biology&quot;, 2006, CRC press.
+            </td>
+        </tr>
+        <tr>
+            <th>Categories:</th>
+            <td>ordinal variables, distribution
+</td>
+        </tr>
+        <tr>
+            <th>Further information:</th>
+            <td><a href="http://mathworld.wolfram.com/GeometricDistribution.html">http://mathworld.wolfram.com/GeometricDistribution.html</a>
+</td>
+        </tr>
+        <tr>
+            <th>XML schema:</th>
+            <td>
+                <pre class="prettyprint">
+&lt;!-- Element --&gt;
+&lt;xs:element name=&quot;GeometricDistribution&quot; substitutionGroup=&quot;un:AbstractDistribution&quot;&gt;
+  &lt;xs:complexType&gt;
+    &lt;xs:complexContent&gt;
+      &lt;xs:extension base=&quot;un:GeometricDistributionType&quot;/&gt;
+    &lt;/xs:complexContent&gt;
+  &lt;/xs:complexType&gt;
+&lt;/xs:element&gt;
+
+&lt;!-- Complex type --&gt;
+&lt;xs:complexType name=&quot;GeometricDistributionType&quot;&gt;
+  &lt;xs:complexContent&gt;
+    &lt;xs:extension base=&quot;un:AbstractDistributionType&quot;&gt;
+      &lt;xs:sequence&gt;
+        &lt;xs:element name=&quot;probability&quot; type=&quot;un:ProbabilityValuesType&quot;/&gt;
+      &lt;/xs:sequence&gt;
+    &lt;/xs:extension&gt;
+  &lt;/xs:complexContent&gt;
+&lt;/xs:complexType&gt;
+                </pre>
+            </td>
+        </tr>
+        <tr>
+            <th>XML example:</th>
+            <td>
+                <pre class="prettyprint">
+&lt;!-- Single value --&gt;
+&lt;un:GeometricDistribution xmlns:un=&quot;http://www.uncertml.org/2.0&quot;&gt;
+  &lt;un:probability&gt;0.1&lt;/un:probability&gt;
+&lt;/un:GeometricDistribution&gt;
+
+&lt;!-- Multiple values --&gt;
+&lt;un:GeometricDistribution xmlns:un=&quot;http://www.uncertml.org/2.0&quot;&gt;
+  &lt;un:probability&gt;0.1 0.2 0.3&lt;/un:probability&gt;
+&lt;/un:GeometricDistribution&gt;
+                </pre>
+            </td>
+        </tr>
+        <tr>
+            <th>JSON example:</th>
+            <td>
+                <pre class="prettyprint">
+// Single value
+{&quot;GeometricDistribution&quot;:{&quot;probability&quot;:[0.1]}}
+
+// Multiple values
+{&quot;GeometricDistribution&quot;:{&quot;probability&quot;:[0.1,0.2,0.3]}}
+                </pre>
+            </td>
+        </tr>
+        <tr>
+            <th>API example:</th>
+            <td>
+                <pre class="prettyprint">
+// Single value declaration
+GeometricDistribution gd = new GeometricDistribution(0.1);
+
+// Multiple value declaration
+GeometricDistribution gd = new GeometricDistribution(new double[] {0.1, 0.2, 0.3});
+
+// Parsing from an XML file
+XMLParser xml = new XMLParser();
+GeometricDistribution gd = (GeometricDistribution)xml.parse(new File(&quot;geometric-distribution.xml&quot;));
+
+// Parsing from a JSON file
+JSONParser json = new JSONParser();
+GeometricDistribution gd = (GeometricDistribution)json.parse(new File(&quot;geometric-distribution.json&quot;));
+
+// Encoding to an XML file
+XMLEncoder xEncoder = new XMLEncoder();
+xEncoder.encode(gd, new File(&quot;geometric-distribution.xml&quot;));
+
+// Encoding to a JSON file
+JSONEncoder jEncoder = new JSONEncoder();
+jEncoder.encode(gd, new File(&quot;geometric-distribution.json&quot;));
+                </pre>
+            </td>
+        </tr>
+    </tbody>
+</table>
+            </div>
+        </div>
+    </body>
+</html>
+

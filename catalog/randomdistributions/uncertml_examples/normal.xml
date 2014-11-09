@@ -1,0 +1,5 @@
+<!-- Single value -->
+<un:NormalDistribution xmlns:un="http://www.uncertml.org/2.0">
+  <un:mean>3.14</un:mean>
+  <un:variance>3.14</un:variance>
+</un:NormalDistribution>

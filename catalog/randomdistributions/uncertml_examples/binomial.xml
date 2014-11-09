@@ -1,0 +1,5 @@
+<!-- Single value -->
+<BinomialDistribution>
+  <numberOfTrials>10</numberOfTrials>
+  <probabilityOfSuccess>0.5</probabilityOfSuccess>
+</BinomialDistribution>

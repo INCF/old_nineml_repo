@@ -1,0 +1,4 @@
+<!-- Multiple values -->
+<un:DirichletDistribution xmlns:un="http://www.uncertml.org/2.0">
+  <un:concentration>3.14 6.28 9.42 12.56</un:concentration>
+</un:DirichletDistribution>

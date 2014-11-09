@@ -1,0 +1,9 @@
+<!-- Single value -->
+<un:BernoulliDistribution xmlns:un="http://www.uncertml.org/2.0">
+  <un:probabilities>0.1</un:probabilities>
+</un:BernoulliDistribution>
+
+<!-- Multiple values -->
+<un:BernoulliDistribution xmlns:un="http://www.uncertml.org/2.0">
+  <un:probabilities>0.1 0.2 0.3</un:probabilities>
+</un:BernoulliDistribution>

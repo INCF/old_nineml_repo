@@ -1,0 +1,6 @@
+<!-- Single value -->
+<un:UniformDistribution xmlns:un="http://www.uncertml.org/2.0">
+  <un:minimum>3.14</un:minimum>
+  <un:maximum>6.28</un:maximum>
+</un:UniformDistribution>
+

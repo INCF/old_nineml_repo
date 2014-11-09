@@ -1,0 +1,11 @@
+<!-- Single value -->
+<un:CauchyDistribution xmlns:un="http://www.uncertml.org/2.0">
+  <un:location>3.14</un:location>
+  <un:scale>3.14</un:scale>
+</un:CauchyDistribution>
+
+<!-- Multiple values -->
+<un:CauchyDistribution xmlns:un="http://www.uncertml.org/2.0">
+  <un:location>3.14 6.28 9.42</un:location>
+  <un:scale>3.14 6.28 9.42</un:scale>
+</un:CauchyDistribution>

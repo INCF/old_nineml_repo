@@ -1,0 +1,11 @@
+<!-- Single value -->
+<un:InverseGammaDistribution xmlns:un="http://www.uncertml.org/2.0">
+  <un:shape>3.14</un:shape>
+  <un:scale>3.14</un:scale>
+</un:InverseGammaDistribution>
+
+<!-- Multiple values -->
+<un:InverseGammaDistribution xmlns:un="http://www.uncertml.org/2.0">
+  <un:shape>3.14 6.28 9.42</un:shape>
+  <un:scale>3.14 6.28 9.42</un:scale>
+</un:InverseGammaDistribution>
