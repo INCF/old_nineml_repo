@@ -1,7 +1,0 @@
-<!-- Multiple values -->
-<un:MultivariateNormalDistribution xmlns:un="http://www.uncertml.org/2.0">
-  <un:mean>3.14 6.28</un:mean>
-  <un:covarianceMatrix dimension="2">
-    <un:values>3.14 0.0 0.0 3.14</un:values>
-  </un:covarianceMatrix>
-</un:MultivariateNormalDistribution>

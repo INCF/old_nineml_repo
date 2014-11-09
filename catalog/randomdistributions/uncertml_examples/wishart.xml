@@ -1,6 +1,0 @@
-<un:WishartDistribution xmlns:un="http://www.uncertml.org/2.0">
-  <un:degreesOfFreedom>3.14</un:degreesOfFreedom>
-  <un:scaleMatrix dimension="2">
-    <un:values>3.14 0.0 0.0 3.14</un:values>
-  </un:scaleMatrix>
-</un:WishartDistribution>

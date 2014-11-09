@@ -1,5 +1,0 @@
-
-<un:NegativeBinomialDistribution xmlns:un="http://www.uncertml.org/2.0">
-  <un:numberOfFailures>1</un:numberOfFailures>
-  <un:probability>0.1</un:probability>
-</un:NegativeBinomialDistribution>

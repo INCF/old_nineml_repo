@@ -1,9 +1,0 @@
-<!-- Single value -->
-<un:ExponentialDistribution xmlns:un="http://www.uncertml.org/2.0">
-  <un:rate>3.14</un:rate>
-</un:ExponentialDistribution>
-
-<!-- Multiple values -->
-<un:ExponentialDistribution xmlns:un="http://www.uncertml.org/2.0">
-  <un:rate>3.14 6.28 9.42</un:rate>
-</un:ExponentialDistribution>

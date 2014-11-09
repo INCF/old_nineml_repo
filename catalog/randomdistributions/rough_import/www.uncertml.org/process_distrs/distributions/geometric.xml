@@ -1,9 +1,0 @@
-<!-- Single value -->
-<un:GeometricDistribution xmlns:un="http://www.uncertml.org/2.0">
-  <un:probability>0.1</un:probability>
-</un:GeometricDistribution>
-
-<!-- Multiple values -->
-<un:GeometricDistribution xmlns:un="http://www.uncertml.org/2.0">
-  <un:probability>0.1 0.2 0.3</un:probability>
-</un:GeometricDistribution>

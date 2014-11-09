@@ -1,5 +1,0 @@
-<!-- Multiple values -->
-<un:MultinomialDistribution xmlns:un="http://www.uncertml.org/2.0">
-  <un:numberOfTrials>2</un:numberOfTrials>
-  <un:probabilities>0.1 0.2 0.3</un:probabilities>
-</un:MultinomialDistribution>

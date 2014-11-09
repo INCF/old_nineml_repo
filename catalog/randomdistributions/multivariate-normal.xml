@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<NineML xmlns="http://nineml.net/9ML/1.0">
+  <ComponentClass name="MultivariateNormalDistribution">
+    <Parameter name="mean"/>
+    <Parameter name="covarianceMatrix"/>
+    <RandomDistribution>
+      <BuiltIn uncertml="http://www.uncertml.org/distributions/multivariate-normal.xml"/>
+    </RandomDistribution>
+  </ComponentClass>
+</NineML>
