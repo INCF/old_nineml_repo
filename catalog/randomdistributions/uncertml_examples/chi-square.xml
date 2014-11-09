@@ -1,4 +1,4 @@
-<!-- Single value -->
+
 <un:ChiSquareDistribution xmlns:un="http://www.uncertml.org/2.0">
   <un:degreesOfFreedom>1</un:degreesOfFreedom>
 </un:ChiSquareDistribution>

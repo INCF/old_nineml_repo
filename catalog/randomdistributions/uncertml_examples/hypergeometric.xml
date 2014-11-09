@@ -1,4 +1,4 @@
-<!-- Single value -->
+
 <un:HypergeometricDistribution xmlns:un="http://www.uncertml.org/2.0">
   <un:numberOfSuccesses>1</un:numberOfSuccesses>
   <un:numberOfTrials>2</un:numberOfTrials>

@@ -1,4 +1,4 @@
-<!-- Single value -->
+
 <un:WeibullDistribution xmlns:un="http://www.uncertml.org/2.0">
   <un:scale>3.14</un:scale>
   <un:shape>3.14</un:shape>

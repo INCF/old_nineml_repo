@@ -1,4 +1,4 @@
-<!-- Single value -->
+
 <un:BetaDistribution xmlns:un="http://www.uncertml.org/2.0">
   <un:alpha>3.14</un:alpha>
   <un:beta>3.14</un:beta>

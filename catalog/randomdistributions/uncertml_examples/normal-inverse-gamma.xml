@@ -1,4 +1,4 @@
-<!-- Single value -->
+
 <un:NormalInverseGammaDistribution xmlns:un="http://www.uncertml.org/2.0">
   <un:mean>3.14</un:mean>
   <un:varianceScaling>3.14</un:varianceScaling>

@@ -1,4 +1,4 @@
-<!-- Single value -->
+
 <un:StudentTDistribution xmlns:un="http://www.uncertml.org/2.0">
   <un:location>3.14</un:location>
   <un:scale>3.14</un:scale>
