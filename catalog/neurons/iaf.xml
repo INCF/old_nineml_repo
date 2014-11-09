@@ -2,7 +2,7 @@
 <NineML xmlns="http://nineml.incf.org/9ML/0.3">
   <ComponentClass name="iaf">
     <AnalogPort mode="send" name="V"/>
-    <AnalogPort mode="reduce" reduce_op="+" name="ISyn"/>
+    <AnalogPort mode="reduce" operator="+" name="ISyn"/>
     <EventPort mode="send" name="spikeoutput"/>
     <Parameter dimension="" name="cm"/>
     <Parameter dimension="" name="taurefrac"/>

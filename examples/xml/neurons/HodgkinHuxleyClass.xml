@@ -35,7 +35,7 @@
     <AnalogSendPort name="v" dimension="voltage"/>
     <AnalogSendPort name="iK" dimension="current"/>
     <AnalogReceivePort name="T" dimension="temperature"/>
-    <AnalogReducePort name="injectedCurrent" dimension="current" reduce_op="+"/>
+    <AnalogReducePort name="injectedCurrent" dimension="current" operator="+"/>
     <EventReceivePort name="incomingSpike"/>
     <EventSendPort name="outgoingSpike"/>
     <Dynamics>
