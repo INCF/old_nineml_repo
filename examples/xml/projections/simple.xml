@@ -6,13 +6,13 @@
   <Unit symbol="ms" dimension="time" power="-3"/>
   <Unit symbol="mV" dimension="voltage" power="-3"/>
   <Unit symbol="S_per_cm2" dimension="conductanceDensity" power="4"/>
-  <Projection name="TestProjection">
+  <Projection name="Izhikevich2HH">
     <Source>
-      <Reference url="../populations/simple.xml">Izhikevich</Reference>
+      <Reference url="../populations/simple.xml">IzhiPopulation</Reference>
     </Source>
     <Destination>
       <Reference url="../populations/simple.xml">HHPopulation</Reference>
-      <FromResponse sendPort="i" receivePort="iSynapse"/>
+      <FromResponse send_port="i" receive_port="iSynapse"/>
     </Destination>
     <Response>
       <Component name="AMPA">
@@ -38,8 +38,8 @@
           </Quantity>
         </Property>
       </Component>
-      <FromSource sendPort="spike" receivePort="spike"/>
-      <FromDestination sendPort="v" receivePort="v"/>
+      <FromSource send_port="spike" receive_port="spike"/>
+      <FromDestination send_port="v" receive_port="v"/>
     </Response>
     <Connectivity>
       <Reference url="../../../catalog/connectionrules/all_to_all.xml">AllToAll</Reference>

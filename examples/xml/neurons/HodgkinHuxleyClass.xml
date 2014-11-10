@@ -29,7 +29,6 @@
     <Parameter name="gbarK" dimension="conductanceDensity"/>
     <Parameter name="gLeak" dimension="conductanceDensity"/>
     <Parameter name="eLeak" dimension="voltage"/>
-    <Parameter name="eSynapse" dimension="voltage"/>
     <Parameter name="eK" dimension="voltage"/>
     <Parameter name="eNa" dimension="voltage"/>
     <Parameter name="C" dimension="specificCapacitance"/>
