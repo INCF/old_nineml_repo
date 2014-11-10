@@ -12,11 +12,11 @@
       <Reference url="../neurons/Izhikevich.xml">Izhikevich</Reference>
     </Cell>
   </Population>
-  <PopulationSelection name="CombinedSelection">
+  <Selection name="CombinedSelection">
     <Concatenate>
       <Item index="0"><Reference>HHPopulation</Reference></Item>
       <Item index="1"><Reference>IzhiPopulation</Reference></Item>      
     </Concatenate>
-  </PopulationSelection>
+  </Selection>
 </NineML>
 
