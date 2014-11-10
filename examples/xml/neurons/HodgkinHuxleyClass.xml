@@ -35,7 +35,7 @@
     <AnalogSendPort name="v" dimension="voltage"/>
     <AnalogSendPort name="iK" dimension="current"/>
     <AnalogReceivePort name="T" dimension="temperature"/>
-    <AnalogReducePort name="injectedCurrent" dimension="current" operator="+"/>
+    <AnalogReducePort name="iSynapse" dimension="current" operator="+"/>
     <EventReceivePort name="incomingSpike"/>
     <EventSendPort name="outgoingSpike"/>
     <Dynamics>
@@ -45,7 +45,7 @@
       <StateVariable name="n"/>
       <Regime name="single">
         <TimeDerivative variable="v">
-          <MathInline>(iNa + iK + iLeak + injectedCurrent) / C</MathInline>
+          <MathInline>(iNa + iK + iLeak + iSynapse) / C</MathInline>
         </TimeDerivative>
         <TimeDerivative variable="m">
           <MathInline>(m_inf - m) / m_tau</MathInline>

@@ -1,27 +1,27 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<nineml xmlns="http://nineml.incf.org/9ML/0.1">
-  <component name="gLIFid8">
-    <parameter name="Vth"/>
-    <parameter name="Vrest"/>
-    <parameter name="Cm"/>
-    <parameter name="Rm"/>
-    <analog-port symbol="V" mode="send"/>
+<NineML xmlns="http://nineml.incf.org/9ML/0.1">
+  <Component name="gLIFid8">
+    <Parameter name="Vth"/>
+    <Parameter name="Vrest"/>
+    <Parameter name="Cm"/>
+    <Parameter name="Rm"/>
+    <AnalogSendPort name="V"/>
     <analog-port symbol="Isyn" mode="reduce" op="+"/>
-    <analog-port symbol="tspike" mode="send"/>
-    <analog-port symbol="t" mode="send"/>
-    <regime name="sub-threshold-regime">
-      <ode independent_variable="t" name="ODE0" dependent_variable="V">
-        <math-inline>(Vrest - V)/(Rm*Cm) + Isyn/Cm</math-inline>
-      </ode>
-    </regime>
+    <AnalogSendPort name="tspike"/>
+    <AnalogSendPort name="t"/>
+    <Regime name="sub-threshold-regime">
+      <TimeDerivative variable="V">
+        <MathInline>(Vrest - V)/(Rm*Cm) + Isyn/Cm</MathInline>
+      </TimeDerivative>
+    </Regime>
     <transition to="sub-threshold-regime" from="sub-threshold-regime" name="Transition0" condition="V&gt;Vth">
       <assignment to="tspike" name="Assignment0">
-        <math-inline>t</math-inline>
+        <MathInline>t</MathInline>
       </assignment>
       <assignment to="V" name="Assignment1">
-        <math-inline>Vrest</math-inline>
+        <MathInline>Vrest</MathInline>
       </assignment>
       <event-port symbol="spike_output" mode="send"/>
     </transition>
-  </component>
-</nineml>
+  </Component>
+</NineML>
