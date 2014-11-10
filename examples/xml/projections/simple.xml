@@ -38,11 +38,13 @@
           </Quantity>
         </Property>
       </Component>
-      <FromSource send_port="spike" receive_port="spike"/>
+      <FromSource send_port="spikeOutput" receive_port="spike"/>
       <FromDestination send_port="v" receive_port="v"/>
     </Response>
     <Connectivity>
-      <Reference url="../../../catalog/connectionrules/all_to_all.xml">AllToAll</Reference>
+      <Component name="AllToAll">
+        <Definition url="../../../catalog/connectionrules/all_to_all.xml">AllToAll</Definition>
+      </Component>
     </Connectivity>
     <Delay>
       <Quantity units="ms">
