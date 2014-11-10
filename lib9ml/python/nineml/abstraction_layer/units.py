@@ -17,8 +17,17 @@ class Dimension(object):
                                 .format(k, "', '".join(self.valid_dims)))
         self._dims = kwargs
 
+    def __eq__(self, other):
+        assert isinstance(other, Dimension)
+        return all(self.power(d) == other.power(d) for d in self.valid_dims)
+
+    def __ne__(self, other):
+        return not (self == other)
+
     def __repr__(self):
-        return "Dimension({})".format(self.name)
+        return ("Dimension(name='{}'{})"
+                .format(self.name, ''.join(", {}={}".format(d, p)
+                                           for d, p in self._dims.items())))
 
     def power(self, dim_name):
         return self._dims.get(dim_name, 0)
@@ -43,7 +52,6 @@ class Unit(object):
     """
 
     element_name = 'Unit'
-    valid_dims = ['m', 'l', 't', 'i', 'n', 'k', 'j']
 
     def __init__(self, name, dimension, power, offset=0.0):
         self.name = name
@@ -51,8 +59,19 @@ class Unit(object):
         self.power = power
         self.offset = offset
 
+    def __eq__(self, other):
+        assert isinstance(other, Unit)
+        return (self.power == other.power and self.offset == other.offset and
+                self.dimension == other.dimension)
+
+    def __ne__(self, other):
+        return not (self == other)
+
     def __repr__(self):
-        return "Units({})".format(self.name)
+        return ("Unit(name='{}', dimension='{}', power={}{})"
+                .format(self.name, self.dimension.name, self.power,
+                        (", offset='{}'".format(self.offset)
+                         if self.offset else '')))
 
     @property
     def symbol(self):

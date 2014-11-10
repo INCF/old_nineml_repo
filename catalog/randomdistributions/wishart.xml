@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<NineML xmlns="http://nineml.net/9ML/1.0">
+  <ComponentClass name="WishartDistribution">
+    <Parameter name="degreesOfFreedom"/>
+    <Parameter name="scaleMatrix"/>
+    <RandomDistribution>
+      <StandardLibrary reference="http://www.uncertml.org/distributions/wishart.xml">WishartDistribution</StandardLibrary>
+    </RandomDistribution>
+  </ComponentClass>
+</NineML>

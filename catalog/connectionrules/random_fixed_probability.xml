@@ -24,7 +24,7 @@
       <Graph xmlns="http://software.incf.org/software/csa/1.0">
 	...
       </Graph>
-      <StandardLib xmlns="http://standardlib.networkguru.org/1.0">
+      <StandardLibrary xmlns="http://standardlib.networkguru.org/1.0">
 	randomFixedProbability
       </StandardLib>
     </ConnectionRule>

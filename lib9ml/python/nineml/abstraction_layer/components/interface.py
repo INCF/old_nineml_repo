@@ -17,7 +17,7 @@ class Parameter(object):
     future, wrapping in into its own object may make the transition easier
     """
 
-    def __init__(self, name, dimension=""):
+    def __init__(self, name, dimension=None):
         """Parameter Constructor
 
         :param name:  The name of the parameter.
@@ -39,7 +39,8 @@ class Parameter(object):
         return self._dimension
 
     def __repr__(self):
-        return "<Parameter: %r (%r)>" % (self.name, self.dimension)
+        dimension = self.dimension.name if self.dimension else 'dimensionless'
+        return "<Parameter: %r (%r)>" % (self.name, dimension)
 
     def accept_visitor(self, visitor, **kwargs):
         """ |VISITATION| """

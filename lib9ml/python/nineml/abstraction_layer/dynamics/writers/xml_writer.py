@@ -18,6 +18,12 @@ class XMLWriter(ComponentVisitor):
 
     @classmethod
     def write(cls, component, file, flatten=True):  # @ReservedAssignment
+        doc = cls.to_xml(component, flatten)
+        etree.ElementTree(doc).write(file, encoding="UTF-8", pretty_print=True,
+                                     xml_declaration=True)
+
+    @classmethod
+    def to_xml(cls, component, flatten=True):  # @ReservedAssignment
         assert isinstance(component, ComponentClass)
         if not component.is_flat():
             if not flatten:
@@ -27,9 +33,7 @@ class XMLWriter(ComponentVisitor):
                                                                reducedcomponent
 
         xml = XMLWriter().visit(component)
-        doc = E.NineML(xml, xmlns=nineml_namespace)
-        etree.ElementTree(doc).write(file, encoding="UTF-8", pretty_print=True,
-                                     xml_declaration=True)
+        return E.NineML(xml, xmlns=nineml_namespace)
 
     def visit_componentclass(self, component):
         elements = ([p.accept_visitor(self) for p in component.analog_ports] +
@@ -62,10 +66,11 @@ class XMLWriter(ComponentVisitor):
                  port=output_event.port_name)
 
     def visit_parameter(self, parameter):
+        kwargs = {}
+        if parameter.dimension is not None:
+            kwargs['dimension'] = parameter.dimension.name
         return E('Parameter',
-                 name=parameter.name,
-                 dimension=(parameter.dimension.name
-                            if parameter.dimension else 'dimensionless'))
+                 name=parameter.name, **kwargs)
 
     def visit_analogreceiveport(self, port, **kwargs):
         return E('AnalogReceivePort', name=port.name,
