@@ -4,7 +4,7 @@
     <Parameter name="numberOfTrials"/>
     <Parameter name="probabilities"/>
     <RandomDistribution>
-      <StandardLibrary reference="http://www.uncertml.org/distributions/multinomial.xml"/>
+      <StandardLibrary reference="http://www.uncertml.org/distributions/multinomial.xml">MultinomialDistribution</StandardLibrary>
     </RandomDistribution>
   </ComponentClass>
 </NineML>

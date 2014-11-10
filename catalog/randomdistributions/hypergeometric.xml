@@ -5,7 +5,7 @@
     <Parameter name="numberOfTrials"/>
     <Parameter name="populationSize"/>
     <RandomDistribution>
-      <StandardLibrary reference="http://www.uncertml.org/distributions/hypergeometric.xml"/>
+      <StandardLibrary reference="http://www.uncertml.org/distributions/hypergeometric.xml">HypergeometricDistribution</StandardLibrary>
     </RandomDistribution>
   </ComponentClass>
 </NineML>

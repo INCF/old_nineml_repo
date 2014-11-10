@@ -4,7 +4,7 @@
     <Parameter name="scale"/>
     <Parameter name="shape"/>
     <RandomDistribution>
-      <StandardLibrary reference="http://www.uncertml.org/distributions/pareto.xml"/>
+      <StandardLibrary reference="http://www.uncertml.org/distributions/pareto.xml">ParetoDistribution</StandardLibrary>
     </RandomDistribution>
   </ComponentClass>
 </NineML>

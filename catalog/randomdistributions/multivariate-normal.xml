@@ -4,7 +4,7 @@
     <Parameter name="mean"/>
     <Parameter name="covarianceMatrix"/>
     <RandomDistribution>
-      <StandardLibrary reference="http://www.uncertml.org/distributions/multivariate-normal.xml"/>
+      <StandardLibrary reference="http://www.uncertml.org/distributions/multivariate-normal.xml">MultivariateNormalDistribution</StandardLibrary>
     </RandomDistribution>
   </ComponentClass>
 </NineML>

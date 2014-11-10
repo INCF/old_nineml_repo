@@ -4,7 +4,7 @@
     <Parameter name="minimum"/>
     <Parameter name="maximum"/>
     <RandomDistribution>
-      <StandardLibrary reference="http://www.uncertml.org/distributions/uniform.xml"/>
+      <StandardLibrary reference="http://www.uncertml.org/distributions/uniform.xml">UniformDistribution</StandardLibrary>
     </RandomDistribution>
   </ComponentClass>
 </NineML>

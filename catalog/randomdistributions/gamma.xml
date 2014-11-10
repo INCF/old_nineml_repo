@@ -4,7 +4,7 @@
     <Parameter name="shape"/>
     <Parameter name="scale"/>
      <RandomDistribution>
-       <StandardLibrary reference="http://www.uncertml.org/distributions/gamma.xml"/>
+       <StandardLibrary reference="http://www.uncertml.org/distributions/gamma.xml">GammaDistribution</StandardLibrary>
      </RandomDistribution>
   </ComponentClass>
 </NineML>
