@@ -3,6 +3,8 @@
   <ComponentClass name="LaplaceDistribution">
     <Parameter name="location"/>
     <Parameter name="scale"/>
-    <RandomDistribution builtin="http://www.uncertml.org/distributions/laplace.xml"/>
+    <RandomDistribution>
+      <StandardLibrary reference="http://www.uncertml.org/distributions/laplace.xml"/>
+    </RandomDistribution>
   </ComponentClass>
 </NineML>

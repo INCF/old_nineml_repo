@@ -3,6 +3,8 @@
   <ComponentClass name="NormalDistribution">
     <Parameter name="mean"/>
     <Parameter name="variance"/>
-    <RandomDistribution builtin="http://www.uncertml.org/distributions/normal.xml"/>
+    <RandomDistribution>
+      <StandardLibrary reference="http://www.uncertml.org/distributions/normal.xml"/>
+    </RandomDistribution>
   </ComponentClass>
 </NineML>

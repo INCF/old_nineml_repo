@@ -3,6 +3,8 @@
   <ComponentClass name="LogNormalDistribution">
     <Parameter name="logScale"/>
     <Parameter name="shape"/>
-    <RandomDistribution builtin="http://www.uncertml.org/distributions/log-normal.xml"/>
+    <RandomDistribution>
+      <StandardLibrary reference="http://www.uncertml.org/distributions/log-normal.xml"/>
+    </RandomDistribution>
   </ComponentClass>
 </NineML>

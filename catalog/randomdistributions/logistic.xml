@@ -3,6 +3,8 @@
   <ComponentClass name="LogisticDistribution">
     <Parameter name="location"/>
     <Parameter name="scale"/>
-    <RandomDistribution builtin="http://www.uncertml.org/distributions/logistic.xml"/>
+    <RandomDistribution>
+      <StandardLibrary reference="http://www.uncertml.org/distributions/logistic.xml"/>
+    </RandomDistribution>
   </ComponentClass>
 </NineML>

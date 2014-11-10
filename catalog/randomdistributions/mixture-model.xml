@@ -1,8 +1,0 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<NineML xmlns="http://nineml.net/9ML/1.0">
-  <ComponentClass name="MixtureModel">
-    <Parameter name="component"/>
-    <Parameter name="component"/>
-    <RandomDistribution builtin="http://www.uncertml.org/distributions/mixture-model.xml"/>
-  </ComponentClass>
-</NineML>
