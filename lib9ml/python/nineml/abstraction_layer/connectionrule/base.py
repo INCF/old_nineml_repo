@@ -15,16 +15,21 @@ docstring goes here
 
 from abc import ABCMeta, abstractmethod, abstractproperty
 from nineml.abstraction_layer.components import BaseComponentClass
+from ..base import BaseALObject
 
 
 class ComponentClass(BaseComponentClass):
+
+    defining_attributes = ('name', '_parameters', '_connection_rule')
 
     def __init__(self, name, parameters=None, connection_rule=None):
         super(ComponentClass, self).__init__(name, parameters)
         self._connection_rule = connection_rule
 
 
-class IntervalSet:
+class IntervalSet(BaseALObject):
+
+    defining_attributes = ('intervals', 'skip')
 
     def __init__(self, intervals=[], skip=1):
         """
@@ -42,7 +47,9 @@ class IntervalSet:
         return self.intervals.__iter__()
 
 
-class Mask:
+class Mask(BaseALObject):
+
+    defining_attributes = ('sources', 'targets')
 
     def __init__(self,
                  sources=[], targets=[],
@@ -55,14 +62,16 @@ class Mask:
         self.targets = IntervalSet(targets, targetSkip)
 
 
-class StandarLibraryConnectionRule:
+class StandarLibraryConnectionRule(BaseALObject):
+
+    defining_attributes = ('name', 'reference_url')
 
     def __init__(self, name, reference_url):
         self.name = name
         self.reference_url = reference_url
 
 
-class ConnectionGenerator:
+class ConnectionGenerator(BaseALObject):
 
     """
     The ConnectionGenerator interface.

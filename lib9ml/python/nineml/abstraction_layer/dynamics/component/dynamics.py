@@ -18,9 +18,13 @@ from nineml.utility import (filter_discrete_types,
 
 from nineml.exceptions import NineMLRuntimeError
 from ..visitors import ClonerVisitor
+from ...base import BaseALObject
 
 
-class Transition(object):
+class Transition(BaseALObject):
+
+    defining_attributes = ('state_assignments', 'event_outputs',
+                           'target_regime_name')
 
     def __init__(self, state_assignments=None, event_outputs=None,
                  target_regime_name=None):
@@ -105,7 +109,7 @@ class Transition(object):
         """
         assert isinstance(target_regime, Regime)
         if self._target_regime:
-            assert self.target_regime == target_regime
+            assert id(self.target_regime) == id(target_regime)
             return
 
         # Did we already set the target_regime_name
@@ -175,6 +179,9 @@ class Transition(object):
 
 class OnEvent(Transition):
 
+    defining_attributes = ('src_port_name', 'state_assignments',
+                           'event_outputs', 'target_regime_name')
+
     def accept_visitor(self, visitor, **kwargs):
         """ |VISITATION| """
         return visitor.visit_onevent(self, **kwargs)
@@ -204,6 +211,9 @@ class OnEvent(Transition):
 
 
 class OnCondition(Transition):
+
+    defining_attributes = ('trigger', 'state_assignments',
+                           'event_outputs', 'target_regime_name')
 
     def accept_visitor(self, visitor, **kwargs):
         """ |VISITATION| """
@@ -239,13 +249,16 @@ class OnCondition(Transition):
         return self._trigger
 
 
-class Regime(object):
+class Regime(BaseALObject):
 
     """
     A Regime is something that contains |TimeDerivatives|, has temporal extent,
     defines a set of |Transitions| which occur based on |Conditions|, and can
     be join the Regimes to other Regimes.
     """
+
+    defining_attributes = ('_time_derivatives', '_on_events', '_on_conditions',
+                           'name')
 
     _n = 0
 
@@ -290,9 +303,10 @@ class Regime(object):
                                                         None))
         time_derivatives = list(args) + kw_tds
 
-        # Generate a name for unnamed regions:
-        self._name = name.strip() if name else Regime.get_next_name()
-        ensure_valid_c_variable_name(self._name)
+        self._name = name
+        if self.name is not None:
+            self._name = self._name.strip()
+            ensure_valid_c_variable_name(self._name)
 
         # Un-named arguments are time_derivatives:
         time_derivatives = normalise_parameter_as_list(time_derivatives)
@@ -302,11 +316,15 @@ class Regime(object):
         td_type_dict = filter_discrete_types(time_derivatives, td_types)
         td_from_str = [StrToExpr.time_derivative(o)
                        for o in td_type_dict[basestring]]
-        self._time_derivatives = td_type_dict[TimeDerivative] + td_from_str
+        time_derivatives = td_type_dict[TimeDerivative] + td_from_str
 
         # Check for double definitions:
-        td_dep_vars = [td.dependent_variable for td in self._time_derivatives]
+        td_dep_vars = [td.dependent_variable for td in time_derivatives]
         assert_no_duplicates(td_dep_vars)
+
+        # Store as a dictionary
+        self._time_derivatives = dict((td.dependent_variable, td)
+                                      for td in time_derivatives)
 
         # We support passing in 'transitions', which is a list of both OnEvents
         # and OnConditions. So, lets filter this by type and add them
@@ -321,6 +339,12 @@ class Regime(object):
             self.add_on_event(event)
         for condition in f_dict[OnCondition]:
             self.add_on_condition(condition)
+
+        # Sort for equality checking
+        self._on_events = sorted(self._on_events,
+                                 key=lambda x: x.src_port_name)
+        self._on_conditions = sorted(self._on_conditions,
+                                     key=lambda x: x.trigger)
 
     def _resolve_references_on_transition(self, transition):
         if transition.target_regime_name is None:
@@ -382,7 +406,7 @@ class Regime(object):
             defined, they are assumed to be zero in this regime.
 
         """
-        return iter(self._time_derivatives)
+        return self._time_derivatives.itervalues()
 
     @property
     def transitions(self):
@@ -409,12 +433,13 @@ class Regime(object):
         return self._name
 
 
-class ComponentDynamics(object):
+class ComponentDynamics(BaseALObject):
     pass
 
 
 # Forwarding Function:
 def On(trigger, do=None, to=None):
+
     if isinstance(do, (OutputEvent, basestring)):
         do = [do]
     elif do == None:
@@ -468,12 +493,14 @@ def DoOnCondition(condition, do=None, to=None):
                        target_regime_name=to)
 
 
-class Dynamics(object):
+class Dynamics(BaseALObject):
 
     """
     A container class, which encapsulates a component's regimes, transitions,
     and state variables
     """
+
+    defining_attributes = ('_regimes', '_aliases', '_state_variables')
 
     def __init__(self, regimes=None, aliases=None, state_variables=None):
         """Dynamics object constructor
@@ -500,55 +527,65 @@ class Dynamics(object):
         # Load the state variables as objects or strings:
         sv_types = (basestring, StateVariable)
         sv_td = filter_discrete_types(state_variables, sv_types)
-        sv_from_strings = [StateVariable(o,
-                                         dimension=None)
+        sv_from_strings = [StateVariable(o, dimension=None)
                            for o in sv_td[basestring]]
         state_variables = sv_td[StateVariable] + sv_from_strings
 
-        self._regimes = regimes
-        self._aliases = aliases
-        self._state_variables = state_variables
+        assert_no_duplicates(r.name for r in regimes)
+        assert_no_duplicates(a.lhs for a in aliases)
+        assert_no_duplicates(s.name for s in state_variables)
+
+        self._regimes = dict((r.name, r) for r in regimes)
+        self._aliases = dict((a.lhs, a) for a in aliases)
+        self._state_variables = dict((s.name, s) for s in state_variables)
 
     def accept_visitor(self, visitor, **kwargs):
         """ |VISITATION| """
         return visitor.visit_dynamics(self, **kwargs)
 
+    def __repr__(self):
+        return ('Dynamics({} regimes, {} aliases, {} state-variables)'
+                .format(len(self.regimes), len(self.aliases),
+                        len(self.state_variables)))
+
     @property
     def regimes(self):
-        return iter(self._regimes)
+        return self._regimes.itervalues()
 
     @property
     def regimes_map(self):
-        return dict((r.name, r) for r in self.regimes)
+        return self._regimes
 
     @property
     def transitions(self):
-        return chain(*[r.transitions for r in self._regimes])
+        return chain(*[r.transitions for r in self.regimes])
 
     @property
     def aliases(self):
-        return iter(self._aliases)
+        return self._aliases.itervalues()
 
     @property
     def aliases_map(self):
-        return dict([(a.lhs, a) for a in self._aliases])
+        return self._aliases
 
     @property
     def state_variables(self):
-        return iter(self._state_variables)
+        return self._state_variables.itervalues()
 
     @property
     def state_variables_map(self):
-        return dict([(sv.name, sv) for sv in self._state_variables])
+        return self._state_variables
 
 
-class StateVariable(object):
+class StateVariable(BaseALObject):
 
     """A class representing a state-variable in a ``ComponentClass``.
 
     This was originally a string, but if we intend to support units in the
     future, wrapping in into its own object may make the transition easier
     """
+
+    defining_attributes = ('name', 'dimension')
 
     def accept_visitor(self, visitor, **kwargs):
         """ |VISITATION| """
@@ -572,7 +609,10 @@ class StateVariable(object):
         return self._dimension
 
     def __repr__(self):
-        return "<StateVariable: %s (%s)>" % (self.name, self.dimension)
+        return ("StateVariable({}{})"
+                .format(self.name,
+                        ', dimension={}'.format(self.dimension.name)
+                        if self.dimension else ''))
 
 # class SubComponent(BaseDynamicsComponent):
 #     pass

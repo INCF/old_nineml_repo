@@ -6,13 +6,16 @@ This module provides the base class for these.
 :copyright: Copyright 2010-2013 by the Python lib9ML team, see AUTHORS.
 :license: BSD-3, see LICENSE for details.
 """
-import inspect
-from nineml.utility import filter_discrete_types
-from .interface import Parameter
+from operator import and_
+# from nineml.utility import filter_discrete_types
+# from .interface import Parameter
 from nineml import NINEML
+from ..base import BaseALObject
+from .interface import Parameter
+from ...utility import filter_discrete_types
 
 
-class BaseComponentClass(object):
+class BaseComponentClass(BaseALObject):
     """Base class for ComponentClasses in different 9ML modules."""
 
     element_name = 'ComponentClass'
@@ -36,15 +39,15 @@ class BaseComponentClass(object):
 
     def __init__(self, name, parameters=None):
         self._name = name
-
         # Turn any strings in the parameter list into Parameters:
         if parameters is None:
-            self._parameters = []
+            parameters = []
         else:
             param_types = (basestring, Parameter)
             param_td = filter_discrete_types(parameters, param_types)
             params_from_strings = [Parameter(s) for s in param_td[basestring]]
-            self._parameters = param_td[Parameter] + params_from_strings
+            parameters = param_td[Parameter] + params_from_strings
+        self._parameters = dict((p.name, p) for p in parameters)
 
     @property
     def name(self):
@@ -54,4 +57,11 @@ class BaseComponentClass(object):
     @property
     def parameters(self):
         """Returns an iterator over the local |Parameter| objects"""
-        return iter(self._parameters)
+        return self._parameters.itervalues()
+
+    @property
+    def parameter_names(self):
+        return self._parameters.iterkeys()
+
+    def parameter(self, name):
+        return self._parameters[name]

@@ -14,19 +14,22 @@ from nineml.exceptions import NineMLRuntimeError
 from nineml.maths import (MathUtil, str_to_npfunc_map, func_namespace_split,
                           is_valid_lhs_target)
 from . import parse
+from ...base import BaseALObject
 
 
-class RegimeElement(object):
+class RegimeElement(BaseALObject):
 
     """ Base class for all things that can be elements of a regime """
     pass
 
 
-class Expression(object):
+class Expression(BaseALObject):
 
     """ This is a base class for Expressions and Conditionals which provides
     the basic interface for parsing, yielding of python functions,
     C equivalents, name substitution """
+
+    defining_attributes = ('_rhs',)
 
     def __init__(self, rhs):
         self._rhs = None
@@ -169,6 +172,8 @@ class ExpressionWithSimpleLHS(ExpressionWithLHS):
     """Represents a an equation with a simple left-hand-side.
     That is, a single symbol, for example 's = t+1'
     """
+
+    defining_attributes = ('_lhs', '_rhs')
 
     def __init__(self, lhs, rhs):
         ExpressionWithLHS.__init__(self, rhs)

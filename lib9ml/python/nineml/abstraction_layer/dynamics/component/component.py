@@ -24,9 +24,10 @@ from nineml.utility import (check_list_contain_same_items,
 
 from nineml.maths import get_reserved_and_builtin_symbols
 from ..visitors import ExpandAliasDefinition, ClonerVisitor, ActionVisitor
+from ...base import BaseALObject
 
 
-class ComponentClassMixinFlatStructure(object):
+class ComponentClassMixinFlatStructure(BaseALObject):
 
     """Mixin Class that provides the infrastructure for *local* component
     definitions - i.e. the dynamics
@@ -37,53 +38,65 @@ class ComponentClassMixinFlatStructure(object):
         """Constructor - For parameter descriptions, see the
         ComponentClass.__init__() method
         """
-        self._analog_send_ports = [port for port in analog_ports if isinstance(port, AnalogSendPort)]
-        self._analog_receive_ports = [port for port in analog_ports if isinstance(port, AnalogReceivePort)]
-        self._analog_reduce_ports = [port for port in analog_ports if isinstance(port, AnalogReducePort)]
-        self._event_send_ports = [port for port in event_ports if isinstance(port, EventSendPort)]
-        self._event_receive_ports = [port for port in event_ports if isinstance(port, EventReceivePort)]
+        self._analog_send_ports = dict((port.name, port)
+                                       for port in analog_ports
+                                       if isinstance(port, AnalogSendPort))
+        self._analog_receive_ports = dict((port.name, port)
+                                          for port in analog_ports
+                                          if isinstance(port,
+                                                        AnalogReceivePort))
+        self._analog_reduce_ports = dict((port.name, port)
+                                         for port in analog_ports
+                                         if isinstance(port, AnalogReducePort))
+        self._event_send_ports = dict((port.name, port)
+                                      for port in event_ports
+                                      if isinstance(port, EventSendPort))
+        self._event_receive_ports = dict((port.name, port)
+                                         for port in event_ports
+                                         if isinstance(port, EventReceivePort))
         self._dynamics = dynamics
         ensure_valid_c_variable_name(self.name)
 
     @property
     def ports(self):
-        return chain(self._analog_send_ports, self._analog_receive_ports,
-                     self._analog_reduce_ports, self._event_send_ports,
-                     self._event_receive_ports)
+        return chain(self.analog_send_ports, self.analog_receive_ports,
+                     self.analog_reduce_ports, self.event_send_ports,
+                     self.event_receive_ports)
 
     @property
     def analog_send_ports(self):
         """Returns an iterator over the local |AnalogSendPort| objects"""
-        return self._analog_send_ports
+        return self._analog_send_ports.itervalues()
 
     @property
     def analog_receive_ports(self):
         """Returns an iterator over the local |AnalogReceivePort| objects"""
-        return self._analog_receive_ports
+        return self._analog_receive_ports.itervalues()
 
     @property
     def analog_reduce_ports(self):
         """Returns an iterator over the local |AnalogReducePort| objects"""
-        return self._analog_reduce_ports
+        return self._analog_reduce_ports.itervalues()
 
     @property
     def analog_ports(self):
-        return list(chain(self._analog_send_ports, self._analog_receive_ports,
-                    self._analog_reduce_ports))
+        """Returns an iterator over the local analog port objects"""
+        return chain(self.analog_send_ports, self.analog_receive_ports,
+                     self.analog_reduce_ports)
 
     @property
     def event_send_ports(self):
         """Returns an iterator over the local |EventSendPort| objects"""
-        return self._event_send_ports
+        return self._event_send_ports.itervalues()
 
     @property
     def event_receive_ports(self):
         """Returns an iterator over the local |EventReceivePort| objects"""
-        return self._event_receive_ports
+        return self._event_receive_ports.itervalues()
 
     @property
     def event_ports(self):
-        return chain(self._event_send_ports, self._event_receive_ports)
+        return chain(self.event_send_ports, self.event_receive_ports)
 
     @property
     def dynamics(self):
@@ -159,7 +172,7 @@ class ComponentClassMixinFlatStructure(object):
         return XMLWriter.write(component=self, file=file, flatten=flatten)
 
 
-class ComponentClassMixinNamespaceStructure(object):
+class ComponentClassMixinNamespaceStructure(BaseALObject):
 
     """ A mixin class that provides the hierarchical structure for
     components.
@@ -376,6 +389,10 @@ class ComponentClass(BaseComponentClass,
          For more information, see
 
     """
+    defining_attributes = ('name', '_parameters', '_analog_send_ports',
+                           '_analog_receive_ports', '_analog_reduce_ports',
+                           '_event_send_ports', '_event_receive_ports',
+                           'dynamics')
 
     writer_name = 'dynamics'
 
@@ -431,7 +448,7 @@ class ComponentClass(BaseComponentClass,
                 raise NineMLRuntimeError(err)
 
         else:
-            # We should always create a dynamics object, even is it is empty:
+            # We should always create a dynamics object, even is it is empty. FIXME: TGC 11/11/14, Why? @IgnorePep8
             dynamics = dyn.Dynamics(regimes=regimes,
                                     aliases=aliases,
                                     state_variables=state_variables)
@@ -439,6 +456,13 @@ class ComponentClass(BaseComponentClass,
 
         # Ensure analog_ports is a list not an iterator
         analog_ports = list(analog_ports)
+        event_ports = list(event_ports)
+
+        # Check there aren't any duplicates in the port and parameter names
+        assert_no_duplicates(p if isinstance(p, basestring) else p.name
+                             for p in chain(parameters if parameters else [],
+                                            analog_ports,
+                                            event_ports))
 
         analog_receive_ports = [port for port in analog_ports
                                 if isinstance(port, AnalogReceivePort)]
@@ -455,13 +479,12 @@ class ComponentClass(BaseComponentClass,
 
         # Check any supplied parameters match:
         if parameters is not None:
-            parameter_names = [p.name for p in self._parameters]
-            inf_check(parameter_names,
+            inf_check(self._parameters.keys(),
                       inferred_struct.parameter_names,
                       'Parameters')
         else:
-            self._parameters = [Parameter(n)
-                                for n in inferred_struct.parameter_names]
+            self._parameters = dict((n, Parameter(n))
+                                    for n in inferred_struct.parameter_names)
 
         # Check any supplied state_variables match:
         if dynamics._state_variables:
@@ -470,11 +493,10 @@ class ComponentClass(BaseComponentClass,
                       inferred_struct.state_variable_names,
                       'StateVariables')
         else:
-            state_vars = [StateVariable(n) for n in
-                          inferred_struct.state_variable_names]
+            state_vars = dict((n, StateVariable(n)) for n in
+                              inferred_struct.state_variable_names)
             dynamics._state_variables = state_vars
-        # Ensure analog_ports is a list not an iterator
-        event_ports = list(event_ports)
+
         # Check Event Receive Ports Match:
         event_receive_ports = [port for port in event_ports
                                if isinstance(port, EventReceivePort)]

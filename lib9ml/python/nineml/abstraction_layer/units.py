@@ -1,7 +1,8 @@
 from .. import E
+from .base import BaseALObject
 
 
-class Dimension(object):
+class Dimension(BaseALObject):
     """
     Defines the dimension used for quantity units
     """
@@ -46,12 +47,13 @@ class Dimension(object):
         return cls(name, **kwargs)
 
 
-class Unit(object):
+class Unit(BaseALObject):
     """
     Defines the units of a quantity
     """
 
     element_name = 'Unit'
+    defining_attributes = ('name', 'dimension', 'power', 'offset')
 
     def __init__(self, name, dimension, power, offset=0.0):
         self.name = name
@@ -89,7 +91,7 @@ class Unit(object):
     def from_xml(cls, element, context):
         name = element.attrib['symbol']
         dimension = context[element.attrib['dimension']]
-        power = int(element.attrib['power'])
+        power = int(element.get('power', 0))
         offset = float(element.attrib.get('name', 0.0))
         return cls(name, dimension, power, offset)
 

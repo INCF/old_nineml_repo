@@ -16,7 +16,7 @@ class BaseComponent(BaseULObject):
     Base class for model components that are defined in the abstraction layer.
     """
     element_name = "Component"
-    defining_attributes = ("name")
+    defining_attributes = ('name', 'component_class', 'properties')
     children = ("Property", "Definition", 'Prototype')
 
     # initial_values is temporary, the idea longer-term is to use a separate
@@ -33,6 +33,7 @@ class BaseComponent(BaseULObject):
                        (value,unit) pairs.
         `prototype` - the name of another component in the model, or None.
         """
+        super(BaseComponent, self).__init__()
         self.name = name
         if not (isinstance(definition, Definition) or
                 isinstance(definition, Prototype)):
@@ -94,16 +95,14 @@ class BaseComponent(BaseULObject):
         vals.update(self._initial_values)
         return vals
 
-    def __eq__(self, other):
-        if not isinstance(other, self.__class__):
-            return False
-        assert not (self.unresolved or other.unresolved)
-        return reduce(and_, (self.name == other.name,
-                             self.component_class == other.component_class,
-                             self.properties == other.properties))
+#     def __eq__(self, other):
+#         if not isinstance(other, self.__class__):
+#             return False
+#         return reduce(and_, (self.name == other.name,
+#                              self.component_class == other.component_class,
+#                              self.properties == other.properties))
 
     def __hash__(self):
-        assert not self.unresolved
         return (hash(self.__class__) ^ hash(self.name) ^
                 hash(self.component_class) ^ hash(self.properties))
 
@@ -219,23 +218,22 @@ class BaseReference(BaseULObject):
     def __eq__(self, other):
         if not isinstance(other, self.__class__):
             return False
-        return reduce(and_, (self.component_name == other.component_name,
+        return reduce(and_, (self._referred_to == other._referred_to,
                              self.url == other.url))
 
     def __hash__(self):
-        assert not self.unresolved
         return (hash(self.__class__) ^ hash(self.component_name) ^
                 hash(self.url))
 
     def __repr__(self):
-            return ('{}(refers_to="{}"{})'
+            return ('{}(name="{}"{})'
                     .format(self.__class__.__name__, self._referred_to.name,
                             ' in "{}"'.format(self.url) if self.url else ''))
 
     def to_xml(self):
         kwargs = {'url': self.url} if self.url else {}
         element = E(self.element_name,
-                    self.component_name,
+                    self._referred_to.name,
                     **kwargs)
         return element
 

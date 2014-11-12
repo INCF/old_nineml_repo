@@ -7,15 +7,18 @@ Contains the classes for defining the interface for a componentclass
 
 
 from nineml.utility import ensure_valid_c_variable_name
+from ..base import BaseALObject
 
 
-class Parameter(object):
+class Parameter(BaseALObject):
 
     """A class representing a state-variable in a ``ComponentClass``.
 
     This was originally a string, but if we intend to support units in the
     future, wrapping in into its own object may make the transition easier
     """
+
+    defining_attributes = ('name', 'dimension')
 
     def __init__(self, name, dimension=None):
         """Parameter Constructor
@@ -28,6 +31,9 @@ class Parameter(object):
         self._name = name
         self._dimension = dimension
 
+    def __eq__(self, other):
+        return self.name == other.name and self.dimension == other.dimension
+
     @property
     def name(self):
         """Returns the name of the parameter"""
@@ -39,8 +45,10 @@ class Parameter(object):
         return self._dimension
 
     def __repr__(self):
-        dimension = self.dimension.name if self.dimension else 'dimensionless'
-        return "<Parameter: %r (%r)>" % (self.name, dimension)
+        return ("Parameter({}{})"
+                .format(self.name,
+                        ', dimension={}'.format(self.dimension.name)
+                        if self.dimension else ''))
 
     def accept_visitor(self, visitor, **kwargs):
         """ |VISITATION| """

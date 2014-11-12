@@ -1,9 +1,11 @@
 from nineml.abstraction_layer.components import BaseComponentClass
+from ..base import BaseALObject
 
 
 class ComponentClass(BaseComponentClass):
 
     writer_name = 'random'
+    defining_attributes = ('name', '_parameters', 'random_distribution')
 
     def __init__(self, name, random_distribution, parameters=None):
         super(ComponentClass, self).__init__(name, parameters)
@@ -14,7 +16,7 @@ class ComponentClass(BaseComponentClass):
         return visitor.visit_componentclass(self, **kwargs)
 
 
-class RandomDistribution(object):
+class RandomDistribution(BaseALObject):
 
     def accept_visitor(self, visitor, **kwargs):
         """ |VISITATION| """
@@ -22,6 +24,8 @@ class RandomDistribution(object):
 
 
 class StandardLibraryRandomDistribution(RandomDistribution):
+
+    defining_attributes = ('name', 'reference_url')
 
     def __init__(self, name, reference_url):
         self.name = name

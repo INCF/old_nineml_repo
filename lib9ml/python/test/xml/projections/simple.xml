@@ -16,7 +16,7 @@
     </Destination>
     <Response>
       <Component name="AMPA">
-        <Definition url="../../../catalog/postsynapticresponses/DoubleExpCondSynapse.xml">DoubleExpCondSynapse</Definition>
+        <Definition url="../postsynapticresponses/DoubleExpCondSynapse.xml">DoubleExpCondSynapse</Definition>
         <Property name="gBar">
           <Quantity units="S_per_cm2">
             <SingleValue>2.6e-3</SingleValue>
@@ -43,7 +43,7 @@
     </Response>
     <Connectivity>
       <Component name="AllToAll">
-        <Definition url="../../../catalog/connectionrules/all_to_all.xml">AllToAll</Definition>
+        <Definition url="../connectionrules/all_to_all.xml">AllToAll</Definition>
       </Component>
     </Connectivity>
     <Delay>
