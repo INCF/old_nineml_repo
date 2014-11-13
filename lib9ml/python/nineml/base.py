@@ -2,7 +2,7 @@ from lxml.builder import ElementMaker
 from itertools import chain
 from operator import and_
 from copy import copy
-from nineml.utility import expect_none_or_single
+from .utility import expect_none_or_single
 
 nineml_namespace = 'http://nineml.net/9ML/1.0'
 NINEML = "{%s}" % nineml_namespace
