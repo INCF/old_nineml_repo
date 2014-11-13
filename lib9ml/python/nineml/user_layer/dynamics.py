@@ -56,6 +56,16 @@ class ConnectionType(BaseDynamicsComponent):
     """
     pass
 
+
+class IonChannelDynamics(BaseDynamicsComponent):
+
+    """
+    Component representing a model of a synaptic connection, including weight,
+    delay, optionally a synaptic plasticity rule.
+    """
+    pass
+
+
 # 
 # def get_or_create_prototype(prototype_ref, components, groups):
 #     if prototype_ref in groups:
