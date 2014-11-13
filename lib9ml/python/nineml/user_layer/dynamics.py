@@ -57,7 +57,7 @@ class ConnectionType(BaseDynamicsComponent):
     pass
 
 
-class IonChannelDynamics(BaseDynamicsComponent):
+class IonDynamics(BaseDynamicsComponent):
 
     """
     Component representing a model of a synaptic connection, including weight,

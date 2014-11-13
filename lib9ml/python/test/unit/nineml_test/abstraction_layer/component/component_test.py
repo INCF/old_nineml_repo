@@ -38,7 +38,7 @@ class ComponentClass_test(unittest.TestCase):
                 # Forwarding function to self.dynamics.aliases
 
         # No Aliases:
-        self.assertEqual( 
+        self.assertEqual(
             list(ComponentClass(name='C1').aliases),
             []
         )
