@@ -5,7 +5,7 @@
     <Parameter name="covarianceMatrix"/>
     <Parameter name="degreesOfFreedom"/>
     <RandomDistribution>
-      <StandardLibrary reference="http://www.uncertml.org/distributions/multivariate-student-t.xml">MultivariateStudentTDistribution</StandardLibrary>
+      <StandardLibrary webpage="http://www.uncertml.org/distributions/multivariate-student-t.xml">MultivariateStudentTDistribution</StandardLibrary>
     </RandomDistribution>
   </ComponentClass>
 </NineML>

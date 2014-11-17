@@ -4,7 +4,7 @@
     <Parameter name="location"/>
     <Parameter name="scale"/>
     <RandomDistribution>
-      <StandardLibrary reference="http://www.uncertml.org/distributions/logistic.xml">LogisticDistribution</StandardLibrary>
+      <StandardLibrary webpage="http://www.uncertml.org/distributions/logistic.xml">LogisticDistribution</StandardLibrary>
     </RandomDistribution>
   </ComponentClass>
 </NineML>

@@ -6,7 +6,7 @@
     <Parameter name="shape"/>
     <Parameter name="scale"/>
     <RandomDistribution>
-      <StandardLibrary reference="http://www.uncertml.org/distributions/normal-inverse-gamma.xml">NormalInverseGammaDistribution</StandardLibrary>
+      <StandardLibrary webpage="http://www.uncertml.org/distributions/normal-inverse-gamma.xml">NormalInverseGammaDistribution</StandardLibrary>
     </RandomDistribution>
   </ComponentClass>
 </NineML>

@@ -3,7 +3,7 @@
   <ComponentClass name="BernoulliDistribution">
     <Parameter name="probabilities"/>
     <RandomDistribution>
-      <StandardLibrary reference="http://www.uncertml.org/distributions/bernoulli.xml">BernoulliDistribution</StandardLibrary>
+      <StandardLibrary webpage="http://www.uncertml.org/distributions/bernoulli.xml">BernoulliDistribution</StandardLibrary>
     </RandomDistribution>
   </ComponentClass>
 </NineML>

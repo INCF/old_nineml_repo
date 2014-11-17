@@ -4,7 +4,7 @@
     <Parameter name="numberOfFailures"/>
     <Parameter name="probability"/>
     <RandomDistribution>
-      <StandardLibrary reference="http://www.uncertml.org/distributions/negative-binomial.xml">NegativeBinomialDistribution</StandardLibrary>
+      <StandardLibrary webpage="http://www.uncertml.org/distributions/negative-binomial.xml">NegativeBinomialDistribution</StandardLibrary>
     </RandomDistribution>
   </ComponentClass>
 </NineML>
