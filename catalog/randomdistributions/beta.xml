@@ -4,7 +4,7 @@
     <Parameter name="alpha"/>
     <Parameter name="beta"/>
     <RandomDistribution>
-      <StandardLibrary reference="http://www.uncertml.org/distributions/beta.xml">BetaDistribution</StandardLibrary>
+      <StandardLibrary webpage="http://www.uncertml.org/distributions/beta.xml">BetaDistribution</StandardLibrary>
     </RandomDistribution>
   </ComponentClass>
 </NineML>

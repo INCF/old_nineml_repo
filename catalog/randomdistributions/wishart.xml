@@ -4,7 +4,7 @@
     <Parameter name="degreesOfFreedom"/>
     <Parameter name="scaleMatrix"/>
     <RandomDistribution>
-      <StandardLibrary reference="http://www.uncertml.org/distributions/wishart.xml">WishartDistribution</StandardLibrary>
+      <StandardLibrary webpage="http://www.uncertml.org/distributions/wishart.xml">WishartDistribution</StandardLibrary>
     </RandomDistribution>
   </ComponentClass>
 </NineML>
