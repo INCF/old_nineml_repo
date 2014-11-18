@@ -3,7 +3,7 @@
   <ComponentClass name="GeometricDistribution">
     <Parameter name="probability"/>
     <RandomDistribution>
-      <StandardLibrary webpage="http://www.uncertml.org/distributions/geometric.xml">GeometricDistribution</StandardLibrary>
+      <StandardLibrary url="http://www.uncertml.org/distributions/geometric.xml">GeometricDistribution</StandardLibrary>
     </RandomDistribution>
   </ComponentClass>
 </NineML>

@@ -4,7 +4,7 @@
     <Parameter name="location"/>
     <Parameter name="scale"/>
     <RandomDistribution>
-      <StandardLibrary webpage="http://www.uncertml.org/distributions/cauchy.xml">CauchyDistribution</StandardLibrary>
+      <StandardLibrary url="http://www.uncertml.org/distributions/cauchy.xml">CauchyDistribution</StandardLibrary>
     </RandomDistribution>
   </ComponentClass>
 </NineML>

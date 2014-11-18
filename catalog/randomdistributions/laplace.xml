@@ -4,7 +4,7 @@
     <Parameter name="location"/>
     <Parameter name="scale"/>
     <RandomDistribution>
-      <StandardLibrary webpage="http://www.uncertml.org/distributions/laplace.xml">LaplaceDistribution</StandardLibrary>
+      <StandardLibrary url="http://www.uncertml.org/distributions/laplace.xml">LaplaceDistribution</StandardLibrary>
     </RandomDistribution>
   </ComponentClass>
 </NineML>

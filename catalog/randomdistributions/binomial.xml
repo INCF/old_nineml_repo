@@ -4,7 +4,7 @@
     <Parameter name="numberOfTrials"/>
     <Parameter name="probabilityOfSuccess"/>
     <RandomDistribution>
-      <StandardLibrary webpage="http://www.uncertml.org/distributions/binomial.xml">BinomialDistribution</StandardLibrary>
+      <StandardLibrary url="http://www.uncertml.org/distributions/binomial.xml">BinomialDistribution</StandardLibrary>
     </RandomDistribution>
   </ComponentClass>
 </NineML>

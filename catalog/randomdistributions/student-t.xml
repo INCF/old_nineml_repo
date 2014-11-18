@@ -5,7 +5,7 @@
     <Parameter name="scale"/>
     <Parameter name="degreesOfFreedom"/>
     <RandomDistribution>
-      <StandardLibrary webpage="http://www.uncertml.org/distributions/student-t.xml">StudentTDistribution</StandardLibrary>
+      <StandardLibrary url="http://www.uncertml.org/distributions/student-t.xml">StudentTDistribution</StandardLibrary>
     </RandomDistribution>
   </ComponentClass>
 </NineML>

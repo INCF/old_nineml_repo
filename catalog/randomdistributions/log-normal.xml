@@ -4,7 +4,7 @@
     <Parameter name="logScale"/>
     <Parameter name="shape"/>
     <RandomDistribution>
-      <StandardLibrary webpage="http://www.uncertml.org/distributions/log-normal.xml">LogNormalDistribution</StandardLibrary>
+      <StandardLibrary url="http://www.uncertml.org/distributions/log-normal.xml">LogNormalDistribution</StandardLibrary>
     </RandomDistribution>
   </ComponentClass>
 </NineML>

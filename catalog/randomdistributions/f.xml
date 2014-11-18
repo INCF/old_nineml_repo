@@ -4,7 +4,7 @@
     <Parameter name="denominator"/>
     <Parameter name="numerator"/>
      <RandomDistribution>
-       <StandardLibrary webpage="http://www.uncertml.org/distributions/f.xml">FDistribution</StandardLibrary>
+       <StandardLibrary url="http://www.uncertml.org/distributions/f.xml">FDistribution</StandardLibrary>
      </RandomDistribution>
   </ComponentClass>
 </NineML>

@@ -4,7 +4,7 @@
     <Parameter name="mean"/>
     <Parameter name="variance"/>
     <RandomDistribution>
-      <StandardLibrary webpage="http://www.uncertml.org/distributions/normal.xml">NormalDistribution</StandardLibrary>
+      <StandardLibrary url="http://www.uncertml.org/distributions/normal.xml">NormalDistribution</StandardLibrary>
     </RandomDistribution>
   </ComponentClass>
 </NineML>

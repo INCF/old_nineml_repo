@@ -3,7 +3,7 @@
   <ComponentClass name="ChiSquareDistribution">
     <Parameter name="degreesOfFreedom"/>
     <RandomDistribution>
-      <StandardLibrary webpage="http://www.uncertml.org/distributions/chi-square.xml">ChiSquareDistribution</StandardLibrary>
+      <StandardLibrary url="http://www.uncertml.org/distributions/chi-square.xml">ChiSquareDistribution</StandardLibrary>
     </RandomDistribution>
   </ComponentClass>
 </NineML>

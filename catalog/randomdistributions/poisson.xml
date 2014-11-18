@@ -3,7 +3,7 @@
   <ComponentClass name="PoissonDistribution">
     <Parameter name="rate"/>
     <RandomDistribution>
-      <StandardLibrary webpage="http://www.uncertml.org/distributions/poisson.xml">PoissonDistribution</StandardLibrary>
+      <StandardLibrary url="http://www.uncertml.org/distributions/poisson.xml">PoissonDistribution</StandardLibrary>
     </RandomDistribution>
   </ComponentClass>
 </NineML>

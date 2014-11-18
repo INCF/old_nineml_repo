@@ -3,7 +3,7 @@
   <ComponentClass name="ExponentialDistribution">
     <Parameter name="rate"/>
     <RandomDistribution>
-      <StandardLibrary webpage="http://www.uncertml.org/distributions/exponential.xml">ExponentialDistribution</StandardLibrary>
+      <StandardLibrary url="http://www.uncertml.org/distributions/exponential.xml">ExponentialDistribution</StandardLibrary>
     </RandomDistribution>
   </ComponentClass>
 </NineML>
