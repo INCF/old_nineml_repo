@@ -67,6 +67,7 @@ class UniformTimeCourseSimulation(sedmlBase):
         xml_algorithm.set('kisaoID', str(self.algorithm))
         
     @classmethod
+    @read_annotations
     def from_xml(self, root, **kwargs):
         id              = root.get('id')
         name            = root.get('name')
@@ -119,6 +120,7 @@ class Model(sedmlBase):
         root.set('source',   str(self.source))
                 
     @classmethod
+    @read_annotations
     def from_xml(self, root, **kwargs):
         id       = root.get('id')
         name     = root.get('name')
@@ -147,6 +149,7 @@ class Task(sedmlBase):
         root.set('simulationReference', self.simulation.id)
         
     @classmethod
+    @read_annotations
     def from_xml(self, root, **kwargs):
         id                  = root.get('id')
         name                = root.get('name')
@@ -204,6 +207,7 @@ class DataGenerator(sedmlBase):
         xml_ci.text = str(self.name)
         
     @classmethod
+    @read_annotations
     def from_xml(self, root, **kwargs):
         id    = root.get('id')
         name  = root.get('name')
@@ -253,6 +257,7 @@ class Variable(sedmlBase):
             root.set('target', self.target)
         
     @classmethod
+    @read_annotations
     def from_xml(self, root, **kwargs):
         id            = root.get('id')
         name          = root.get('name')
@@ -292,6 +297,7 @@ class Plot2D(sedmlBase):
             curve.to_xml(xml_curve)
         
     @classmethod
+    @read_annotations
     def from_xml(self, root, **kwargs):
         id   = root.get('id')
         name = root.get('name')
@@ -338,6 +344,7 @@ class Curve(sedmlBase):
         root.set('yDataReference', str(self.yDataReference.id))
         
     @classmethod
+    @read_annotations
     def from_xml(self, root, **kwargs):
         id             = root.get('id')
         name           = root.get('name')
@@ -433,6 +440,7 @@ class Experiment:
         etree.ElementTree(sedML).write(filename, encoding="utf-8", pretty_print=True, xml_declaration=True)
         
     @classmethod
+    @read_annotations
     def from_xml(cls, filename):
         root = etree.parse(filename).getroot()
         
