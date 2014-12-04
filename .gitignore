@@ -1,0 +1,6 @@
+.DS_store
+.pydevproject
+.project
+*.lock
+/spec
+_site
