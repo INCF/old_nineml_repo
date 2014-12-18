@@ -22,3 +22,5 @@ nineml_mechanisms
 *.settings
 *.pdf
 *.synctex.gz
+.9build
+/Gemfile.lock
