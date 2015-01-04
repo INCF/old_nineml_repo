@@ -27,8 +27,8 @@
 \newcommand{\Function}{\defRef{\textbf{\class{Function}}\xspace}{sec:Function}}
 \newcommand{\BuiltInDistribution}{\defRef{\textbf{\class{BuiltInDistribution}}\xspace}{sec:BuiltInDistribution}}
 \newcommand{\ConnectionRule}{\defRef{\textbf{\class{ConnectionRule}}\xspace}{sec:ConnectionRule}}
-\newcommand{\ConnectIf}{\defRef{\textbf{\class{ConnectIf}}\xspace}{sec:ConnectIf}}
-\newcommand{\Prune}{\defRef{\textbf{\class{Prune}}\xspace}{sec:Prune}}
+\newcommand{\ConnectCondition}{\defRef{\textbf{\class{ConnectCondition}}\xspace}{sec:ConnectCondition}}
+\newcommand{\PruneToTarget}{\defRef{\textbf{\class{PruneToTarget}}\xspace}{sec:PruneToTarget}}
 \newcommand{\TargetNumber}{\defRef{\textbf{\class{TargetNumber}}\xspace}{sec:TargetNumber}}
 \newcommand{\OrderOfPreference}{\defRef{\textbf{\class{OrderOfPreference}}\xspace}{sec:OrderOfPreference}}
 \newcommand{\MathInline}{\defRef{\textbf{\class{MathInline}}\xspace}{sec:MathInline}}
@@ -61,19 +61,13 @@
 \newcommand{\ValueReceivePort}{\defRef{\textbf{\class{ValueReceivePort}}\xspace}{sec:ValueReceivePort}}
 \newcommand{\Annotations}{\defRef{\textbf{\class{Annotations}}\xspace}{sec:Annotations}}
 
-% Define User Layer element references
+% Define Composition Layer element references
 
 \newcommand{\Component}{\defRef{\textbf{\class{Component}}\xspace}{sec:Component}}
-\newcommand{\Property}{\defRef{\textbf{\class{Property}}\xspace}{sec:Property}}
-\newcommand{\Quantity}{\defRef{\textbf{\class{Quantity}}\xspace}{sec:Quantity}}
-\newcommand{\SingleValue}{\defRef{\textbf{\class{SingleValue}}\xspace}{sec:SingleValue}}
-\newcommand{\ExternalArrayValue}{\defRef{\textbf{\class{ExternalArrayValue}}\xspace}{sec:ExternalArrayValue}}
-\newcommand{\ComponentValue}{\defRef{\textbf{\class{ComponentValue}}\xspace}{sec:ComponentValue}}
-\newcommand{\ArrayValue}{\defRef{\textbf{\class{ArrayValue}}\xspace}{sec:ArrayValue}}
-\newcommand{\ArrayValueRow}{\defRef{\textbf{\class{ArrayValueRow}}\xspace}{sec:ArrayValueRow}}
-\newcommand{\ListColumn}{\defRef{\textbf{\class{ListColumn}}\xspace}{sec:ListColumn}}
+\newcommand{\MetaParameter}{\defRef{\textbf{\class{MetaParameter}}\xspace}{sec:MetaParameter}}
+\newcommand{\DerivedParameter}{\defRef{\textbf{\class{DerivedParameter}}\xspace}{sec:DerivedParameter}}
+\newcommand{\FromComponent}{\defRef{\textbf{\class{FromComponent}}\xspace}{sec:FromComponent}}
 \newcommand{\Definition}{\defRef{\textbf{\class{Definition}}\xspace}{sec:Definition}}
-\newcommand{\Prototype}{\defRef{\textbf{\class{Prototype}}\xspace}{sec:Prototype}}
 \newcommand{\Reference}{\defRef{\textbf{\class{Reference}}\xspace}{sec:Reference}}
 \newcommand{\Population}{\defRef{\textbf{\class{Population}}\xspace}{sec:Population}}
 \newcommand{\Cell}{\defRef{\textbf{\class{Cell}}\xspace}{sec:Cell}}
@@ -94,16 +88,26 @@
 \newcommand{\Concatenate}{\defRef{\textbf{\class{Concatenate}}\xspace}{sec:Concatenate}}
 \newcommand{\Item}{\defRef{\textbf{\class{Item}}\xspace}{sec:Item}}
 
+% Define Parameterization Layer element references
+
+\newcommand{\ComponentProperties}{\defRef{\textbf{\class{ComponentProperties}}\xspace}{sec:ComponentProperties}}
+\newcommand{\Property}{\defRef{\textbf{\class{Property}}\xspace}{sec:Property}}
+\newcommand{\Prototype}{\defRef{\textbf{\class{Prototype}}\xspace}{sec:Prototype}}
+\newcommand{\SingleValue}{\defRef{\textbf{\class{SingleValue}}\xspace}{sec:SingleValue}}
+\newcommand{\ExternalArrayValue}{\defRef{\textbf{\class{ExternalArrayValue}}\xspace}{sec:ExternalArrayValue}}
+\newcommand{\ArrayValue}{\defRef{\textbf{\class{ArrayValue}}\xspace}{sec:ArrayValue}}
+\newcommand{\ArrayValueRow}{\defRef{\textbf{\class{ArrayValueRow}}\xspace}{sec:ArrayValueRow}}
+\newcommand{\NetworkProperties}{\defRef{\textbf{\class{NetworkProperties}}\xspace}{sec:NetworkProperties}}
+\newcommand{\PopulationProperties}{\defRef{\textbf{\class{PopulationProperties}}\xspace}{sec:PopulationProperties}}
+\newcommand{\ProjectionProperties}{\defRef{\textbf{\class{ProjectionProperties}}\xspace}{sec:ProjectionProperties}}
+
 % Multi-component element references
-\newcommand{\MultiComponentClass}{\defRef{\textbf{\class{MultiComponentClass}}\xspace}{sec:MultiComponentClass}}
 \newcommand{\SubComponent}{\defRef{\textbf{\class{SubComponent}}\xspace}{sec:SubComponent}}
 \newcommand{\PortExposure}{\defRef{\textbf{\class{PortExposure}}\xspace}{sec:PortExposure}}
-\newcommand{\MetaParameter}{\defRef{\textbf{\class{MetaParameter}}\xspace}{sec:MetaParameter}}
-\newcommand{\MetaProperty}{\defRef{\textbf{\class{MetaProperty}}\xspace}{sec:MetaProperty}}
-\newcommand{\DerivedProperty}{\defRef{\textbf{\class{DerivedProperty}}\xspace}{sec:DerivedProperty}}
 \newcommand{\ReceiveConnection}{\defRef{\textbf{\class{ReceiveConnection}}\xspace}{sec:ReceiveConnection}}
 \newcommand{\FromSister}{\defRef{\textbf{\class{FromSister}}\xspace}{sec:FromSister}}
 \newcommand{\MultiComponent}{\defRef{\textbf{\class{MultiComponent}}\xspace}{sec:MultiComponent}}
+\newcommand{\MultiComponentProperties}{\defRef{\textbf{\class{MultiComponentProperties}}\xspace}{sec:MultiComponentProperties}}
 
 % Multi-compartment element references
 
@@ -115,8 +119,10 @@
 \newcommand{\Domain}{\defRef{\textbf{\class{Domain}}\xspace}{sec:Domain}}
 \newcommand{\FromProximal}{\defRef{\textbf{\class{FromProximal}}\xspace}{sec:FromProximal}}
 \newcommand{\FromDistal}{\defRef{\textbf{\class{FromDistal}}\xspace}{sec:FromDistal}}
-\newcommand{\MultiCompartmentComponent}{\defRef{\textbf{\class{MultiCompartmentComponent}}\xspace}{sec:MultiCompartmentComponent}}
-\newcommand{\MultiCompartmentProjection}{\defRef{\textbf{\class{MultiCompartmentProjection}}\xspace}{sec:MultiCompartmentProjection}}
+\newcommand{\MultiCompartmental}{\defRef{\textbf{\class{MultiCompartmental}}\xspace}{sec:MultiCompartmental}}
+\newcommand{\MultiCompartmentalProperties}{\defRef{\textbf{\class{MultiCompartmentalProperties}}\xspace}{sec:MultiCompartmentalProperties}}
+\newcommand{\MultiCompartmentalProjection}{\defRef{\textbf{\class{MultiCompartmentalProjection}}\xspace}{sec:MultiCompartmentalProjection}}
+\newcommand{\MultiCompartmentalProjectionProperties}{\defRef{\textbf{\class{MultiCompartmentalProjectionProperties}}\xspace}{sec:MultiCompartmentalProjectionProperties}}
 \newcommand{\CompartmentConnectivity}{\defRef{\textbf{\class{CompartmentConnectivity}}\xspace}{sec:CompartmentConnectivity}}
 
 % Macros just for this document:
@@ -1357,7 +1363,7 @@ Each \EventOut requires a \textit{port} attribute. This should refer to the name
 
 \section{Network Connectivity}
 
-Network connectivity is defined via extensible components to promote reuse of connection logic. Connections are provisionally connected if the \ConnectIf evaluates to true for a given connection, and then can be pruned to a fixed number (which can be derived from a random value) if a \Prune element is provided.
+Network connectivity is defined via extensible components to promote reuse of connection logic. Connections are provisionally connected if the \ConnectCondition evaluates to true for a given connection, and then can be PruneToTargetd to a fixed number (which can be derived from a random value) if a \PruneToTarget element is provided.
 
 \subsection{ConnectionRule}
 \label{sec:ConnectionRule}
@@ -1369,8 +1375,8 @@ Network connectivity is defined via extensible components to promote reuse of co
     \toprule
     \em{Element type} & \em{Multiplicity} & \em{Required} \\
     \midrule
-    \ConnectIf & singleton & no\\
-    \Prune & singleton & no\\
+    \ConnectCondition & singleton & no\\
+    \PruneToTarget & singleton & no\\
     \Alias & set & no\\
     \Constant & set & no\\
     \RandomVariable & set & no\\
@@ -1380,13 +1386,13 @@ Network connectivity is defined via extensible components to promote reuse of co
 
 \ConnectionRule elements are the top-level container for \ComponentClass elements that define network connectivity. Typically, values are read from \ExtraProperty elements within the source and destination population via \ValueReceivePort{}s .
 
-\subsection{ConnectIf}
-\label{sec:ConnectIf}
+\subsection{ConnectCondition}
+\label{sec:ConnectCondition}
 
 \begin{table}[H]
   \begin{edtable}{tabular}{llr}
     \toprule
-    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{ConnectIf Structure}}}\\
+    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{ConnectCondition Structure}}}\\
     \toprule
     \em{Element type} & \em{Multiplicity} & \em{Required} \\
     \midrule
@@ -1395,15 +1401,15 @@ Network connectivity is defined via extensible components to promote reuse of co
   \end{edtable}
 \end{table}
 
-\ConnectIf elements specify the conditions under which 
+\ConnectCondition elements specify the conditions under which 
 
-\subsection{Prune}
-\label{sec:Prune}
+\subsection{PruneToTarget}
+\label{sec:PruneToTarget}
 
 \begin{table}[H]
   \begin{edtable}{tabular}{llr}
     \toprule
-    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{Prune Structure}}}\\
+    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{PruneToTarget Structure}}}\\
     \toprule
     \em{Element type} & \em{Multiplicity} & \em{Required} \\
     \midrule
@@ -1470,8 +1476,8 @@ Functions are used to define relationships between parameters over members of a 
 
 
 \clearpage
-\part{User Layer}
-\section{Components and Properties}
+\part{Composition Layer}
+\section{Components}
 
 \subsection{Component}
 \label{sec:Component}
@@ -1487,8 +1493,8 @@ Functions are used to define relationships between parameters over members of a 
     \midrule
     \em{Element type} & \em{Multiplicity} & \em{Required} \\
     \midrule
-    \Definition | \Prototype & singleton & yes \\ 
-    \Property & set & no\\
+    \Definition & singleton & yes \\ 
+    \DerivedParameter & set & no\\
     \bottomrule
   \end{edtable}
 \end{table}
@@ -1530,64 +1536,49 @@ If the \ComponentClass referenced by the definition element is defined outside t
 \subsubsection{Text format}
 The name of the \ComponentClass to be referenced \ComponentClass needs to be provided in the text of \Definition element.
 
-\subsection{Prototype}
-\label{sec:Prototype}
+\subsection{DerivedParameter}
+\label{sec:DerivedParameter}
 
 \begin{table}[H]
   \begin{edtable}{tabular}{llr}
     \toprule
-    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{Prototype Structure}}}\\
+    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{DerivedParameter Structure}}}\\
     \toprule
     \em{Attribute name} & \em{Type/Format} & \em{Required} \\
     \midrule
-    url & \href{http://en.wikipedia.org/wiki/Uniform_resource_locator}{URL} & no\\
-    \midrule
-    \em{Text format} & \; & \em{Required} \\
-    \midrule
-    \Component{}@name & \; & yes \\ 
-    \bottomrule
-  \end{edtable}
-\end{table}
-
-The \Prototype element establishes a link to an existing User Layer \Component, which defines the \ComponentClass and default properties of the \Component.  The reference \Component can be located either in the current
-document or in another file if a \textit{url} attribute is provided.
-
-\subsubsection{Url attribute}
-If the prototype \Component is defined outside the current file, the \textit{URL} attribute specifies a \URL for the file which contains the prototype \Component.
-
-\subsubsection{Text format}
-The name of the \Component to be referenced \Component needs to be provided in the text of \Prototype element.
-
-\draftnote{I have removed the \Quantity{s} in favour of adding units to the \Property elements as it seemed superfluous and incongruous with the AL (i.e. \Parameter s define the dimension). I will create a GitHub issue about this where we can discuss this and potentially decide to change it back if you like}
-
-\subsection{Property}
-\label{sec:Property}
-
-\begin{table}[H]
-  \begin{edtable}{tabular}{llr}
-    \toprule
-    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{Property Structure}}}\\
-    \toprule
-    \em{Attribute name} & \em{Type/Format} & \em{Required} \\
-    \midrule
-    name & \Parameter{}@name & yes\\
-    units & \Unit{}@symbol & yes\\
+    name & \identifier & yes\\
     \midrule
     \em{Element type} & \em{Multiplicity} & \em{Required} \\
     \midrule
-    \SingleValue | \ArrayValue | \ExternalArrayValue | \ComponentValue & singleton & yes \\ 
+    \MathInline | \FromComponent & singleton & yes \\
     \bottomrule
   \end{edtable}
 \end{table}
 
-\Property elements provide values for the parameters defined in the \ComponentClass
-of the \Component. Their \textit{name} attribute should match the name of the corresponding \Parameter element in the \ComponentClass. The \Property should be provided units that match the dimensionality of the corresponding \Parameter definition.
+\subsection{FromComponent}
+\label{sec:FromComponent}
 
-\subsubsection{Name attribute}
-Each \Property requires a \textit{name} attribute. This should refer to the name of a \Parameter in the corresponding \ComponentClass of the \Component.
+\begin{table}[H]
+  \begin{edtable}{tabular}{llr}
+    \toprule
+    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{FromComponent Structure}}}\\
+    \toprule
+    \em{Attribute name} & \em{Type/Format} & \em{Required} \\
+    \midrule
+    port & {\AnalogSendPort}@name & yes\\
+    \midrule    
+    \em{Element type} & \em{Multiplicity} & \em{Required} \\
+    \midrule
+    \Component | \Reference{}\pointto\Component & singleton & yes \\
+    \bottomrule
+  \end{edtable}
+\end{table}
 
-\subsubsection{Units attribute}
-Each \Property element requires a \emph{units} attribute. The \textit{units} attribute specifies the units of the quantity and should refer to the name of a \Unit element in the global scope. For a dimensionless units a \Unit\withelem\Dimension with no SI dimensions can be used. The SI dimensions of the \Unit\withelem\Dimension should match the SI dimensions of the corresponding \Parameter\withelem\Dimension.
+The array of values represented by a \FromComponent element is populated from the output port of a component. As of version 1.0, only components are supported within \FromComponent but function and generator components are planned for later versions. The size of the generated array is determined by the size of the container (i.e. \Population or \Projection) the \FromComponent is nested within.
+
+\subsubsection{Port attribute}
+Each \FromComponent requires a \textit{port} attribute, which selects which port of the \Component to read.
+
 
 \subsection{Reference}
 \label{sec:Reference}
@@ -1615,143 +1606,6 @@ The \textit{url} attribute specifies a \URL for the file which contains the User
 
 \subsubsection{Text format}
 The name of the User Layer element to be referenced should be included in the text of the \Reference element.
-
-\section{Values}
-\label{sec:Values}
-
-In NineML, ``values'' are arrays that implicitly grow to fill the size of the container (i.e. \Population or \Projection) they are located within. Values can be one of four types
-\begin{itemize}
-\item \SingleValue, a consistent value across the container
-\item \ArrayValue, an explicit array defined in NineML
-\item \ExternalArrayValue, an explicit array defined in text (space delimited) or HDF5 format.
-\end{itemize}
-
-\subsection{SingleValue}
-\label{sec:SingleValue}
-
-\begin{table}[H]
-  \begin{edtable}{tabular}{llr}
-    \toprule
-    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{SingleValue Structure}}}\\
-    \toprule
-    \em{Text format} & \; & \em{Required} \\
-    \midrule
-    \primtype{real number} & \; & yes \\ 
-    \bottomrule
-  \end{edtable}
-\end{table}
-
-A \SingleValue element represents an array filled with a single value.
-
-\subsubsection{Text format}
-Any valid numeric value in \href{http://en.wikipedia.org/wiki/ANSI_C}{ANSI C89}, including shorthand scientific notation  e.g. 1e-5 ($1\times10^{-5}$).
-
-\subsection{ArrayValue}
-\label{sec:ArrayValue}
-
-\begin{table}[H]
-  \begin{edtable}{tabular}{llr}
-    \toprule
-    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{ArrayValue Structure}}}\\
-    \toprule
-    \em{Element type} & \em{Multiplicity} & \em{Required} \\
-    \midrule
-    \ArrayValueRow & set & no \\
-    \bottomrule
-  \end{edtable}
-\end{table}
-
-\ArrayValue elements are used to represent an explicit array of values in XML. \ArrayValue elements contain a set of \ArrayValueRow elements (i.e. unordered, since they are explicitly ordered by their \textit{index} attribute). Since XML is significantly slower to parse than plain text and binary formats it is not recommended to use \ArrayValue for large arrays, preferring \ExternalArrayValue instead. 
-
-\subsection{ArrayValueRow}
-\label{sec:ArrayValueRow}
-
-\begin{table}[H]
-  \begin{edtable}{tabular}{llr}
-    \toprule
-    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{ArrayValueRow Structure}}}\\
-    \toprule
-    \em{Attribute name} & \em{Type/Format} & \em{Required} \\
-    \midrule
-    index & integer & yes \\
-    \midrule
-    \em{Text format} & \; & \em{Required} \\
-    \midrule
-    \primtype{real number} & \; & yes\\
-    \bottomrule
-  \end{edtable}
-\end{table}
-
-\ArrayValueRow elements represent the numerical values of the explicit \ArrayValue element.
-\subsubsection{Index attribute}
-The \textit{index} attribute specifies the index of the \ArrayValueRow in the \ArrayValue. It must be non-negative, unique amongst the set of \ArrayValueRow{}@index in the list, and the set of indices must be contiguous for a single \ArrayValue.
-
-\note{The order of {\ArrayValueRow} elements within an \ArrayValue element does not effect the interpreted order of the values in the array in keeping with the order non-specific design philosophy of NineML (see \ref{sec:design_considerations}).}
-
-\subsubsection{Text format}
-Any valid numeric value in \href{http://en.wikipedia.org/wiki/ANSI_C}{ANSI C89}, including shorthand scientific notation  e.g. 1e-5 ($1\times10^{-5}$).
-
-\subsection{ExternalArrayValue}
-\label{sec:ExternalArrayValue}
-
-\begin{table}[H]
-  \begin{edtable}{tabular}{llr}
-    \toprule
-    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{ExternalArrayValue Structure}}}\\
-    \toprule
-    \em{Attribute name} & \em{Type/Format} & \em{Required} \\
-    \midrule
-    url & \href{http://en.wikipedia.org/wiki/Uniform_resource_locator}{URL} & yes\\
-    mimeType & \href{http://en.wikipedia.org/wiki/Internet_media_type}{MIME type}  & yes\\
-    columnName & Data column name in external file & yes\\    
-    \bottomrule
-  \end{edtable}
-\end{table}
-
-\ExternalArrayValue elements are used to explicitly define large arrays of values. The array data are not stored in XML (which is slow to parse) but more efficient text or binary \href{http://www.hdfgroup.org/HDF5/}{HDF5 (http://www.hdfgroup.org/HDF5/)} formats. As of version 1.0, the data in the external files are stored as dense \primtype{float} or \primtype{integer} arrays. However, sparse-array formats are planned for future versions.
-
-The \textit{columnName} attribute of the \ExternalArrayValue elements allows multiple arrays of equal length (and therefore typically relating to the same container) to be stored in the same external file. 
-
-\subsubsection{Url attribute}
-The \textit{url} attribute specifies the \URL of the external data file.
-
-\subsubsection{MimeType attribute}
-The \textit{mimetype} attribute specifies the data format for the external value list in the \href{http://en.wikipedia.org/wiki/Internet_media_type}{MIME type} syntax. Currently, only two formats are supported \lstinline|application/vnd.nineml.valuelist.text| and \lstinline|application/vnd.nineml.valuelist.hdf5|. 
-
-\begin{itemize}
-\item \lstinline|application/vnd.nineml.externalvaluearray.text| - an ASCII text file with a single row of white-space separated column names, followed by arbitrarily many white-space separated data rows of numeric values. Each numeric value is associated with the column name corresponding to the same index the along the row. Therefore, the number of items in each row must be the same.
-\item \lstinline|application/vnd.nineml.externalvaluearray.hdf5| - a \href{http://www.hdfgroup.org/HDF5/}{HDF5} data file containing a single level of named members of \primtype{array->float} or \primtype{array->int} type.
-\end{itemize}
-
-\subsubsection{ColumnName attribute}
-
-Each \ExternalArrayValue must have a \textit{columnName} attribute, which refers to a column header in the external data file. 
-
-%\draftnote{What do you think of this? This allows a single component to return two (related) values at different places at the model (e.g. weight and delay in distance dependent rules). It also seemed a bit neater}
-
-%%\subsection{ComponentValue}
-%%\label{sec:ComponentValue}
-%%
-%%\begin{table}[H]
-%%  \begin{edtable}{tabular}{llr}
-%%    \toprule
-%%    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{ExternalArrayValue Structure}}}\\
-%%    \toprule
-%%    \em{Attribute name} & \em{Type/Format} & \em{Required} \\
-%%    \midrule
-%%    port & {\AnalogSendPort}@name & yes\\
-%%    \midrule    
-%%    \em{Element type} & \em{Multiplicity} & \em{Required} \\
-%%    \midrule
-%%    \Component{}\withelem\RandomDistribution | \Reference{}\pointto\Component{}\withelem\RandomDistribution & singleton & yes \\
-%%    \bottomrule
-%%  \end{edtable}
-%%\end{table}
-%%
-%%The array of values represented by a \ComponentValue element is populated from the output port of a component. As of version 1.0, only \RandomDistribution components are supported within \ComponentValue but function and generator components are planned for later versions. The size of the generated array is determined by the size of the container (i.e. \Population or \Projection) the \ComponentValue is nested within.
-%%
-%%\subsubsection{Port attribute}
-%%Each \ComponentValue requires a \textit{port} attribute, which selects which port of the \Component to read.
 
 \section{Populations}
 
@@ -1833,7 +1687,7 @@ The text of the \Number element contains an \primtype{integer} representing the 
     \midrule
     \em{Element type} & \em{Multiplicity} & \em{Required} \\
     \midrule
-    \SingleValue | \ArrayValue | \ExternalArrayValue | \ComponentValue & singleton & yes \\ 
+    \SingleValue | \ArrayValue | \ExternalArrayValue & singleton & yes \\ 
     \bottomrule
   \end{edtable}
 \end{table}
@@ -1850,7 +1704,7 @@ Each \ExtraProperty element requires a \emph{units} attribute. The \textit{units
 
 Projections define the synaptic connectivity between two populations, the post-synaptic response of the connections, the plasticity rules that modulate the post-synaptic response and the transmission delays. Synaptic and plasticity dynamic components are created and connected to and from explicitly defined ports of the cell components in the source and projection populations if the connection rule determines there is a connection between a particular source and destination cell pair. 
 
-\SingleValue and \ComponentValue elements used in properties of a projection (in the \Connectivity and \Synapse elements) take the size of the number of connections made. While \ArrayValue and \ExternalArrayValue elements can either be the size of the number of connections made or the number of possible unique connections (i.e. $N_{\mathrm{source}} * N_{\mathrm{dest}}$). In either case, the expected array data is ordered by the indices
+\SingleValue elements used in properties of a projection (in the \Connectivity and \Synapse elements) take the size of the number of connections made. While \ArrayValue and \ExternalArrayValue elements can either be the size of the number of connections made or the number of possible unique connections (i.e. $N_{\mathrm{source}} * N_{\mathrm{dest}}$). In either case, the expected array data is ordered by the indices
 \begin{equation}
 i_{\mathrm{value}} = i_{\mathrm{source}} * N_{\mathrm{dest}} + i_{\mathrm{dest}}
 \end{equation}
@@ -2068,7 +1922,7 @@ Each \FromSynapse element requires a \textit{port} attribute. This should refer 
     \midrule
     \em{Element type} & \em{Multiplicity} & \em{Required} \\
     \midrule
-    \SingleValue | \ArrayValue | \ExternalArrayValue | \ComponentValue & singleton & yes \\ 
+    \SingleValue | \ArrayValue | \ExternalArrayValue & singleton & yes \\ 
     \bottomrule
   \end{edtable}
 \end{table}
@@ -2161,6 +2015,266 @@ Each \Item element references as a \Population or \Selection element and specifi
 Each \Item requires a \textit{index} attribute. This attribute specifies the order in which the {\Population}s in the \Selection are concatenated and thereby the indices of the cells within the combined \Selection. 
 
 \note{This preserves the order non-specific nature of elements in NineML}
+
+\clearpage
+\part{Parameterization Layer}
+
+\section{Parameterization of Components}
+
+\subsection{ComponentProperties}
+\label{sec:ComponentProperties}
+
+\begin{table}[H]
+  \begin{edtable}{tabular}{llr}
+    \toprule
+    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{ComponentProperties Structure}}}\\
+    \toprule
+    \em{Attribute name} & \em{Type/Format} & \em{Required} \\
+    \midrule
+    name & \Component{}@name & yes\\
+    \midrule
+    \em{Element type} & \em{Multiplicity} & \em{Required} \\
+    \midrule
+    \Definition & singleton & yes \\ 
+    \Property & set & no\\
+    \bottomrule
+  \end{edtable}
+\end{table}
+
+\subsection{Prototype}
+\label{sec:Prototype}
+
+\begin{table}[H]
+  \begin{edtable}{tabular}{llr}
+    \toprule
+    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{Prototype Structure}}}\\
+    \toprule
+    \em{Attribute name} & \em{Type/Format} & \em{Required} \\
+    \midrule
+    url & \href{http://en.wikipedia.org/wiki/Uniform_resource_locator}{URL} & no\\
+    \midrule
+    \em{Text format} & \; & \em{Required} \\
+    \midrule
+    \Component{}@name & \; & yes \\ 
+    \bottomrule
+  \end{edtable}
+\end{table}
+
+The \Prototype element establishes a link to an existing User Layer \Component, which defines the \ComponentClass and default properties of the \Component.  The reference \Component can be located either in the current
+document or in another file if a \textit{url} attribute is provided.
+
+\subsubsection{Url attribute}
+If the prototype \Component is defined outside the current file, the \textit{URL} attribute specifies a \URL for the file which contains the prototype \Component.
+
+\subsubsection{Text format}
+The name of the \Component to be referenced \Component needs to be provided in the text of \Prototype element.
+
+\subsection{Property}
+\label{sec:Property}
+
+\begin{table}[H]
+  \begin{edtable}{tabular}{llr}
+    \toprule
+    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{Property Structure}}}\\
+    \toprule
+    \em{Attribute name} & \em{Type/Format} & \em{Required} \\
+    \midrule
+    name & \Parameter{}@name & yes\\
+    units & \Unit{}@symbol & yes\\
+    \midrule
+    \em{Element type} & \em{Multiplicity} & \em{Required} \\
+    \midrule
+    \SingleValue | \ArrayValue | \ExternalArrayValue & singleton & yes \\ 
+    \bottomrule
+  \end{edtable}
+\end{table}
+
+\Property elements provide values for the parameters defined in the \ComponentClass
+of the \Component. Their \textit{name} attribute should match the name of the corresponding \Parameter element in the \ComponentClass. The \Property should be provided units that match the dimensionality of the corresponding \Parameter definition.
+
+\subsubsection{Name attribute}
+Each \Property requires a \textit{name} attribute. This should refer to the name of a \Parameter in the corresponding \ComponentClass of the \Component.
+
+\subsubsection{Units attribute}
+Each \Property element requires a \emph{units} attribute. The \textit{units} attribute specifies the units of the quantity and should refer to the name of a \Unit element in the global scope. For a dimensionless units a \Unit\withelem\Dimension with no SI dimensions can be used. The SI dimensions of the \Unit\withelem\Dimension should match the SI dimensions of the corresponding \Parameter\withelem\Dimension.
+
+
+\section{Values}
+\label{sec:Values}
+
+In NineML, ``values'' are arrays that implicitly grow to fill the size of the container (i.e. \Population or \Projection) they are located within. Values can be one of four types
+\begin{itemize}
+\item \SingleValue, a consistent value across the container
+\item \ArrayValue, an explicit array defined in NineML
+\item \ExternalArrayValue, an explicit array defined in text (space delimited) or HDF5 format.
+\end{itemize}
+
+\subsection{SingleValue}
+\label{sec:SingleValue}
+
+\begin{table}[H]
+  \begin{edtable}{tabular}{llr}
+    \toprule
+    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{SingleValue Structure}}}\\
+    \toprule
+    \em{Text format} & \; & \em{Required} \\
+    \midrule
+    \primtype{real number} & \; & yes \\ 
+    \bottomrule
+  \end{edtable}
+\end{table}
+
+A \SingleValue element represents an array filled with a single value.
+
+\subsubsection{Text format}
+Any valid numeric value in \href{http://en.wikipedia.org/wiki/ANSI_C}{ANSI C89}, including shorthand scientific notation  e.g. 1e-5 ($1\times10^{-5}$).
+
+\subsection{ArrayValue}
+\label{sec:ArrayValue}
+
+\begin{table}[H]
+  \begin{edtable}{tabular}{llr}
+    \toprule
+    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{ArrayValue Structure}}}\\
+    \toprule
+    \em{Element type} & \em{Multiplicity} & \em{Required} \\
+    \midrule
+    \ArrayValueRow & set & no \\
+    \bottomrule
+  \end{edtable}
+\end{table}
+
+\ArrayValue elements are used to represent an explicit array of values in XML. \ArrayValue elements contain a set of \ArrayValueRow elements (i.e. unordered, since they are explicitly ordered by their \textit{index} attribute). Since XML is significantly slower to parse than plain text and binary formats it is not recommended to use \ArrayValue for large arrays, preferring \ExternalArrayValue instead. 
+
+\subsection{ArrayValueRow}
+\label{sec:ArrayValueRow}
+
+\begin{table}[H]
+  \begin{edtable}{tabular}{llr}
+    \toprule
+    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{ArrayValueRow Structure}}}\\
+    \toprule
+    \em{Attribute name} & \em{Type/Format} & \em{Required} \\
+    \midrule
+    index & integer & yes \\
+    \midrule
+    \em{Text format} & \; & \em{Required} \\
+    \midrule
+    \primtype{real number} & \; & yes\\
+    \bottomrule
+  \end{edtable}
+\end{table}
+
+\ArrayValueRow elements represent the numerical values of the explicit \ArrayValue element.
+\subsubsection{Index attribute}
+The \textit{index} attribute specifies the index of the \ArrayValueRow in the \ArrayValue. It must be non-negative, unique amongst the set of \ArrayValueRow{}@index in the list, and the set of indices must be contiguous for a single \ArrayValue.
+
+\note{The order of {\ArrayValueRow} elements within an \ArrayValue element does not effect the interpreted order of the values in the array in keeping with the order non-specific design philosophy of NineML (see \ref{sec:design_considerations}).}
+
+\subsubsection{Text format}
+Any valid numeric value in \href{http://en.wikipedia.org/wiki/ANSI_C}{ANSI C89}, including shorthand scientific notation  e.g. 1e-5 ($1\times10^{-5}$).
+
+\subsection{ExternalArrayValue}
+\label{sec:ExternalArrayValue}
+
+\begin{table}[H]
+  \begin{edtable}{tabular}{llr}
+    \toprule
+    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{ExternalArrayValue Structure}}}\\
+    \toprule
+    \em{Attribute name} & \em{Type/Format} & \em{Required} \\
+    \midrule
+    url & \href{http://en.wikipedia.org/wiki/Uniform_resource_locator}{URL} & yes\\
+    mimeType & \href{http://en.wikipedia.org/wiki/Internet_media_type}{MIME type}  & yes\\
+    columnName & Data column name in external file & yes\\    
+    \bottomrule
+  \end{edtable}
+\end{table}
+
+\ExternalArrayValue elements are used to explicitly define large arrays of values. The array data are not stored in XML (which is slow to parse) but more efficient text or binary \href{http://www.hdfgroup.org/HDF5/}{HDF5 (http://www.hdfgroup.org/HDF5/)} formats. As of version 1.0, the data in the external files are stored as dense \primtype{float} or \primtype{integer} arrays. However, sparse-array formats are planned for future versions.
+
+The \textit{columnName} attribute of the \ExternalArrayValue elements allows multiple arrays of equal length (and therefore typically relating to the same container) to be stored in the same external file. 
+
+\subsubsection{Url attribute}
+The \textit{url} attribute specifies the \URL of the external data file.
+
+\subsubsection{MimeType attribute}
+The \textit{mimetype} attribute specifies the data format for the external value list in the \href{http://en.wikipedia.org/wiki/Internet_media_type}{MIME type} syntax. Currently, only two formats are supported \lstinline|application/vnd.nineml.valuelist.text| and \lstinline|application/vnd.nineml.valuelist.hdf5|. 
+
+\begin{itemize}
+\item \lstinline|application/vnd.nineml.externalvaluearray.text| - an ASCII text file with a single row of white-space separated column names, followed by arbitrarily many white-space separated data rows of numeric values. Each numeric value is associated with the column name corresponding to the same index the along the row. Therefore, the number of items in each row must be the same.
+\item \lstinline|application/vnd.nineml.externalvaluearray.hdf5| - a \href{http://www.hdfgroup.org/HDF5/}{HDF5} data file containing a single level of named members of \primtype{array->float} or \primtype{array->int} type.
+\end{itemize}
+
+\subsubsection{ColumnName attribute}
+
+Each \ExternalArrayValue must have a \textit{columnName} attribute, which refers to a column header in the external data file. 
+
+\section{Parameterization of Containers}
+
+\subsection{NetworkProperties}
+\label{sec:NetworkProperties}
+
+\begin{table}[H]
+  \begin{edtable}{tabular}{llr}
+    \toprule
+    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{NetworkProperties Structure}}}\\
+    \toprule
+    \em{Attribute name} & \em{Type/Format} & \em{Required} \\
+    \midrule
+    name & \Network{}@name & yes\\
+    \midrule
+    \em{Element type} & \em{Multiplicity} & \em{Required} \\
+    \midrule
+    \Reference | \Prototype & singleton & yes \\ 
+    \Property & set & no\\
+    \PopulationProperties & set & yes \\
+    \ProjectionProperties & set & yes \\
+    \bottomrule
+  \end{edtable}
+\end{table}
+
+\subsection{PopulationProperties}
+\label{sec:PopulationProperties}
+
+\begin{table}[H]
+  \begin{edtable}{tabular}{llr}
+    \toprule
+    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{PopulationProperties Structure}}}\\
+    \toprule
+    \em{Attribute name} & \em{Type/Format} & \em{Required} \\
+    \midrule
+    name & \Population{}@name & yes\\
+    \midrule
+    \em{Element type} & \em{Multiplicity} & \em{Required} \\
+    \midrule
+    \Reference | \Prototype & singleton & yes \\ 
+    \Property & set & no\\
+     \ComponentProperties | \MultiComponentProperties | \MultiCompartmentalProperties & set & yes \\
+    \bottomrule
+  \end{edtable}
+\end{table}
+
+\subsection{ProjectionProperties}
+\label{sec:ProjectionProperties}
+
+\begin{table}[H]
+  \begin{edtable}{tabular}{llr}
+    \toprule
+    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{ProjectionProperties Structure}}}\\
+    \toprule
+    \em{Attribute name} & \em{Type/Format} & \em{Required} \\
+    \midrule
+    name & \Projection{}@name & yes\\
+    \midrule
+    \em{Element type} & \em{Multiplicity} & \em{Required} \\
+    \midrule
+    \Reference | \Prototype & singleton & yes \\ 
+    \Property & set & no\\
+    \ComponentProperties | \MultiComponentProperties & set & yes \\    
+    \bottomrule
+  \end{edtable}
+\end{table}
 
 \clearpage
 \part{Standard Extensions}
@@ -2271,6 +2385,28 @@ Each \PortExposure requires a \textit{component} attribute, which should refer t
 \subsubsection{Port attribute}
 Each \PortExposure requires a \textit{port} attribute, which should refer to the name of a port in the corresponding \SubComponent.
 
+\subsection{MultiComponentProperties}
+\label{sec:MultiComponentProperties}
+
+\begin{table}[H]
+  \begin{edtable}{tabular}{llr}
+    \toprule
+    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{MultiComponentProperties Structure}}}\\
+    \toprule
+    \em{Attribute name} & \em{Type/Format} & \em{Required} \\
+    \midrule
+    name & \MultiComponent{}@name & yes\\
+    \midrule
+    \em{Element type} & \em{Multiplicity} & \em{Required} \\
+    \midrule
+    \Reference | \Prototype & singleton & yes \\ 
+    \Property & set & no\\
+    \ComponentProperties | \MultiComponentProperties & set & yes \\    
+    \bottomrule
+  \end{edtable}
+\end{table}
+
+
 \section{Multi-compartmental models}
 
 Multi-compartmental models enable component classes with axonal and dendritic trees to be constructed by grouping compartments into different ``domains''. As with multi-component models, the multi-compartmental elements extend the User Layer.
@@ -2279,8 +2415,8 @@ The expected technique for flattening to multi-compartmental models to the core,
 
 \note{This format does not contain any positional information about the compartments only their connectivity to one another. However, 3D points could be optionally included as annotations to allow plotting and other analysis but would not effect the length parameter in the dynamics component or the interpretation of the dynamics in general.}
 
-\subsection{MultiCompartmentComponent}
-\label{sec:MultiCompartmentComponent}
+\subsection{MultiCompartmental}
+\label{sec:MultiCompartmental}
 
 \begin{table}[H]
   \begin{edtable}{tabular}{llr}
@@ -2301,7 +2437,7 @@ The expected technique for flattening to multi-compartmental models to the core,
   \end{edtable}
 \end{table}
 
-The \MultiCompartmentComponent is the top-level element for multi-compartmental models. It can be only used within \Population\withelem{}\Cell elements. The branching structure of the compartments (i.e. which compartments are connected to which) is specified by the \Branches element, while the dynamics of the compartments is specified in \Domain they are mapped to by the \Mapping element. 
+The \MultiCompartmental is the top-level element for multi-compartmental models. It can be only used within \Population\withelem{}\Cell elements. The branching structure of the compartments (i.e. which compartments are connected to which) is specified by the \Branches element, while the dynamics of the compartments is specified in \Domain they are mapped to by the \Mapping element. 
 
 \subsection{Branches}
 \label{sec:Branches}
@@ -2313,7 +2449,7 @@ The \MultiCompartmentComponent is the top-level element for multi-compartmental 
     \toprule
     \em{Element type} & Multiplicity & \em{Required} \\
     \midrule \relax
-    \SingleValue | \ArrayValue | \ExternalArrayValue | \ComponentValue & singleton & yes\\
+    \SingleValue | \ArrayValue | \ExternalArrayValue & singleton & yes\\
     \bottomrule
   \end{edtable}
 \end{table}
@@ -2330,7 +2466,7 @@ The Branches is an array containing the indices of the parent node of the segmen
     \toprule
     \em{Element type} & Multiplicity & \em{Required} \\
     \midrule \relax
-    \SingleValue | \ArrayValue | \ExternalArrayValue | \ComponentValue & singleton & yes\\
+    \SingleValue | \ArrayValue | \ExternalArrayValue & singleton & yes\\
     \bottomrule
   \end{edtable}
 \end{table}
@@ -2363,10 +2499,10 @@ Domain component classes would contain all the ion channels and concentration dy
 The parameters of the components can either be SingleValues, ArrayValues or Components. Like Projections, the length of the arrays could either be the same as the number of compartments in the model, in which case only the values that map to the domain would be used, or the same as the number of compartments in the domain.
 
 \subsubsection{Name attribute}
-Each \Domain requires a \textit{name} attribute, which should be a valid \identifier and uniquely identify the \Domain in the \MultiCompartmentComponent scope.
+Each \Domain requires a \textit{name} attribute, which should be a valid \identifier and uniquely identify the \Domain in the \MultiCompartmental scope.
 
 \subsubsection{MapID attribute}
-Each \Domain requires a \text{mapID} attribute, which should be a non-negative integer and unique amongst the \Domain element in the enclosing \MultiCompartmentComponent. The \textit{mapID} is used to map the compartments onto the domain.
+Each \Domain requires a \text{mapID} attribute, which should be a non-negative integer and unique amongst the \Domain element in the enclosing \MultiCompartmental. The \textit{mapID} is used to map the compartments onto the domain.
 
 \subsection{MultiPortExposure}
 \label{sec:MultiPortExposure}
@@ -2385,18 +2521,16 @@ Each \Domain requires a \text{mapID} attribute, which should be a non-negative i
   \end{edtable}
 \end{table}
 
-\MultiPortExposure elements expose ports within \Domain elements outside the \MultiCompartmentComponent. They are distinguished from \PortExposure elements because when the \MultiCompartmentComponent is flattened multiple ports are created, one for each compartment of the specified \Domain, or all compartments if no \Domain is specified.
+\MultiPortExposure elements expose ports within \Domain elements outside the \MultiCompartmental. They are distinguished from \PortExposure elements because when the \MultiCompartmental is flattened multiple ports are created, one for each compartment of the specified \Domain, or all compartments if no \Domain is specified.
 
 \subsubsection{Name attribute}
 Each \MultiPortExposure requires a \textit{name} attribute, which should be a valid \identifier and uniquely identify the \MultiPortExposure in the \MultiComponent scope.
 
 \subsubsection{Domain attribute}
-Each \MultiPortExposure requires a \textit{domain} attribute, which should refer to a \Domain within the \MultiCompartmentComponent scope.
+Each \MultiPortExposure requires a \textit{domain} attribute, which should refer to a \Domain within the \MultiCompartmental scope.
 
 \subsubsection{Port attribute}
 Each \PortExposure requires a \textit{port} attribute, which should refer to the name of a port in the corresponding \Domain.
-
-
 
 \subsection{FromProximal}
 \label{sec:FromProximal}
@@ -2417,7 +2551,7 @@ Each \PortExposure requires a \textit{port} attribute, which should refer to the
 \FromProximal elements without a component attribute accept ports from any compartments that are connected to it (assumes ports have the same name in different domains). With a name attribute they are only connected if the compartment is of the corresponding domain. 
 
 \subsubsection{Domain attribute}
-Each \FromProximal can define a \textit{domain} attribute. If present the \textit{domain} attribute should refer to a \Domain within the \MultiCompartmentComponent scope.
+Each \FromProximal can define a \textit{domain} attribute. If present the \textit{domain} attribute should refer to a \Domain within the \MultiCompartmental scope.
 
 \subsubsection{Port attribute}
 Each \FromProximal requires a \textit{port} attribute, which should refer to the name of a port in the corresponding \Domain element, or all \Domain elements if the \textit{domain} attribute is omitted.
@@ -2441,18 +2575,18 @@ Each \FromProximal requires a \textit{port} attribute, which should refer to the
 \FromDistal elements without a component attribute accept ports from any compartments that are connected to it (assumes ports have the same name in different domains). With a name attribute they are only connected if the compartment is of the corresponding domain. \ReceiveConnection elements with \FromDistal child elements must be able to handle multiple port connections, i.e. they must be either \EventReceivePort, \AnalogReducePort or \AnalogArrayPort elements.
 
 \subsubsection{Domain attribute}
-Each \FromProximal can define a \textit{domain} attribute. If present the \textit{domain} attribute should refer to a \Domain within the \MultiCompartmentComponent scope.
+Each \FromProximal can define a \textit{domain} attribute. If present the \textit{domain} attribute should refer to a \Domain within the \MultiCompartmental scope.
 
 \subsubsection{Port attribute}
 Each \FromProximal requires a \textit{port} attribute, which should refer to the name of a port in the corresponding \Domain element, or all \Domain elements if the \textit{domain} attribute is omitted.
 
-\subsection{MultiCompartmentProjection}
-\label{sec:MultiCompartmentProjection}
+\subsection{MultiCompartmentalProjection}
+\label{sec:MultiCompartmentalProjection}
 
 \begin{table}[H]
   \begin{edtable}{tabular}{llr}
     \toprule
-    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{MultiCompartmentProjection Structure}}}\\
+    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{MultiCompartmentalProjection Structure}}}\\
     \toprule
     \em{Attribute name} & \em{Type/Format} & \em{Required} \\
     \midrule
@@ -2469,12 +2603,12 @@ Each \FromProximal requires a \textit{port} attribute, which should refer to the
   \end{edtable}
 \end{table}
 
-An extension of the \Projection object model, \MultiCompartmentProjection, must be used if either the source or destination populations consist of multi-compartmental models. It receives a \CompartmentConnectivity element which determines which compartments projections are made. 
+An extension of the \Projection object model, \MultiCompartmentalProjection, must be used if either the source or destination populations consist of multi-compartmental models. It receives a \CompartmentConnectivity element which determines which compartments projections are made. 
 
-In flattening the \MultiCompartmentProjection elements to Core NineML, a single \MultiCompartmentProjection is split into a set of \Projection elements, one for each source/destination compartment pairing that has a non-empty set of connections.
+In flattening the \MultiCompartmentalProjection elements to Core NineML, a single \MultiCompartmentalProjection is split into a set of \Projection elements, one for each source/destination compartment pairing that has a non-empty set of connections.
 
 \subsubsection{Name attribute}
-Each \MultiCompartmentProjection requires a \textit{name} attribute, which should be a valid \identifier and uniquely identify the \MultiCompartmentProjection in the global scope.
+Each \MultiCompartmentalProjection requires a \textit{name} attribute, which should be a valid \identifier and uniquely identify the \MultiCompartmentalProjection in the global scope.
 
 \subsection{CompartmentConnectivity}
 \label{sec:CompartmentConnectivity}
@@ -2491,7 +2625,51 @@ Each \MultiCompartmentProjection requires a \textit{name} attribute, which shoul
   \end{edtable}
 \end{table}
 
-The \CompartmentConnectivity element specifies the connections between source and destination compartments if the \Connectivity element of the \MultiCompartmentProjection specifies a connection between the source and destination cell models. 
+The \CompartmentConnectivity element specifies the connections between source and destination compartments if the \Connectivity element of the \MultiCompartmentalProjection specifies a connection between the source and destination cell models. 
+
+\subsection{MultiCompartmentalProperties}
+\label{sec:MultiCompartmentalProperties}
+
+\begin{table}[H]
+  \begin{edtable}{tabular}{llr}
+    \toprule
+    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{MultiCompartmentalProperties Structure}}}\\
+    \toprule
+    \em{Attribute name} & \em{Type/Format} & \em{Required} \\
+    \midrule
+    name & \MultiCompartmental{}@name & yes\\
+    \midrule
+    \em{Element type} & \em{Multiplicity} & \em{Required} \\
+    \midrule
+    \Reference | \Prototype & singleton & yes \\ 
+    \Property & set & no\\
+    \ComponentProperties | \MultiComponentProperties & set & yes \\    
+    \bottomrule
+  \end{edtable}
+\end{table}
+
+
+\subsection{MultiCompartmentalProjectionProperties}
+\label{sec:MultiCompartmentalProjectionProperties}
+
+\begin{table}[H]
+  \begin{edtable}{tabular}{llr}
+    \toprule
+    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{MultiCompartmentalProjectionProperties Structure}}}\\
+    \toprule
+    \em{Attribute name} & \em{Type/Format} & \em{Required} \\
+    \midrule
+    name & \MultiCompartmentalProjection{}@name & yes\\
+    \midrule
+    \em{Element type} & \em{Multiplicity} & \em{Required} \\
+    \midrule
+    \Reference | \Prototype & singleton & yes \\ 
+    \Property & set & no\\
+    \ComponentProperties | \MultiComponentProperties & set & yes \\    
+    \bottomrule
+  \end{edtable}
+\end{table}
+
 
 \clearpage
 \part{Annotations}
@@ -2519,6 +2697,10 @@ In order to be compliant with the NineML specification any tool handling NineML 
 \end{table}
 
 The \Annotations element is the top-level of the annotations attached to a NineML element. They can be included within any NineML element (User Layer and Abstraction Layer) and any valid XML is allowed within them.
+
+\subsection{MultiCompartmentalProperties}
+
+\subsection{MultiCompartmentalProjectionProperties}
 
 \appendix
 \clearpage
@@ -2967,7 +3149,7 @@ in this simulation}
 \begin{lstlisting}
 <?xml version="1.0" encoding="UTF-8"?>
 <NineML xmlns="http://nineml.net/9ML/2.0">
-  <MultiCompartmentComponent name="ExampleMultiCompartmentModel">
+  <MultiCompartmental name="ExampleMultiCompartmentModel">
     <Definition>ExampleMultiCompartmentClass</Definition>
     <Branches>
       <ExternalArrayValue url="./example_compartments.txt.txt"
@@ -3092,7 +3274,7 @@ in this simulation}
         </ZCoords>
       </Points3D>
     </Annotations>
-  </MultiCompartmentComponent>
+  </MultiCompartmental>
   <Dimension name="time" t="1"/>
   <Dimension name="voltage" m="1" l="2" t="-3" i="-1"/>
   <Dimension name="conductance" m="-1" t="3" l="-2" i="2"/>
