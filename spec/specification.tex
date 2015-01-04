@@ -1536,6 +1536,23 @@ If the \ComponentClass referenced by the definition element is defined outside t
 \subsubsection{Text format}
 The name of the \ComponentClass to be referenced \ComponentClass needs to be provided in the text of \Definition element.
 
+
+\subsection{MetaParameter}
+\label{sec:MetaParameter}
+
+\begin{table}[H]
+  \begin{edtable}{tabular}{llr}
+    \toprule
+    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{MetaParameter Structure}}}\\
+    \toprule
+    \em{Attribute name} & \em{Type/Format} & \em{Required} \\
+    \midrule
+    name & \identifier & yes\\
+    dimension & \Dimension{}@name & yes\\    
+    \bottomrule
+  \end{edtable}
+\end{table}
+
 \subsection{DerivedParameter}
 \label{sec:DerivedParameter}
 
@@ -1623,14 +1640,17 @@ The name of the User Layer element to be referenced should be included in the te
     \midrule
     \em{Element type} & \em{Multiplicity} & \em{Required} \\
     \midrule
-    \Number & singleton & yes \\
     \Cell & singleton & yes \\
     \ExtraProperty & set & no \\
+    \MetaParameter & set & no\\
+    \DerivedParameter & singleton & no\\
     \bottomrule
   \end{edtable}
 \end{table}
 
 A \Population defines a set of dynamic components of the same class. The size of the set is specified by the \Number element. The properties of the dynamic components are generated from value types, which can be constant across the population, randomly distributed or individually specified (see \ref{sec:Values}).
+
+The number of cells in the population is specified by the integer provided to a builtin property of the \Population called \textit{number}. If this number is derived from other parameters it can be provided by a \DerivedParameter. 
 
 \subsubsection{Name attribute}
 Each \Population requires a \textit{name} attribute, which should be a valid \identifier and uniquely identify the {\Population} from all other elements in the global scope.
@@ -1651,26 +1671,6 @@ Each \Population requires a \textit{name} attribute, which should be a valid \id
 \end{table}
 
 The \Cell element specifies the dynamic components that will make up the population. The \Component can be defined inline or via a \Reference element. 
-
-\subsection{Number}
-\label{sec:Number}
-
-\begin{table}[H]
-  \begin{edtable}{tabular}{llr}
-    \toprule
-    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{Number Structure}}}\\
-    \toprule
-    \em{Text format} & \; & \em{Required} \\
-    \midrule
-    \primtype{integer} & \; & yes\\
-    \bottomrule
-  \end{edtable}
-\end{table}
-
-The number of cells in the population is specified by the integer provided in the text of the \Number element. In future versions this may be extended to allow the size of a population to be derived from other features of the \Population. 
-
-\subsubsection{Text format}
-The text of the \Number element contains an \primtype{integer} representing the size of the population.
 
 \subsection{ExtraProperty}
 \label{sec:ExtraProperty}
@@ -1728,6 +1728,7 @@ where $i_{\mathrm{value}}$, $i_{\mathrm{source}}$ and $i_{\mathrm{dest}}$ are th
     \Destination & singleton & yes \\
     \Connectivity & singleton & yes \\
     \Synapse & singleton & yes \\
+    \MetaParameter & set & no\\    
     \bottomrule
   \end{edtable}
 \end{table}
