@@ -4,7 +4,8 @@ from ..base import BaseULObject
 from ...base import E, read_annotations, annotate_xml, NINEML
 from ..utility import check_tag
 from ...utility import expect_single  #FIXME: really should only have one utility @IgnorePep8
-from ...abstraction_layer import Unit
+from .base import BaseComponent
+from ...abstraction_layer.units import Unit, unitless
 from ..values import (SingleValue, ArrayValue, ExternalArrayValue,
                       ComponentValue)
 
@@ -14,7 +15,7 @@ class Property(BaseULObject):
     """
     Representation of a numerical- or string-valued parameter.
 
-    A numerical parameter is a (name, value, unit) triplet, a string parameter
+    A numerical parameter is a (name, value, units) triplet, a string parameter
     is a (name, value) pair.
 
     Numerical values may either be numbers, or a component that generates
@@ -37,10 +38,10 @@ class Property(BaseULObject):
         if isinstance(value, (int, float)):
             value = SingleValue(value)
         self._value = value
-        self.unit = units
+        self.units = units
 
     def __hash__(self):
-        return hash(self.name) ^ hash(self.value) ^ hash(self.unit)
+        return hash(self.name) ^ hash(self.value) ^ hash(self.units)
 
     def is_single(self):
         return isinstance(self._value, SingleValue)
@@ -76,14 +77,17 @@ class Property(BaseULObject):
             raise Exception("Cannot access random distribution for component "
                             "or single value types")
 
+    def set_units(self, units):
+        self.units = units
+
     def __repr__(self):
-        if self.unit is not None:
-            units = self.unit.name
+        if self.units is not None:
+            units = self.units.name
             if u"µ" in units:
                 units = units.replace(u"µ", "u")
         else:
-            units = self.unit
-        return "Property(name=%s, value=%s, unit=%s)" % (self.name,
+            units = self.units
+        return "Property(name=%s, value=%s, units=%s)" % (self.name,
                                                           self.value, units)
 
     def __eq__(self, other):
@@ -93,13 +97,13 @@ class Property(BaseULObject):
         return isinstance(other, self.__class__) and \
             reduce(and_, (self.name == other.name,
                           self.value == other.value,
-                          self.unit == other.unit))
+                          self.units == other.units))
 
     @annotate_xml
     def to_xml(self):
         kwargs = {'name': self.name}
-        if self.unit:
-            kwargs['units'] = self.unit.name
+        if self.units:
+            kwargs['units'] = self.units.name
         return E(self.element_name,
                  self._value.to_xml(),
                  **kwargs)
@@ -159,13 +163,13 @@ class PropertySet(dict):
     def __init__(self, *properties, **kwproperties):
         """
         `*properties` - should be Property instances
-        `**kwproperties` - should be name=(value,unit)
+        `**kwproperties` - should be name=(value,units)
         """
         dict.__init__(self)
         for prop in properties:
             self[prop.name] = prop  # should perhaps do a copy
-        for name, (value, unit) in kwproperties.items():
-            self[name] = Property(name, value, unit)
+        for name, (value, units) in kwproperties.items():
+            self[name] = Property(name, value, units)
 
     def __hash__(self):
         return hash(tuple(self.items()))
@@ -202,13 +206,13 @@ class InitialValueSet(PropertySet):
     def __init__(self, *ivs, **kwivs):
         """
         `*ivs` - should be InitialValue instances
-        `**kwivs` - should be name=(value,unit)
+        `**kwivs` - should be name=(value,units)
         """
         dict.__init__(self)
         for iv in ivs:
             self[iv.name] = iv  # should perhaps do a copy
-        for name, (value, unit) in kwivs.items():
-            self[name] = InitialValue(name, value, unit)
+        for name, (value, units) in kwivs.items():
+            self[name] = InitialValue(name, value, units)
 
     def __repr__(self):
         return "InitialValueSet(%s)" % dict(self)

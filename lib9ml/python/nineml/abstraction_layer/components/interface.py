@@ -8,6 +8,7 @@ Contains the classes for defining the interface for a componentclass
 
 from nineml.utility import ensure_valid_c_variable_name
 from ..base import BaseALObject
+from ..units import dimensionless, Dimension
 
 
 class Parameter(BaseALObject):
@@ -29,7 +30,9 @@ class Parameter(BaseALObject):
         ensure_valid_c_variable_name(name)
 
         self._name = name
-        self._dimension = dimension
+        self._dimension = dimension if dimension is not None else dimensionless
+        assert isinstance(self._dimension, Dimension), (
+            "dimension must be None or a nineml.Dimension instance")
 
     def __eq__(self, other):
         return self.name == other.name and self.dimension == other.dimension
@@ -43,6 +46,9 @@ class Parameter(BaseALObject):
     def dimension(self):
         """Returns the dimensions of the parameter"""
         return self._dimension
+
+    def set_dimension(self, dimension):
+        self._dimension = dimension
 
     def __repr__(self):
         return ("Parameter({}{})"

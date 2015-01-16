@@ -16,7 +16,7 @@ class Dimension(BaseALObject):
 
     def __init__(self, name, **kwargs):
         super(Dimension, self).__init__()
-        self.name = name
+        self._name = name
         for k in kwargs:
             if k not in self.valid_dims:
                 raise Exception("'{}' is not a valid dimension name ('{}')"
@@ -27,6 +27,9 @@ class Dimension(BaseALObject):
         assert isinstance(other, Dimension)
         return all(self.power(d) == other.power(d) for d in self.valid_dims)
 
+    def __hash__(self):
+        return hash(tuple(self.power(d) for d in self.valid_dims))
+
     def __ne__(self, other):
         return not (self == other)
 
@@ -34,6 +37,10 @@ class Dimension(BaseALObject):
         return ("Dimension(name='{}'{})"
                 .format(self.name, ''.join(", {}={}".format(d, p)
                                            for d, p in self._dims.items())))
+
+    @property
+    def name(self):
+        return self._name
 
     def power(self, dim_name):
         return self._dims.get(dim_name, 0)
@@ -79,15 +86,18 @@ class Unit(BaseALObject):
 
     def __init__(self, name, dimension, power, offset=0.0):
         super(Unit, self).__init__()
-        self.name = name
-        self.dimension = dimension
-        self.power = power
-        self.offset = offset
+        self._name = name
+        self._dimension = dimension
+        self._power = power
+        self._offset = offset
 
     def __eq__(self, other):
         assert isinstance(other, Unit)
         return (self.power == other.power and self.offset == other.offset and
                 self.dimension == other.dimension)
+
+    def __hash__(self):
+        return hash((self.power, self.offset, self.dimension))
 
     def __ne__(self, other):
         return not (self == other)
@@ -100,10 +110,29 @@ class Unit(BaseALObject):
 
     def to_SI_units_str(self):
         if self.offset != 0.0:
-            raise Exception("Cannot convert to SI unit string as offset is not"
+            raise Exception("Cannot convert to SI units string as offset is not"
                             " zero ({})".format(self.offset))
         return (self.dimension.to_SI_units_str() +
                 ' * 10**({})'.format(self.power) if self.power else '')
+
+    @property
+    def name(self):
+        return self._name
+
+    @property
+    def dimension(self):
+        return self._dimension
+
+    def set_dimension(self, dimension):
+        self._dimension = dimension
+
+    @property
+    def power(self):
+        return self._power
+
+    @property
+    def offset(self):
+        return self._offset
 
     @property
     def symbol(self):
@@ -114,7 +143,7 @@ class Unit(BaseALObject):
         kwargs = {'symbol': self.name, 'dimension': self.dimension.name,
                   'power': str(self.power)}
         if self.offset:
-            kwargs['offset'] = self.offset
+            kwargs['offset'] = str(self.offset)
         return E(self.element_name,
                  **kwargs)
 
@@ -135,24 +164,32 @@ per_voltage = Dimension(name="per_voltage", m=-1, l=-2, t=3, i=1)
 conductance = Dimension(name="conductance", m=-1, l=-2, t=3, i=2)
 conductanceDensity = Dimension(name="conductanceDensity", m=-1, l=-4, t=3, i=2)
 capacitance = Dimension(name="capacitance", m=-1, l=-2, t=4, i=2)
-specificCapacitance = Dimension(name="specificCapacitance", m=-1, l=-4, t=4, i=2)
+specificCapacitance = Dimension(name="specificCapacitance", m=-1, l=-4, t=4,
+                                i=2)
 resistance = Dimension(name="resistance", m=1, l=2, t=-3, i=-2)
 resistivity = Dimension(name="resistivity", m=2, l=2, t=-3, i=-2)
 charge = Dimension(name="charge", i=1, t=1)
 charge_per_mole = Dimension(name="charge_per_mole", i=1, t=1, n=-1)
+charge_density = Dimension(name="charge_per_mole", i=1, t=1, m=-3)
+mass_per_charge = Dimension(name="mass_per_charge", i=-1, t=-1)
 current = Dimension(name="current", i=1)
 currentDensity = Dimension(name="currentDensity", i=1, l=-2)
+current_per_time = Dimension(name="current", i=1, t=-1)
 length = Dimension(name="length", l=1)
 area = Dimension(name="area", l=2)
 volume = Dimension(name="volume", l=3)
 concentration = Dimension(name="concentration", l=-3, n=1)
+per_time_per_concentration = Dimension(name="concentration", l=3, n=-1, t=-1)
 substance = Dimension(name="substance", n=1)
+flux = Dimension(name="flux", m=1, l=-3, t=-1)
+substance_per_area = Dimension(name="substance", n=1, l=-2)
 permeability = Dimension(name="permeability", l=1, t=-1)
 temperature = Dimension(name="temperature", k=1)
-idealGasConstantDims = Dimension(name="idealGasConstantDims", m=1, l=2, t=-2, k=-1, n=-1)
+idealGasConstantDims = Dimension(name="idealGasConstantDims", m=1, l=2, t=-2,
+                                 k=-1, n=-1)
 rho_factor = Dimension(name="rho_factor", l=-1, n=1, i=-1, t=-1)
-dimensionless = None
- 
+dimensionless = Dimension(name="dimensionless")
+
 s = Unit(name="s", dimension=time, power=0)
 per_s = Unit(name="per_s", dimension=per_time, power=0)
 Hz = Unit(name="Hz", dimension=per_time, power=0)
@@ -195,6 +232,7 @@ ohm_cm = Unit(name="ohm_cm", dimension=resistivity, power=-2)
 C = Unit(name="C", dimension=charge, power=0)
 C_per_mol = Unit(name="C_per_mol", dimension=charge_per_mole, power=0)
 A = Unit(name="A", dimension=current, power=0)
+mA = Unit(name="mA", dimension=current, power=-3)
 uA = Unit(name="uA", dimension=current, power=-6)
 nA = Unit(name="nA", dimension=current, power=-9)
 pA = Unit(name="pA", dimension=current, power=-12)
@@ -212,5 +250,8 @@ um_per_ms = Unit(name="um_per_ms", dimension=permeability, power=-3)
 cm_per_ms = Unit(name="cm_per_ms", dimension=permeability, power=1)
 degC = Unit(name="degC", dimension=temperature, power=0, offset=273.15)
 K = Unit(name="K", dimension=temperature, power=0)
-J_per_K_per_mol = Unit(name="J_per_K_per_mol", dimension=idealGasConstantDims, power=0)
-mol_per_m_per_A_per_s = Unit(name="mol_per_m_per_A_per_s", dimension=rho_factor, power=0)
+J_per_K_per_mol = Unit(name="J_per_K_per_mol", dimension=idealGasConstantDims,
+                       power=0)
+mol_per_m_per_A_per_s = Unit(name="mol_per_m_per_A_per_s",
+                             dimension=rho_factor, power=0)
+unitless = Unit(name="unitless", dimension=dimensionless, power=0)

@@ -13,6 +13,7 @@ from nineml.abstraction_layer.xmlns import nineml_namespace
 from nineml.abstraction_layer.dynamics.component import ComponentClass
 from ..visitors import ComponentVisitor
 from nineml.base import annotate_xml
+from nineml.abstraction_layer.units import dimensionless
 
 
 class XMLWriter(ComponentVisitor):
@@ -32,10 +33,11 @@ class XMLWriter(ComponentVisitor):
                 assert False, 'Trying to save nested models not yet supported'
             else:
                 component = flattening.ComponentFlattener(component).\
-                                                               reducedcomponent
-
+                    reducedcomponent
+        component.standardize_unit_dimensions()
         xml = XMLWriter().visit(component)
-        xml = [XMLWriter().visit_dimension(d) for d in component.dimensions if d is not None] + [xml]
+        xml = [XMLWriter().visit_dimension(d) for d in component.dimensions
+               if d is not None] + [xml]
         return E.NineML(*xml, xmlns=nineml_namespace)
 
     def visit_componentclass(self, component):
@@ -62,10 +64,11 @@ class XMLWriter(ComponentVisitor):
 
     @annotate_xml
     def visit_statevariable(self, state_variable):
+        kwargs = {}
+        if state_variable.dimension != dimensionless:
+            kwargs['dimension'] = state_variable.dimension.name
         return E('StateVariable',
-                 name=state_variable.name,
-                 dimension=(state_variable.dimension.name
-                            if state_variable.dimension else 'dimensionless'))
+                 name=state_variable.name, **kwargs)
 
     @annotate_xml
     def visit_outputevent(self, output_event, **kwargs):  # @UnusedVariable
@@ -75,7 +78,7 @@ class XMLWriter(ComponentVisitor):
     @annotate_xml
     def visit_parameter(self, parameter):
         kwargs = {}
-        if parameter.dimension is not None:
+        if parameter.dimension != dimensionless:
             kwargs['dimension'] = parameter.dimension.name
         return E('Parameter',
                  name=parameter.name, **kwargs)

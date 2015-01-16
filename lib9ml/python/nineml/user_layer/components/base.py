@@ -1,13 +1,12 @@
 # encoding: utf-8
-"""
-missing docstring
-"""
-
 from itertools import chain
+from lxml import etree
 from ..base import BaseULObject, resolve_reference, write_reference
 from ...base import E, read_annotations, annotate_xml, NINEML
 from ...context import BaseReference, Context
 from nineml.exceptions import NineMLUnitMismatchError
+from nineml.abstraction_layer.xmlns import nineml_namespace
+from ...abstraction_layer.units import unitless
 
 
 class BaseComponent(BaseULObject):
@@ -29,10 +28,10 @@ class BaseComponent(BaseULObject):
              the URL of an abstraction layer component class definition,
              a :class:`Definition` or a :class:`Prototype` instance.
         `properties`:
-             a dictionary containing (value,unit) pairs or a
+             a dictionary containing (value,units) pairs or a
              :class:`PropertySet` for the component's properties.
         `initial_values`:
-            a dictionary containing (value,unit) pairs or a
+            a dictionary containing (value,units) pairs or a
             :class:`PropertySet` for the component's state variables.
 
     """
@@ -116,14 +115,7 @@ class BaseComponent(BaseULObject):
 
     @property
     def units(self):
-        return set(p.unit for p in chain(self.properties.values(), self.initial_values.values()) if p.unit is not None)
-
-#     def __eq__(self, other):
-#         if not isinstance(other, self.__class__):
-#             return False
-#         return reduce(and_, (self.name == other.name,
-#                              self.component_class == other.component_class,
-#                              self.properties == other.properties))
+        return set(p.units for p in chain(self.properties.values(), self.initial_values.values()) if p.units is not None)
 
     def __hash__(self):
         return (hash(self.__class__) ^ hash(self.name) ^
@@ -169,8 +161,8 @@ class BaseComponent(BaseULObject):
             raise Exception(". ".join(msg))
         # Check dimensions match
         for param in self.component_class.parameters:
-            prop_units = self.properties[param.name].unit
-            prop_dimension = prop_units.dimension if prop_units else None
+            prop_units = self.properties[param.name].units
+            prop_dimension = prop_units.dimension
             param_dimension = param.dimension
             if prop_dimension != param_dimension:
                 err = ("Dimensions for '{}' parameter don't match, component "
@@ -206,11 +198,9 @@ class BaseComponent(BaseULObject):
                 NINEML, cls.element_name, element.tag))
         name = element.attrib.get("name", None)
         properties = PropertySet.from_xml(
-                               element.findall(NINEML + Property.element_name),
-                                  context)
+            element.findall(NINEML + Property.element_name), context)
         initial_values = InitialValueSet.from_xml(
-                           element.findall(NINEML + InitialValue.element_name),
-                           context)
+            element.findall(NINEML + InitialValue.element_name), context)
         definition_element = element.find(NINEML + Definition.element_name)
         if definition_element is not None:
             definition = Definition.from_xml(definition_element, context)
@@ -222,6 +212,40 @@ class BaseComponent(BaseULObject):
             definition = Prototype.from_xml(prototype_element, context)
         return cls(name, definition, properties,
                        initial_values=initial_values)
+
+    @property
+    def used_units(self):
+        return set(p.units for p in self.properties.itervalues())
+
+    def standardize_units(self, reference_units=None,
+                          reference_dimensions=None):
+        """Standardized the units used to avoid naming conflicts writing to
+        """
+        if reference_units is None:
+            reference_units = self.used_units
+        if reference_dimensions is None:
+            reference_dimensions = set(u.dimension for u in reference_units)
+        else:
+            # Ensure that the units reference the same set of dimensions
+            for u in reference_units:
+                if u.dimension not in reference_dimensions:
+                    u.set_dimension(next(d for d in reference_units
+                                         if d == u.dimension))
+        for p in self.properties.itervalues():
+            try:
+                std_unit = next(u for u in reference_units if u == p.units)
+            except StopIteration:
+                continue
+            p.set_units(std_unit)
+
+    def write(self, file):  # @ReservedAssignment
+        self.standardize_units()
+        xml = [self.to_xml()]
+        xml.extend(chain(*((u.to_xml(), u.dimension.to_xml())
+                            for u in self.used_units if u != unitless)))
+        doc = E.NineML(*xml, xmlns=nineml_namespace)
+        etree.ElementTree(doc).write(file, encoding="UTF-8", pretty_print=True,
+                                     xml_declaration=True)
 
 
 class Definition(BaseReference):

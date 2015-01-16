@@ -13,13 +13,21 @@ class BaseDynamicsComponent(BaseComponent):
             except KeyError:
                 raise Exception("Initial value not specified for %s" %
                                 var.name)
-            check_units(initial_value.unit, var.dimension)
+            check_units(initial_value.units, var.dimension)
 
 
 class SpikingNodeType(BaseDynamicsComponent):
     """
     Component representing a model of a spiking node, i.e. something that can
     emit (and optionally receive) spikes.
+    """
+    pass
+
+
+class IonDynamicsType(BaseComponent):
+    """
+    Component representing either a ion channel or the dynamics of the
+    concentration of a pool of ions. Typically part of a SpikingNodeType.
     """
     pass
 
