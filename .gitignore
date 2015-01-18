@@ -13,6 +13,7 @@ x86_64
 .idea
 *.synctex.gz*
 cover
+.coverage
 build
 nest_model
 test_files
@@ -24,3 +25,6 @@ nineml_mechanisms
 *.synctex.gz
 .9build
 /Gemfile.lock
+*.egg-info
+lib9ml/python/MANIFEST
+lib9ml/python/dist
