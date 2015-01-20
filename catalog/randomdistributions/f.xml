@@ -12,4 +12,5 @@
         </RandomVariable>
      </Distribution>
   </ComponentClass>
+  <Dimension name="dimensionless"/>
 </NineML>
