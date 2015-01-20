@@ -3,8 +3,14 @@
   <ComponentClass name="NegativeBinomialDistribution">
     <Parameter name="numberOfFailures"/>
     <Parameter name="probability"/>
-    <RandomDistribution>
-      <StandardLibrary url="http://www.uncertml.org/distributions/negative-binomial.xml">NegativeBinomialDistribution</StandardLibrary>
-    </RandomDistribution>
+    <PropertySendPort name="weight" dimension="dimensionless"/>
+    <Distribution>
+      <RandomVariable name="weight" dimension="dimensionless">
+        <un:negativeBinomialDistribution xmlns:un="http://www.uncertml.org/2.0">
+          <un:numberOfFailures>numberOfFailures</un:numberOfFailures>
+          <un:probability>probability</un:probability>
+        </un:negativeBinomialDistribution>
+      </RandomVariable>
+    </Distribution>
   </ComponentClass>
 </NineML>

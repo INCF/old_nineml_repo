@@ -1,10 +1,15 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <NineML xmlns="http://nineml.net/9ML/1.0">
   <ComponentClass name="FDistribution">
-    <Parameter name="denominator"/>
-    <Parameter name="numerator"/>
-     <RandomDistribution>
-       <StandardLibrary url="http://www.uncertml.org/distributions/f.xml">FDistribution</StandardLibrary>
-     </RandomDistribution>
+    <Parameter name="denominator"/><un:denominator>denominator</un:denominator>
+    <Parameter name="numerator"/><un:numerator>numerator</un:numerator>
+    <PropertySendPort name="weight" dimension="dimensionless"/>
+    <PropertySendPort name="weight" dimension="dimensionless"/>
+     </Distribution>
+         <RandomVariable>
+           <un:f xmlns:un="http://www.uncertml.org/2.0">
+           </un:f>
+        </RandomVariable>
+     </Distribution>
   </ComponentClass>
 </NineML>

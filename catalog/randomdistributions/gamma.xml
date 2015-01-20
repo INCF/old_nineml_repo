@@ -3,8 +3,14 @@
   <ComponentClass name="GammaDistribution">
     <Parameter name="shape"/>
     <Parameter name="scale"/>
-     <RandomDistribution>
-       <StandardLibrary url="http://www.uncertml.org/distributions/gamma.xml">GammaDistribution</StandardLibrary>
-     </RandomDistribution>
+    <PropertySendPort name="weight" dimension="dimensionless"/>
+    <Distribution>
+      <RandomVariable>
+        <un:gamma xmlns:un="http://www.uncertml.org/2.0">
+          <un:shape>shape</un:shape>
+          <un:shape>scale</un:shape>
+        </un:gamma>
+      </RandomVariable>
+     </Distribution>
   </ComponentClass>
 </NineML>

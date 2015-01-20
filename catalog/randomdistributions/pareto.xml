@@ -3,8 +3,14 @@
   <ComponentClass name="ParetoDistribution">
     <Parameter name="scale"/>
     <Parameter name="shape"/>
-    <RandomDistribution>
-      <StandardLibrary url="http://www.uncertml.org/distributions/pareto.xml">ParetoDistribution</StandardLibrary>
-    </RandomDistribution>
+    <PropertySendPort name="weight" dimension="dimensionless"/>
+    <Distribution>
+      <RandomVariable name="weight" dimension="dimensionless">
+        <un:pareto xmlns:un="http://www.uncertml.org/2.0">
+          <un:scale>scale</un:scale>
+          <un:shape>shape</un:shape>
+        </un:pareto>
+      </RandomVariable>
+    </Distribution>
   </ComponentClass>
 </NineML>

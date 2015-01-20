@@ -3,8 +3,14 @@
   <ComponentClass name="UniformDistribution">
     <Parameter name="minimum"/>
     <Parameter name="maximum"/>
-    <RandomDistribution>
-      <StandardLibrary url="http://www.uncertml.org/distributions/uniform.xml">UniformDistribution</StandardLibrary>
-    </RandomDistribution>
+    <PropertySendPort name="weight" dimension="dimensionless"/>
+    <Distribution>
+      <RandomVariable name="weight" dimension="dimensionless">
+        <un:uniform xmlns:un="http://www.uncertml.org/2.0">
+          <un:minimum>minimum</un:minimum>
+          <un:maximum>maximum</un:maximum>
+        </un:uniform>
+      </RandomVariable>
+    </Distribution>
   </ComponentClass>
 </NineML>

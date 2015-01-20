@@ -2,8 +2,13 @@
 <NineML xmlns="http://nineml.net/9ML/1.0">
   <ComponentClass name="GeometricDistribution">
     <Parameter name="probability"/>
-    <RandomDistribution>
-      <StandardLibrary url="http://www.uncertml.org/distributions/geometric.xml">GeometricDistribution</StandardLibrary>
-    </RandomDistribution>
+    <PropertySendPort name="weight" dimension="dimensionless"/>
+    <Distribution>
+      <RandomVariable name="weight" dimension="dimensionless">
+        <un:geometric xmlns:un="http://www.uncertml.org/2.0">
+          <un:probability>probability</un:probability>
+        </un:geometric>
+      </RandomVariable>
+    </Distribution>
   </ComponentClass>
 </NineML>

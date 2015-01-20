@@ -3,8 +3,14 @@
   <ComponentClass name="BetaDistribution">
     <Parameter name="alpha"/>
     <Parameter name="beta"/>
-    <RandomDistribution>
-      <StandardLibrary url="http://www.uncertml.org/distributions/beta.xml">BetaDistribution</StandardLibrary>
-    </RandomDistribution>
+    <PropertySendPort name="weight" dimension="dimensionless"/>
+    <Distribution>
+      <RandomVariable name="weight" dimension="dimensionless">
+        <un:beta xmlns:un="http://www.uncertml.org/2.0">
+          <un:alpha>alpha</un:alpha>
+          <un:beta>beta</un:beta>
+        </un:beta>
+      </RandomVariable>
+    </Distribution>
   </ComponentClass>
 </NineML>

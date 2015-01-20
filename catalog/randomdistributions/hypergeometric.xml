@@ -4,8 +4,15 @@
     <Parameter name="numberOfSuccesses"/>
     <Parameter name="numberOfTrials"/>
     <Parameter name="populationSize"/>
-    <RandomDistribution>
-      <StandardLibrary url="http://www.uncertml.org/distributions/hypergeometric.xml">HypergeometricDistribution</StandardLibrary>
-    </RandomDistribution>
+    <PropertySendPort name="weight" dimension="dimensionless"/>
+    <Distribution>
+      <RandomVariable name="weight" dimension="dimensionless">
+        <un:hypergeometric xmlns:un="http://www.uncertml.org/2.0">
+          <un:numberOfSuccesses>numberOfSuccesses</un:numberOfSuccesses>
+          <un:numberOfTrials>numberOfTrials</un:numberOfTrials>
+          <un:populationSize>populationSize</un:populationSize>
+        </un:hypergeometric>
+      </RandomVariable>
+    </Distribution>
   </ComponentClass>
 </NineML>

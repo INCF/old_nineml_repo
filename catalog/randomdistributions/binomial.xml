@@ -3,8 +3,14 @@
   <ComponentClass name="BinomialDistribution">
     <Parameter name="numberOfTrials"/>
     <Parameter name="probabilityOfSuccess"/>
-    <RandomDistribution>
-      <StandardLibrary url="http://www.uncertml.org/distributions/binomial.xml">BinomialDistribution</StandardLibrary>
-    </RandomDistribution>
+    <PropertySendPort name="weight" dimension="dimensionless"/>
+    <Distribution>
+      <RandomVariable name="weight" dimension="dimensionless">
+        <un:binomial xmlns:un="http://www.uncertml.org/2.0">
+          <un:numberOfTrials>numberOfTrials</un:numberOfTrials>
+          <un:probabilityOfSuccess>probabilityOfSuccess</un:probabilityOfSuccess>
+        </un:binomial>
+      </RandomVariable>
+    </Distribution>
   </ComponentClass>
 </NineML>
