@@ -34,6 +34,5 @@ nineml_mechanisms
 *.egg-info
 *.dvi
 *#
-*.egg-info
 lib9ml/python/MANIFEST
 lib9ml/python/dist
