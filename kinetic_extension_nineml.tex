@@ -15,6 +15,8 @@
 %%
 %% ============================================================================
 
+\newcommand{\incomplete}{\begin{center}\noindent{\Large\textcolor{incompletered}{\textbf{!! INCOMPLETE !!}}}\end{center}}
+
 % Define misc. references
 \newcommand{\identifier}{\typeDefRef{identifier\xspace}{sec:identifier}}
 \newcommand{\URL}{\href{http://en.wikipedia.org/wiki/Uniform_resource_locator}{URL}\xspace}
@@ -26,7 +28,7 @@
 \newcommand{\Dimension}{\defRef{\textbf{\class{Dimension}}\xspace}{sec:Dimension}}
 \newcommand{\ComponentClass}{\defRef{\textbf{\class{ComponentClass}}\xspace}{sec:ComponentClass}}
 \newcommand{\Dynamics}{\defRef{\defRef{\textbf{\class{Dynamics}}\xspace}{sec:Dynamics}}{sec:Dynamics}}
-\newcommand{\Distribution}{\defRef{\textbf{\class{Distribution}}\xspace}{sec:Distribution}}
+\newcommand{\Function}{\defRef{\textbf{\class{Function}}\xspace}{sec:Function}}
 \newcommand{\BuiltInDistribution}{\defRef{\textbf{\class{BuiltInDistribution}}\xspace}{sec:BuiltInDistribution}}
 \newcommand{\ConnectionRule}{\defRef{\textbf{\class{ConnectionRule}}\xspace}{sec:ConnectionRule}}
 \newcommand{\ConnectCondition}{\defRef{\textbf{\class{ConnectCondition}}\xspace}{sec:ConnectCondition}}
@@ -76,7 +78,7 @@
 \newcommand{\Quantity}{\defRef{\textbf{\class{Quantity}}\xspace}{sec:Quantity}}
 \newcommand{\SingleValue}{\defRef{\textbf{\class{SingleValue}}\xspace}{sec:SingleValue}}
 \newcommand{\ExternalArrayValue}{\defRef{\textbf{\class{ExternalArrayValue}}\xspace}{sec:ExternalArrayValue}}
-\newcommand{\FromDistribution}{\defRef{\textbf{\class{FromDistribution}}\xspace}{sec:FromDistribution}}
+\newcommand{\FromFunction}{\defRef{\textbf{\class{FromFunction}}\xspace}{sec:FromFunction}}
 \newcommand{\ArrayValue}{\defRef{\textbf{\class{ArrayValue}}\xspace}{sec:ArrayValue}}
 \newcommand{\ArrayValueRow}{\defRef{\textbf{\class{ArrayValueRow}}\xspace}{sec:ArrayValueRow}}
 \newcommand{\ListColumn}{\defRef{\textbf{\class{ListColumn}}\xspace}{sec:ListColumn}}
@@ -178,8 +180,7 @@
 \vspace*{0.75cm}
 
 \begin{center}
-\noindent{\Huge \bf Network Interchange for Neuroscience Modeling Language
-(NineML)}\\
+\noindent{\Huge \bf NineML Kinetic Extension	}\\
 \vspace{0.5cm}
 \noindent{\LARGE \bf Specification}\\
 \vspace{0.5cm}
@@ -197,12 +198,7 @@
 
 {\Large\bf Editors: }
 \begin{itemize}
-\item Alex Cope
-\item Andrew P. Davison
-\item Erik De Schutter
-\item Ivan Raikov
-\item Paul Richmond
-\item Thomas G. Close
+\item Russell Jarvis
 \end{itemize}
 
 \vspace*{0.25cm}
@@ -210,9 +206,6 @@
 \begin{normalsize}
 \noindent \textbf{Acknowledgments:}\\\\
 \noindent
-We would like to thank the former INCF NineML Task Force members for their contributions to the text and the concepts presented in this document. In particular:
-A. Gorchetchnikov, M. Hull, Y. Le Franc, P. Gleeson, E. Muller, R. Cannon, Birgit Kriener, Subhasis Ray and S. Hill.
-
 
 \vspace*{0.5cm}
 
@@ -228,102 +221,73 @@ This document is under the Common Creative license BY-NC-SA:\\ http://creativeco
 \end{normalsize}
 }
 
-\title{NineML (9ML) Specification}
+\title{NineML Kinetic Extension Specification}
 
 \newpage
 \pagestyle{plain}
 
 %\maketitlepage
-\maketableofcontents
+%\maketableofcontents
 
 % -----------------------------------------------------------------------------
 \section{Introduction}
 % -----------------------------------------------------------------------------
 \vspace{-12.5pc} % A bit of a hack to reverse the vspace added by the Appendix name
-The increasing diversity of neuronal network models and the software/hardware platforms used to simulate them,
-presents a significant challenge for sharing, replicability and reusability of models in computational neuroscience.
-To address this problem, we propose a common description language to facilitate the exchange neuronal network models between researchers and simulator platforms.
 
-This description language is based on a
-common object model describing the different elements of network
-models. This work, initiated and supported by the International
-Neuroinformatics Coordinating Facility as part of the Multiscale Modeling
-Program, involve computational neuroscientists, simulator developers and
-developers of simulator-independent languages (NeuroML, PyNN).  The name of the
-proposed language is NineML (Network Interchange for Neuroscience Modeling
-Language).
 
 \subsection{Scope}
 
-The purpose of NineML is to provide a computer language for
-succinct and unambiguous description of computational neuroscience models of neuronal networks.
+The purpose of the kinetic extension to NINEML is to provide a convenient means of converting the KINETIC scheme block in a model described by NMODL to the NINEML language. 
+The kinetic extension must also provided a means of converting from the NINEML language back into the KINETIC block scheme specified by NMODL.
 
-NineML is intended to describe the network architecture, parameters
-and equations that govern the dynamics of a neuronal network, without
-taking into account model implementation details such as numerical integration
-methods.
-
-As of version 1.0, the following neuronal
-network objects can be described in NineML:
 \begin{enumerate}
-\item spiking and non-spiking neurons
-\item synapses
-\begin{enumerate}
-\item Post-synaptic membrane current mechanisms
-\item Short-term synaptic dynamics (depression, facilitation)
-\item Long-term synaptic modifications (STDP, learning, etc.)
-\item Gap-junctions
-\end{enumerate}
+\item NMODL
+\item STATE block
+\item KINETIC block
+\item NineML
+\item StateVariable
+\item TimeDerivative
 \end{enumerate}
 
-\subsection{Design considerations}
-\label{sec:design_considerations}
 
-As one of the goals of NineML is to provide a means to exchange models between simulator platforms, 
-it is important to maintain a clear distinction
-between the role of NineML and the role of a simulator. Therefore, NineML only
-contains the necessary information to describe the model
-not how to simulate it, although suggestions can be supplied in annotations to the model (see \ref{sec:AnnotationsSection}). 
-For example, NineML should specify the neuron membrane equation to solve,
-but not how to solve it.  In addition, for implementation and performance
-reasons, it is important to keep the language layer ``close'' to the simulator
--- such that the language layer is not responsible for maintaining separate
-representations of all the instantiated elements in the network.
 
-A NineML object model representation can take multiple forms.  A
-program can employ a concrete representation of the NineML objects in
-a specific programming language, convert an internal model
-representation to and from the NineML XML schema, or use code generation 
-to produce a model representation for a target simulation environment. 
-It is important to note that the NineML XML schema is isomorphic to the NineML
-object model.
 
-The design of NineML is divided into two semantic layers:
-\begin {enumerate}
-\item An {\bf Abstraction Layer} that provides the core concepts and
-mathematical descriptions with which model variables and state update
-rules are explicitly described in {\em parametrized} form, and
-\item A {\bf User Layer} that provides a syntax to specify the
-instantiation and the value of parameters of all these components of a network
-model.
-\end {enumerate}
+\subsection{NMDOL}
+\label{sec:\item NMODL}
 
-Since the User Layer provides the instantiation and
-parametrization of model elements that have been defined in the
-Abstraction Layer, the two layers should share
-a complementary and compatible design philosophy. Which aspects of a model
-are defined in the Abtraction Layer and which are in the User Layer
-Layer are clearly defined (each element type belongs to either one).
-In order to simplify their interpretation and maintain compatibility with a wide 
-range of data formats (e.g. JSON, Python objects), NineML documents are 
-not sensitive to the order that objects appear in.
+\subsection{PARAMETER block}
+%variables who values are normally specified by the user are parameters, and are declared in a PARAMETER block. PARAMETERS generally remain constant during a simulation, but they can be changed in mid-run if necssary to emulate some external influence on the characteristic properties of a model.
+
+\subsection{STATE block}
+%\label{sec:\item STATE block}
+Closed states and open states.
+%Almost Direct qoute 'the states in this mechanism are the fractions of channels that are in closed states 1 or 2, or in open state. Since the total number of channels in all staets is conserved, the sum of the STATE fractions must equal one. ie c1+c2+o=1
+%...
+%...
+% If there are N state variables. Because of the conservation rule, there is always N-1 indipendent states. The Nth state is dependent and is implied by the conservation of states rule. The NINEML algotihm exploits this property in calculating states.
+
+
+
+\subsection{KINETIC block}
+%\label{sec:\item KINETIC block}
+% The voltage dependent rate constants are computed in produre rates(). That procedure computes the equilibrium constants K1 and K2 from the constants k1, d1, k2, and d2, whose emperically determined default values are given in the PARAMETER 
+% block, and membrane potential v. The time constants tau1 and tau2, however are found from tables created under hoc.
+%
+%
+
+
+
+\subsection{NINEML block}
+%\label{sec:\item NINEML block}
+
+\subsection{StateVariable}
+%\label{sec:\item StateVariable}
+
+
 
 \subsection{Identifiers}
 \label{sec:identifier}
 
-Elements are identified by \emph{names}, which are unique in the scope they are enclosed by (either within a component class, container or in the global scope of the document). For a name to be a valid NineML identifier, it must meet the requirements for \href{http://msdn.microsoft.com/en-us/library/e7f8y25b.aspx}{ANSI C89 identifiers}. Additionally, identifiers are not permitted to be one of the reserved keywords (see Appendix \ref{sec:reserved_keywords}) or begin or end with an underscore character (i.e. `\_') to allow special variables to be defined in the same scope as identified variables/objects in generated code.
-
-NineML identifiers are case-sensitive in the sense that they must be referred to with the same case as they are defined. However, two identifiers that are identical with the exception of case, e.g. `v\_threshold' and `v\_Threshold', are not permitted within the same scope.
 
 \subsection{Extensions}
 \label{sec:extensions}
@@ -401,7 +365,7 @@ can be used for example to signal action potential firing.
     \PropertyReceivePort & set & no\\
     \IndexSendPort & set & no\\
     \IndexReceivePort & set & no\\
-    \Dynamics | \ConnectionRule | \Distribution & singleton & yes \\
+    \Dynamics | \ConnectionRule | \Function & singleton & yes \\
     \bottomrule
   \end{edtable}
 \end{table}
@@ -412,9 +376,9 @@ A \ComponentClass is composed of:
 \item An unordered collection of port objects, which either publish or read state variables or derived values published from other components in the case of analog send and receive ports, or emit events or listen for events emitted from components. \EventSendPort and \EventReceivePort objects raise and listen for events passed between dynamic components.
 \item {A `main' block, which specifies the nature of the component class:
 \begin{itemize} 
-\item \Dynamics, the component class defines a dynamic element such as neuron or post-synaptic response.
+\item \Dynamics, the component class defines a dynamic element such as neutron or post-synaptic response.
 \item \ConnectionRule, the component class defines a rule by which populations are connected in projections.
-\item \Distribution, the component class defines random distribution.
+\item \Function, the component class defines random distribution.
 \end{itemize}}
 \end{itemize}
 
@@ -649,7 +613,7 @@ The following functions are built in,
 \item \verb|tanh(x)|
 \end{itemize}
 \end{multicols}
-All built-in functions are defined as per ANSI C89 with the exception of `\verb|round|', which has the same function as `\verb|nearbyint|' in the C89 standard, with `round-to-nearest' set in the floating point parameters \\(see \href{http://www.gnu.org/software/libc/manual/html\_node/Rounding-Distributions.html}{http://www.gnu.org/software/libc/manual/html\_node/Rounding-Distributions.html}).
+All built-in functions are defined as per ANSI C89 with the exception of `\verb|round|', which has the same function as `\verb|nearbyint|' in the C89 standard, with `round-to-nearest' set in the floating point parameters \\(see \href{http://www.gnu.org/software/libc/manual/html\_node/Rounding-Functions.html}{http://www.gnu.org/software/libc/manual/html\_node/Rounding-Functions.html}).
 
 The following symbols refer to built-in values,
 \begin{itemize}
@@ -761,8 +725,7 @@ Any valid numeric value, including shorthand scientific notation e.g. 1e-5 ($1\t
   \end{edtable}
 \end{table}
 
-\draftnote{I realised that RandomDistributions can't be components if we are going to separate the Abstraction and User Layers (i.e. It would require using a \Component within a \ComponentClass) so I have separated it out. Also random distributions derived from standard distributions (the only ones I can see people wanting to manually define), can be specified using \Distribution elements in this scheme.
-see \href{https://github.com/INCF/nineml/issues/72}{GitHub Issue \#31}}
+\draftnote{I realised that RandomDistributions can't be components if we are going to separate the Abstraction and User Layers (i.e. It would require using a \Component within a \ComponentClass) so I have separated it out. Also random distributions derived from standard distributions (the only ones I can see people wanting to manually define), can be specified using \Function elements in this scheme.}
 
 \RandomVariable elements represent randomly varying quantities, which are drawn from standard families of random distributions. The random distributions are defined via \href{http://www.uncertml.org/distributions}{UncertML (http://www.uncertml.org/distributions)}, with the caveats that the "multi-values" are not permitted and the numerical arguments passed to UncertML distributions can be substituted for the names of dimensionless properties and aliases of the enclosing \ComponentClass.
 
@@ -785,6 +748,7 @@ The subset of UncertML distributions available in NineML is
 \item laplace
 \item logistic
 \item logNormal
+\item mixtureModel
 \item multinomial
 \item negativeBinomial
 \item normal
@@ -825,7 +789,6 @@ Each \Constant requires a \textit{units} attribute. The \textit{units} attribute
   \end{edtable}
 \end{table}
 
-\draftnote{see \href{https://github.com/INCF/nineml/issues/74}{GitHub Issue \#74}}
 \Piecewise elements are used to describe piecewise mathematical functions. The syntax is inspired by the \MathML format for piecewise functions. Each \Piece element describes a continuous segment of the function that is valid over the range its condition evaluates to true (see \Condition). It is critical that the combination of parameters and states under which the \Piece\withelem\Condition blocks evaluate to true are exclusive within a \Piecewise element. As in \MathML, the onus is on the model designer to ensure that the conditions do not overlap. For combinations of parameters and states that are not covered by any \Piece\withelem{}\Condition block, the \Piecewise function evaluates to the value of the \Otherwise\withelem{}\MathInline expression.
 
 \note{Piecewise expressions do not appear within \Dynamics{}\withelem{}\Regime elements. Discontinuous expressions within \Dynamics blocks, require transitions to a new \Dynamics{}\withelem{}\Regime.}
@@ -886,13 +849,11 @@ The \Otherwise block is active within a \Piecewise expression whenever all other
 \label{sec:Ports}
 
 Ports allow components to communicate with each
-
 other during a simulation. Ports can either transmit discrete events (see \EventSendPort and \EventReceivePort), continuous streams of analog data (see \AnalogSendPort, \AnalogReceivePort and \AnalogReducePort), properties of a component (see \PropertySendPort and \PropertyReceivePort) or the indices of a cells, connections or compartments within a container (see \IndexSendPort and \IndexReceivePort).
 
-\draftnote{see \href{https://github.com/INCF/nineml/issues/73}{GitHub Issue \#73} for discussion on Property and Index ports}
-Events are typically used to model synaptic transmission but can be used more generally to model any instantaneous communication between components. Analog ports are used to model continuous communication between components, typically injected current, gap junctions or internal quantities shared between sub-components of a multi-component model. Property ports are used in several distinct situations: in order to pass parameters of cells in a population (such as their spatial coordinates) to \ConnectionRule or \Distribution components, to return properties from \Distribution components and to read properties of neighbouring compartments in multi-compartmental models.
+Events are typically used to model synaptic transmission but can be used more generally to model any instantaneous communication between components. Analog ports are used to model continuous communication between components, typically injected current, gap junctions or internal quantities shared between sub-components of a multi-component model. Property ports are used in several distinct situations: in order to pass parameters of cells in a population (such as their spatial coordinates) to \ConnectionRule or \Function components, to return properties from \Function components and to read properties of neighbouring compartments in multi-compartmental models.
 
-For each mode of communication there is a sending a receiving port. For dynamic ports, which handle events and analog data streams, the send and receive ports are connected directly to each other. Whereas the \PropertySendPort and \PropertyReceivePort{}s are connected to \DerivedProperty and \Property elements respectively. \IndexReceivePort{}s receive connections from sources that are implicit to the container, whereas \IndexSendPort{}s are used in \Distribution elements used to generate multi-compartmental models.
+For each mode of communication there is a sending a receiving port. For dynamic ports, which handle events and analog data streams, the send and receive ports are connected directly to each other. Whereas the \PropertySendPort and \PropertyReceivePort{}s are connected to \DerivedProperty and \Property elements respectively. \IndexReceivePort{}s receive connections from sources that are implicit to the container, whereas \IndexSendPort{}s are used in \Function elements used to generate multi-compartmental models.
 
 \subsection{AnalogSendPort}
 \label{sec:AnalogSendPort}
@@ -917,7 +878,7 @@ Each \AnalogSendPort requires a \textit{name} attribute, which should refer to a
 
 \subsubsection{Dimension attribute}
 Each \AnalogSendPort requires a \textit{dimension} attribute. This attribute specifies the dimension of the units of the quantity that is expected to be passed through the \AnalogSendPort and should refer to the name of a \Dimension element in the global scope.
-\note{"Dimensionless" parameters can be defined by referring to an empty \Dimension object, i.e. one without any \textit{power} or offset attributes} 
+
 
 \subsection{AnalogReceivePort}
 \label{sec:AnalogReceivePort}
@@ -1051,7 +1012,7 @@ Each \EventReceivePort requires a \textit{name} attribute, which is a valid \ide
   \end{edtable}
 \end{table}
 
-\PropertySendPort{}s are used to return quantities from \Component\withelem\Distribution{}s to populate \DerivedProperty elements.
+\PropertySendPort{}s are used to return quantities from \Component\withelem\Function{}s to populate \DerivedProperty elements.
 
 \subsubsection{Name attribute}
 Each \PropertySendPort requires a \textit{name} attribute, which is a valid \identifier and uniquely identifies the \PropertySendPort from all other elements in the \ComponentClass.
@@ -1099,7 +1060,7 @@ Each \PropertyReceivePort requires a \textit{dimension} attribute. This attribut
   \end{edtable}
 \end{table}
 
-\IndexSendPort{}s are used to return indices generated within \ComponentClass\withelem{}\Distribution elements, which can be used in \MultiCompartmental models to generate branch structures and domain-to-compartment mappings. Before sending, real numbers are floored to the nearest integer (\MathInline expressions provide, 
+\IndexSendPort{}s are used to return indices generated within \ComponentClass\withelem{}\Function elements, which can be used in \MultiCompartmental models to generate branch structures and domain-to-compartment mappings. Before sending, real numbers are floored to the nearest integer (\MathInline expressions provide, 
 
 \subsubsection{Name attribute}
 Each \IndexSendPort requires a \textit{name} attribute, which is a valid \identifier and uniquely identifies the \IndexSendPort from all other elements in the \ComponentClass.
@@ -1224,7 +1185,7 @@ Each \StateVariable requires a \textit{dimension} attribute. This attribute spec
 
 A \Regime element represents a system of ODEs in time
 on \StateVariable.  As such, \Regime defines how the state variables
-change (propagate in time) between subsequent transitions. \Regime elements 
+change (propagate in time) between subsequent transitions. \Regime is
 must have non-vanishing temporal extent. Once construction of
 the \Regime is complete, it should have defined the following
 properties:
@@ -1346,7 +1307,7 @@ Each \OnEvent requires a \textit{port} attribute. This should refer to the name 
     \toprule
     \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{Trigger Structure}}}\\
     \toprule
-    \em{Element type} & \em{Multiplicity} & \em{Required} \\
+    \em{Element type} & \em{Multiplicity} & \em{Required} \\			
     \midrule
     \MathInline & singleton & yes \\ 
     \bottomrule
@@ -1407,7 +1368,7 @@ Each \StateAssignment requires a \textit{variable} attribute. This should refer 
 Each \EventOut requires a \textit{port} attribute. This should refer to the name of an \EventSendPort in the \ComponentClass interface.
 
 \section{Network Connectivity}
-\draftnote{See \href{https://github.com/INCF/nineml/issues/72}{GitHub issue \#72}}
+
 Network connectivity is defined via extensible components to promote reuse of connection logic. Connections are provisionally connected if the \ConnectCondition evaluates to true for a given connection. If \ConnectCondition is omitted then all possible connections are connected (i.e. all-to-all).  If a \SelectConnections element is provided the set of provisional connections will be pruned to a reduced size, which can be fixed or derived from other values. 
 %Additionally, connections can be specified explicitly via \ExplicitConnections, which can either be in addition to the selected connections or replace the least preferred connections.
 
@@ -1545,19 +1506,17 @@ Which subset to select from the provisional connections is determined by the \Ma
 %\subsubsection{Source attribute}
 %Each \ExplicitConnections requires a \textit{source} attribute, which should be refer to the name of a property.
 
-\section{Distributions}
-\draftnote{see \href{https://github.com/INCF/nineml/issues/63}{GitHub Issue \#63}}
-\Distribution{}s define how the value of parameters varying over members of a container (\Population, \Projection or \MultiCompartmental). The values can be dependent on any combination of random variables, the properties of members of the containers (see \PropertyReceivePort) and their indices (see \IndexReceivePort). The values provided via \PropertyReceivePort{}s and \IndexReceivePort{}s are iterated over each member of the container and the expressions are reevaluated, drawing new instances of each \RandomVariable{}.
+\section{Functions}
 
-\Component{}\withelem{}\Distribution elements are connected to \DerivedProperty elements via \PropertySendPort{}s. A single distribution component can be used to populate multiple \DerivedProperty elements via multiple \PropertySendPort{}s, allowing the same random variable instance to be shared between properties. 
+Functions are used to define relationships between parameters over members of a container.
 
-\subsection{Distribution}
-\label{sec:Distribution}
+\subsection{Function}
+\label{sec:Function}
 
 \begin{table}[H]
   \begin{edtable}{tabular}{llr}
     \toprule
-    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{Distribution Structure}}}\\
+    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{Function Structure}}}\\
     \toprule
     \em{Element type} & \em{Multiplicity} & \em{Required} \\
     \midrule
@@ -1569,7 +1528,6 @@ Which subset to select from the provisional connections is determined by the \Ma
   \end{edtable}
 \end{table}
 
-\Distribution is the top-level element for distribution component classes and defines all expressions.
 
 \clearpage
 \part{User Layer}
@@ -1592,7 +1550,6 @@ Which subset to select from the provisional connections is determined by the \Ma
     \Definition | \Prototype & singleton & yes \\ 
     \Property & set & no\\
     \DerivedProperty & set & no\\
-    \ReceiveConnection & set & no\\    
     \bottomrule
   \end{edtable}
 \end{table}
@@ -1653,8 +1610,6 @@ The name of the \ComponentClass to be referenced \ComponentClass needs to be pro
   \end{edtable}
 \end{table}
 
-\draftnote{This would be a bit nicer if we split the user layer into composition and parameterisation layers as then \Prototype{}s could be in the parameterisation layer and not have any \ReceiveConnection{}s, which don't really make sense in a prototype.}
-
 The \Prototype element establishes a link to an existing User Layer \Component, which defines the \ComponentClass and default properties of the \Component.  The reference \Component can be located either in the current
 document or in another file if a \textit{url} attribute is provided. Selected properties provided by the \Prototype\pointto\Component are then overridden by the referencing \Component.
 
@@ -1708,7 +1663,7 @@ Each \Property element requires a \emph{units} attribute. The \textit{units} att
     \midrule
     \em{Element type} & \em{Multiplicity} & \em{Required} \\
     \midrule
-    \FromDistribution & singleton & yes \\ 
+    \FromFunction & singleton & yes \\ 
     \bottomrule
   \end{edtable}
 \end{table}
@@ -1721,32 +1676,9 @@ of the \Component that are derived from \PropertySendPort{}s of components. Thei
 \subsubsection{Name attribute}
 Each \Property requires a \textit{name} attribute. This should refer to the name of a \Parameter in the corresponding \ComponentClass of the \Component.
 
-\subsection{ReceiveConnection}
-\label{sec:ReceiveConnection}
 
-\begin{table}[H]
-  \begin{edtable}{tabular}{llr}
-    \toprule
-    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{ReceiveConnection Structure}}}\\
-    \toprule
-    \em{Attribute name} & \em{Type/Format} & \em{Required} \\
-    \midrule \relax
-    port & *Port{}@name & yes\\
-    \midrule \relax
-    \em{Element type} & Multiplicity & \em{Required} \\
-    \midrule \relax
-    From* & set & yes\\
-    \bottomrule
-  \end{edtable}
-\end{table}
-
-The \ReceiveConnection element specifies a receive port which will receive a connection from a port of a remote component or container. Depending on the type of the \Component{}\withelem{}\ComponentClass the source of remote port to be connected can vary and are specified by different ``port source'' objects, e.g. \FromSource, \FromDestination and \FromSynapse  in \Projection containers.
-
-\subsubsection{Port attribute}
-Each \ReceiveConnection element requires a \textit{port} attribute. This should refer to the name of a port in the class definition of the component.
-
-\subsection{FromDistribution}
-\label{sec:FromDistribution}
+\subsection{FromFunction}
+\label{sec:FromFunction}
 
 \begin{table}[H]
   \begin{edtable}{tabular}{llr}
@@ -1759,36 +1691,16 @@ Each \ReceiveConnection element requires a \textit{port} attribute. This should 
     \midrule
     \em{Element type} & \em{Multiplicity} & \em{Required} \\
     \midrule
-    \Component{}\withelem\Distribution | \Reference{}\pointto\Component{}\withelem\Distribution & singleton & yes \\
+    \Component{}\withelem\Function | \Reference{}\pointto\Component{}\withelem\Function & singleton & yes \\
     \bottomrule
   \end{edtable}
 \end{table}
 
-The values of \DerivedProperty elements are populated from \PropertySendPort{}s of \Component{}\withelem\Distribution{}s, as specified by \FromDistribution elements. The function is evaluated for each item in the container (i.e. \Population, \Projection or \MultiCompartmental) it is enclosed by.
+The values of \DerivedProperty elements are populated from \PropertySendPort{}s of \Component{}\withelem\Function{}s, as specified by \FromFunction elements. The function is evaluated for each item in the container (i.e. \Population, \Projection or \MultiCompartmental) it is enclosed by.
 
 \subsubsection{Port attribute}
-Each \FromDistribution requires a \textit{port} attribute, which selects which port of the \Component to read.
+Each \FromFunction requires a \textit{port} attribute, which selects which port of the \Component to read.
 
-\subsection{FromIndex}
-\label{sec:FromIndex}
-
-\begin{table}[H]
-  \begin{edtable}{tabular}{llr}
-    \toprule
-    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{FromIndex Structure}}}\\
-    \toprule
-     \em{Attribute name} & \em{Type/Format} & \em{Required} \\
-    \midrule
-    of & `cell' | `source' | `destination' | `connection' | `sourceDomain' | 'destinationDomain' & yes\\
-    \bottomrule
-  \end{edtable}
-\end{table}
-
-\draftnote{Not quite happy with this either. Was thinking of reusing \FromSource, \FromDestination, etc... to provide the indices instead}
-The \FromIndex element provides various indices for use in \ConnectionRule and \Distribution components. The indices that are available to use varies depending on the container the \FromIndex is located in. 
-
-\subsubsection{Of attribute}
-The \textit{of} attribute specifies which index should be supplied. Within a \Population, the only index available is that of the `cell'. For any element in a \Projection the `source', `destination' and `connection' indices are available. Whereas `sourceDomain' and `destinationDomain' are only valid in the \CompartmentConnectivity block and refer to the domain index of the source and destination compartments to determine the connectivity of.
 
 \subsection{Reference}
 \label{sec:Reference}
@@ -1950,16 +1862,16 @@ Each \ExternalArrayValue must have a \textit{columnName} attribute, which refers
     \Cell & singleton & yes \\
     \Property & set & no \\
     \DerivedProperty & set & no \\
-    \Component{}\withelem{}\Distribution & set & no\\
+    \Component{}\withelem{}\Function & set & no\\
     \bottomrule
   \end{edtable}
 \end{table}
 
-\draftnote{see \href{https://github.com/INCF/nineml/issues/19}{GitHub issue \#19} for a discussion around the use of \Property and \DerivedProperty directly within the \Population.}
-A \Population defines a set of dynamic components of the same class. The size of the set is specified by the \Size element. The properties of the dynamic components are either specified directly via single or array values or derived from other \Component{}\withelem{}\Distribution{}s. \Component{}\withelem{}\Distribution{}s included within the \Projection container are evaluated once for each member in the container so that multiple \DerivedProperty elements can reference (see \Reference) the same random variable instance for each member.
+A \Population defines a set of dynamic components of the same class. The size of the set is specified by the \Size element. The properties of the dynamic components are generated from value types, which can be constant across the population, randomly distributed or individually specified (see \ref{sec:Values}).
 
-\Property, \DerivedProperty and \Component{}\withelem{}\Distribution elements can be used to store additional properties of the cells, which are not related to their dynamics, but are useful for deriving connection rules, e.g. their spatial coordinates.
-
+%%%%%%%%%%%%%%
+\incomplete %%%%%%%%
+%%%%%%%%%%%%%%
 
 \subsubsection{Name attribute}
 Each \Population requires a \textit{name} attribute, which should be a valid \identifier and uniquely identify the {\Population} from all other elements in the global scope.
@@ -1974,7 +1886,7 @@ Each \Population requires a \textit{name} attribute, which should be a valid \id
     \toprule
     \em{Element type} & \em{Multiplicity} & \em{Required} \\
     \midrule
-    \FromDistribution & singleton & no \\
+    \FromFunction & singleton & no \\
     \midrule    
     \em{Text format} & \; & \em{Required} \\
     \midrule
@@ -1983,13 +1895,10 @@ Each \Population requires a \textit{name} attribute, which should be a valid \id
   \end{edtable}
 \end{table}
 
-The number of cells in the population is specified either by a non-negative integer provided in the text of the \Size element or from an \IndexSendPort within a \Distribution component. The value of the \FromDistribution{}@port should not depend on any \IndexReceivePort or \PropertyReceivePort only the \Parameter{}s of the \Component{}\withelem{}\Distribution. 
-\draftnote{This is a little bit messy, any suggestions? I am thinking of creating a ``SizeSendPort'' but this seems a little strange}
-
-It is envsaged that deriving the size of the population from a \Component{}\withelem{}\Distribution port would be useful when parameters to the spatial layout of the population (e.g. length, width and depth) determines the total number of cells in the population.
+The number of cells in the population is specified either by a non-negative integer provided in the text of the \Size element or from an \IndexSendPort within a \Function component.
 
 \subsubsection{Text format}
-The text of the \Size element should contain an \primtype{integer} representing the size of the population if and only if it isn't derived from a \FromDistribution{}\withelem\IndexSendPort port. 
+The text of the \Size element should contain an \primtype{integer} representing the size of the population if and only if it isn't derived from a \FromFunction{}\withelem\IndexSendPort port. 
 
 \subsection{Cell}
 \label{sec:Cell}
@@ -2036,12 +1945,12 @@ where $N$ is the size of the population and $i$ the index of the cell/connection
     \Destination & singleton & yes \\
     \Connectivity & singleton & yes \\
     \Synapse & singleton & yes \\
-    \Component{}\withelem{}\Distribution & set & no\\
+    \Component{}\withelem{}\Function & set & no\\
     \bottomrule
   \end{edtable}
 \end{table}
 
-The \Projection element contains all the elements that define a projection between two populations and should be uniquely identified in the scope of the document. \Component{}\withelem{}\Distribution{}s included within the \Projection container are evaluated once for each member in the container so that multiple \DerivedProperty elements can reference (see \Reference) the same random variable instance for each member.
+The \Projection element contains all the elements that define a projection between two populations and should be uniquely identified in the scope of the document.
 
 \subsubsection{Name attribute}
 Each \Projection requires a \textit{name} attribute, which should be a valid \identifier and uniquely identify the {\Projection} from all other elements in the global scope.
@@ -2093,7 +2002,8 @@ The \Destination element specifies the post-synaptic or selection (see \Selectio
     \toprule
     \em{Element type} & \em{Multiplicity} & \em{Required} \\
     \midrule
-    \Component{}\withelem\ConnectionRule & singleton & yes \\
+    \Component{}\withelem\ConnectionRule | \Reference{}\pointto{}\Component\withelem\ConnectionRule& singleton & yes \\
+    \ReceiveConnection & set & yes\\ 
     \bottomrule
   \end{edtable}
 \end{table}
@@ -2110,7 +2020,8 @@ The \Connectivity element contains a \Component\withelem\ConnectionRule, which d
     \toprule
     \em{Element type} & \em{Multiplicity} & \em{Required} \\
     \midrule
-    \Component{}\withelem\Dynamics & singleton & yes \\ 
+    \Component{}\withelem\Dynamics | \Reference{}\pointto\Component{}\withelem\Dynamics & singleton & yes \\ 
+    \ReceiveConnection & set & yes\\
     \bottomrule
   \end{edtable}
 \end{table}
@@ -2120,6 +2031,30 @@ The \Synapse defines the effect on the post-synaptic cell dynamics of an incomin
 The post-synaptic response dynamics can receive incoming port connections from either the pre or post synaptic populations (see \FromSource and \FromDestination). A \Synapse object is implicitly created and connected to these ports if the \Connectivity\withelem\ConnectionRule determines that the source and destination cells should be connected.
 
 It is recommended to factor out plasticity rules from post-synaptic response dynamics and combine them within \MultiComponent element to promote reusability of response and plasticity dynamics. 
+
+\subsection{ReceiveConnection}
+\label{sec:ReceiveConnection}
+
+\begin{table}[H]
+  \begin{edtable}{tabular}{llr}
+    \toprule
+    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{ReceiveConnection Structure}}}\\
+    \toprule
+    \em{Attribute name} & \em{Type/Format} & \em{Required} \\
+    \midrule \relax
+    port & [\EventReceivePort{} | \AnalogReceivePort{} | \AnalogReducePort{}]@name & yes\\
+    \midrule \relax
+    \em{Element type} & Multiplicity & \em{Required} \\
+    \midrule \relax
+    From* & set & yes\\
+    \bottomrule
+  \end{edtable}
+\end{table}
+
+The \ReceiveConnection element specifies a receive port which will receive a connection from a port of a remote component. Depending on the context in which \ReceiveConnection is placed, the role of the components it can receive from vary. Therefore, it accepts a range of elements (all named \emph{From*}), which specify the relationship of the remote component to the enclosing element (e.g. \FromSource, \FromDestination and \FromSynapse  in \Projection containers).
+
+\subsubsection{Port attribute}
+Each \ReceiveConnection element requires a \textit{port} attribute. This should refer to the name of a \AnalogReceivePort, \EventReceivePort or \AnalogReducePort in the \ComponentClass associated with the enclosing element.
 
 \subsection{FromSource}
 \label{sec:FromSource}
@@ -2155,10 +2090,9 @@ Each \FromSource element requires a \textit{port} attribute. This should refer t
     \toprule
      \em{Attribute name} & \em{Type/Format} & \em{Required} \\
     \midrule
-    port & [\AnalogSendPort | \EventSendPort{} | \Parameter{}]@name & yes\\
+    port & [\AnalogSendPort | \EventSendPort{} | \Parameter{}@name]@name & yes\\
     \midrule
     \em{Element type} & Multiplicity & \em{Required} \\
-    \midrule
     \Delay & singleton & no\\
     \bottomrule
   \end{edtable}
@@ -2180,10 +2114,9 @@ Each \FromDestination element requires a \textit{port} attribute. This should re
     \toprule
      \em{Attribute name} & \em{Type/Format} & \em{Required} \\
     \midrule
-    port & [\AnalogSendPort | \EventSendPort{} | \Parameter{}]@name & yes\\
+    port & [\AnalogSendPort | \EventSendPort{} | \Parameter{}@name]@name & yes\\
     \midrule \relax
     \em{Element type} & Multiplicity & \em{Required} \\
-    \midrule
     \Delay & singleton & no\\
     \bottomrule
   \end{edtable}
@@ -2229,16 +2162,39 @@ The \textit{units} attribute specifies the units of the delay and should refer t
     \toprule
     \em{Element type} & \em{Multiplicity} & \em{Required} \\
     \midrule
-    \FromDistribution & singleton & yes \\ 
+    \FromFunction & singleton & yes \\ 
     \bottomrule
   \end{edtable}
 \end{table}
 
 In the current version, the \Delay element specifies the delay between the pre-synaptic cell port and the \Synapse. In future versions, it is planned to expand the delay architecture to allow delays on any port connections to allow finer control of the delay between the different components.
 
+\subsection{FromIndex}
+\label{sec:FromIndex}
+
+\begin{table}[H]
+  \begin{edtable}{tabular}{llr}
+    \toprule
+    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{FromIndex Structure}}}\\
+    \toprule
+     \em{Attribute name} & \em{Type/Format} & \em{Required} \\
+    \midrule
+    of & `source' | `destination' | `connection' | `sourceDomain' | 'destinationDomain' & yes\\
+    \bottomrule
+  \end{edtable}
+\end{table}
+
+\subsubsection{Of attribute}
+The \textit{of} attribute specifies the index and should refer to the name of a \Unit element in the global scope. The \Unit{}\withelem\Dimension should be temporal, i.e. have $t=1$ and all other SI dimensions set to 0. 
+
+
+%%%%%%%%%%%%%
+\incomplete %%%%%%%
+%%%%%%%%%%%%%
+
 \section{Networks}
 
-Sets of \Population and \Projection elements are collected into networks, which are the top-level NineML object model. \Network{}s can also consist of smaller sub-networks allowing complex networks to be built up incrementally.
+Sets of \Population and \Projection elements are collected into networks.
 
 \subsection{Network}
 \label{sec:Network}
@@ -2253,12 +2209,9 @@ Sets of \Population and \Projection elements are collected into networks, which 
     \midrule
     \Reference{}\pointto{}\Population & set & yes\\    
     \Reference{}\pointto{}\Projection & set & yes\\
-    \Reference{}\pointto{}\Network & set & yes\\    
     \bottomrule
   \end{edtable}
 \end{table}
-
-The \Network object is the highest level NineML container.
 
 \section{Selections: combining populations and subsets}
 
@@ -2327,7 +2280,7 @@ Each \Item requires a \textit{index} attribute. This attribute specifies the ord
 \part{Standard Extensions}
 
 \section{Multi-component models}
-\draftnote{see \href{https://github.com/INCF/nineml/issues/4}{GitHub Issue \#4}}
+
 Multi-component models enable component classes to be constructed out of smaller sub-components. Multi-component models are envisaged to be useful for modelling biophysically detailed models, where of ion-channel and ion-concentration dynamics (e.g. voltage-activated Na, p-type Ca, internal Ca concentration)  can be modelled separately and then combined in different configurations depending on the cell type. The multi-component elements extend the User Layer.
 
 
@@ -2433,7 +2386,7 @@ Each \PortExposure requires a \textit{component} attribute, which should refer t
 Each \PortExposure requires a \textit{port} attribute, which should refer to the name of a port in the corresponding \SubComponent.
 
 \section{Multi-compartmental models}
-\draftnote{see \href{https://github.com/INCF/nineml/issues/30}{GitHub Issue \#30}}
+
 Multi-compartmental models enable component classes with axonal and dendritic trees to be constructed by grouping compartments into different ``domains''. As with multi-component models, the multi-compartmental elements extend the User Layer.
 
 The expected technique for flattening to multi-compartmental models to the core, would include first flattening to multi-component models. For implementation in simulators that don't provide structures for multi-compartmental modelling (e.g. NEST, Brian, etc...) flattened descriptions would be used. For simulators with explicit structures for multi-compartmental modelling (e.g. NEURON, GENESIS, etc...), the compartments can be translated directly to these simulator specific structures.
@@ -2457,10 +2410,7 @@ The expected technique for flattening to multi-compartmental models to the core,
     \Branches & singleton & yes\\
     \Mapping & singleton & yes\\   
     \Domain & set & yes\\
-    \MultiPortExposure & set & no\\
-    \Property & set & no\\
-    \DerivedProperty & set & no\\
-    \Component{}\withelem{}\Distribution & set & no\\
+    \MultiPortExposure & set & no\\     
     \bottomrule
   \end{edtable}
 \end{table}
@@ -2477,7 +2427,7 @@ The \MultiCompartmental is the top-level element for multi-compartmental models.
     \toprule
     \em{Element type} & Multiplicity & \em{Required} \\
     \midrule \relax
-    \SingleValue | \ArrayValue | \ExternalArrayValue | \FromDistribution & singleton & yes\\
+    \SingleValue | \ArrayValue | \ExternalArrayValue | \FromFunction & singleton & yes\\
     \bottomrule
   \end{edtable}
 \end{table}
@@ -2494,7 +2444,7 @@ The Branches is an array containing the indices of the parent node of the segmen
     \toprule
     \em{Element type} & Multiplicity & \em{Required} \\
     \midrule \relax
-    \SingleValue | \ArrayValue | \ExternalArrayValue | \FromDistribution & singleton & yes\\
+    \SingleValue | \ArrayValue | \ExternalArrayValue | \FromFunction & singleton & yes\\
     \bottomrule
   \end{edtable}
 \end{table}
@@ -2633,7 +2583,7 @@ Each \FromProximal requires a \textit{port} attribute, which should refer to the
   \end{edtable}
 \end{table}
 
-For connecting populations with \MultiCompartmental cell models, \MultiCompartmentProjection must be used. \MultiCompartmentProjection extends the \Projection element by including \CompartmentConnectivity connection-rule which determines which compartments projections are connected by synapses when two cells are connected. 
+An extension of the \Projection object model, \MultiCompartmentProjection, must be used if either the source or destination populations consist of multi-compartmental models. It receives a \CompartmentConnectivity element which determines which compartments projections are made. 
 
 In flattening the \MultiCompartmentProjection elements to Core NineML, a single \MultiCompartmentProjection is split into a set of \Projection elements, one for each source/destination compartment pairing that has a non-empty set of connections.
 
@@ -2654,6 +2604,10 @@ Each \MultiCompartmentProjection requires a \textit{name} attribute, which shoul
     \bottomrule
   \end{edtable}
 \end{table}
+
+%%%%%%%%%%%
+\incomplete %%%%%
+%%%%%%%%%%%
 
 The \CompartmentConnectivity element specifies the connections between source and destination compartments if the \Connectivity element of the \MultiCompartmentProjection specifies a connection between the source and destination cell models. 
 
@@ -3240,18 +3194,22 @@ in this simulation}
         <FromDistal domain="dendrites" port="withinDendritesSendPort"/>
       </ReceiveConnection>
     </Domain>
-     <Property name="xCoords">
-      <ExternalArrayValue url="./example_compartments.txt"
-        mimetype="vnd.net.nineml.arrayvalue.text" columnName="X"/>
-    </Property>
-    <Property name="yCoords">
-      <ExternalArrayValue url="./example_compartments.txt"
-         mimetype="vnd.net.nineml.arrayvalue.text" columnName="Y"/>
-    </Property>
-    <Property name="zCoords">
-       <ExternalArrayValue url="./example_compartments.txt"
-         mimetype="vnd.net.nineml.arrayvalue.text" columnName="Z"/>
-    </Property>
+    <Annotations>
+      <Points3D>
+        <XCoords>
+          <ExternalArrayValue url="./example_compartments.txt.txt"
+            mimetype="vnd.net.nineml.arrayvalue.text" columnName="X"/>
+        </XCoords>
+        <YCoords>
+          <ExternalArrayValue url="./example_compartments.txt.txt"
+            mimetype="vnd.net.nineml.arrayvalue.text" columnName="Y"/>
+        </YCoords>
+        <ZCoords>
+          <ExternalArrayValue url="./example_compartments.txt.txt"
+            mimetype="vnd.net.nineml.arrayvalue.text" columnName="Z"/>
+        </ZCoords>
+      </Points3D>
+    </Annotations>
   </MultiCompartmental>
   <Dimension name="time" t="1"/>
   <Dimension name="voltage" m="1" l="2" t="-3" i="-1"/>
@@ -3259,7 +3217,7 @@ in this simulation}
   <Dimension name="area" l="2"/>
   <Dimension name="length" l="1"/>
   <Unit symbol="mV" dimension="voltage" power="-3"/>
-  <Unit symbol="um" dimension="length" power="-3"/>
+  <Unit symbol="um" dimension="length" power="-6"/>
   <Unit symbol="ms" dimension="time" power="-3"/>
   <Unit symbol="cm_square" dimension="area" power="-4"/>
   <Unit symbol="mS" dimension="conductance" power="-3"/>
@@ -3478,9 +3436,6 @@ In addition to the built-in mathematical functions and symbols (see \MathInline)
 \item do
 \item double
 \item dynamic\_cast
-\item if
-\item then
-\item else
 \item elif
 \item else
 \item elseif
@@ -3674,9 +3629,9 @@ In addition to the built-in mathematical functions and symbols (see \MathInline)
 \end{itemize}
 \end{multicols}
 
+
 \section{Acknowledgments}
 \subsection{Former NineML INCF Task Force members}
-\begin{multicols}{2}
 \begin{itemize}
 \item Abigail Morrison
 \item Alex Cope
@@ -3692,7 +3647,7 @@ In addition to the built-in mathematical functions and symbols (see \MathInline)
 \item Hugo Cornelis
 \item Ivan Raikov
 \item Lars Schwabe
-\item Malin Sandstr�m
+\item Malin Sandström
 \item Michael Hull
 \item Mikael Djurfeldt
 \item Padraig Gleeson
@@ -3704,10 +3659,9 @@ In addition to the built-in mathematical functions and symbols (see \MathInline)
 \item Valentin Haenel
 \item Yann Le Franc
 \end{itemize}
-\end{multicols}
 
 \clearpage
-\bibliography{kinetics}
+\bibliography{specification}
 
 % -----------------------------------------------------------------------------
 % End of document
