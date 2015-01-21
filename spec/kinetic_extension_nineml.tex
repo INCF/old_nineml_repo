@@ -253,15 +253,18 @@ Because NEURON is a dominant simulator within the field of neuroscience NineML m
 
 \subsection{Scope}
 
-The purpose of the kinetic extension to NINEML is to provide a convenient means of converting the KINETIC scheme block in a model described by NMODL to the NINEML language. The kinetic extension must also provided a means of converting from the NINEML language back into the KINETIC block scheme specified by NMODL.
+The purpose of the kinetic extension to NINEML is to provide a convenient means of converting the KINETIC scheme block in a model described by NMODL to the NINEML language. The kinetic extension must also provided a means of converting from the NINEML language back into the KINETIC block scheme specified by NMODL. Ultimately the kinetic scheme should be able to handle discontinuous state transitions.
 
 \begin{enumerate}
 \item NMODL
+\item PARAMETER block
 \item STATE block
+\item DERIVATIVE block
 \item KINETIC block
 \item NineML
 \item StateVariable
 \item TimeDerivative
+\item Translation
 \end{enumerate}
 
 
@@ -296,27 +299,51 @@ The procedure block provides an opportunity to define a procedure called { \it r
 
 % If there are N state variables. Because of the conservation rule, there is always N-1 indipendent states. The Nth state is dependent and is implied by the conservation of states rule. The NINEML algotihm exploits this property in calculating states.
 
+\subsection{DERIVATIVE block}
 
 
 \subsection{KINETIC block}
 
-%Simple schemes which do not include Longitudinal and radial diffusion will only be considered here for the time being.
+The NMODL translator converts the content of the kinetic scheme block into a family of Ordinary Differential Equations. An equivalent but less readable method of doing this would be to declare the appropriate differential equations to be solved in a NEURON DERIVATIVE block\cite{carnevale2006neuron}
 
-The concept of conservation of matter is central in calculating the fraction of ion channels that occupy a particular state.
+The concept of conservation of matter is central in calculating the fraction of ion channels that occupy a particular state. This is because ion transition from one state equals ion transition into another state.
 
 The kinetics block can call a procedure such as { \it rates()}
 The rates function solves the equilibrium constants, using time constants which may have been derived theoretically.
 
- 
- %or possibly update_rates in russell@kappa2:~/neuron/nrn/share/lib/python/neuron/rxd$ emacs reaction.py ._update_rates()
 
-%\label{sec:\item KINETIC block}
+%Unknown variables which are solved 
+
+
+%Direct qoute from the NEURON book:
+\begin{lstlisting}[language=c]
+
+STATE { mc m }
+KINETIC scheme1 {
+	~ mc <-> m (a(v), b(v))
+}
+is equivalent to 
+
+DERIVATIVE scheme1{
+	mc' = -a(v)*mc + b(v)*m
+	m'  =  a(v)*mc - b(v)*m
+
+}
+
+\end{lstlisting}
+%Paraphrased:
+The two expressions in paranthesis a(v), and b(v) indicate the forward and reverse reaction rates. And variables directly adjacent to the tokens: $<->$ signify the reactants. Kinetic schemes use a basic notation where the tilde ~ signifies to the NMODL compiler that this is a Kinetic scheme. 
+
+
 % The voltage dependent rate constants are computed in produre rates(). That procedure computes the equilibrium constants K1 and K2 from the constants k1, d1, k2, and d2, whose emperically determined default values are given in the PARAMETER 
 % block, and membrane potential v. The time constants tau1 and tau2, however are found from tables created under hoc.
 %
 %
 
+\subsection{DERIVATIVE block}
 
+\subsection{BREAKPOINT}
+In the NEURON book \cite{carnevale2006neuron} it is recommended that sparse METHOD should be used for SOLVE a kinetic scheme. This is specified inside the BREAKPOINT block.
 
 \section{NINEML Blocks}
 
@@ -414,6 +441,19 @@ which can contain of references to any combination of \StateVariable, \Parameter
 
 \subsubsection{Variable attribute}
 Each \TimeDerivative requires a \textit{variable} attribute. This should refer to the name of a \StateVariable in the \ComponentClass. Only one \TimeDerivative is allowed per \textit{variable} in each \Regime.
+
+\section{Translation}
+
+It can be seen from the above that what is required is a program that translates the contents of various NMODL blocks into appropriate NineML formatting for the equivalent NineML class and back again. 
+
+\begin{lstlisting}
+NMODL           NineML
+STATE      <->  StateVariable.
+KINETICS   <->  TimeDerivative
+PARAMETERS <-> ?     
+\end{lstlisting}
+
+
 
 
 %\note{To facilitate the reverse conversion from core to extended formats, NineML compliant tools must preserve all annotations during reading, writing and transformation, with the exception of when the return conversion is no longer possible due to the applied transformation or the annotations are explicitly added/deleted by the user.}
