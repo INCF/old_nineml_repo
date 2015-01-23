@@ -59,6 +59,8 @@
 \newcommand{\OnCondition}{\defRef{\textbf{\class{OnCondition}}\xspace}{sec:OnCondition}}
 \newcommand{\Parameter}{\defRef{\textbf{\class{Parameter}}\xspace}{sec:Parameter}}
 \newcommand{\AnalogSendPort}{\defRef{\textbf{\class{AnalogSendPort}}\xspace}{sec:AnalogSendPort}}
+
+
 \newcommand{\EventSendPort}{\defRef{\textbf{\class{EventSendPort}}\xspace}{sec:EventSendPort}}
 \newcommand{\AnalogReceivePort}{\defRef{\textbf{\class{AnalogReceivePort}}\xspace}{sec:AnalogReceivePort}}
 \newcommand{\AnalogReducePort}{\defRef{\textbf{\class{AnalogReducePort}}\xspace}{sec:AnalogReducePort}}
@@ -142,6 +144,11 @@
 \newcommand{\distURL}{https://github.com/INCF/nineml/tree/master/spec/specification.pdf}
 \newcommand{\srcURL}{https://github.com/INCF/nineml/tree/master/spec/specification.tex}
 \newcommand{\webURL}{https://github.com/INCF/nineml/tree/master/spec/specification.pdf}
+
+\newcommand{\KineticEquation}{\defRef{\textbf{\class{KineticEquation}}\xspace}{sec:KineticEquation}}
+\newcommand{\ForwardRate}{\defRef{\textbf{\class{ForwardRate}}\xspace}{sec:ForwardRate}}
+\newcommand{\ReverseRate}{\defRef{\textbf{\class{ReverseRate}}\xspace}{sec:ReverseRate}}
+\newcommand{\Conserve}{\defRef{\textbf{\class{Conserve}}\xspace}{sec:Conserve}}
 
 % Custom latex listing style, for use with the listings package.  The default
 % highlights far too many things, IMHO.  This keeps it simple and only adjusts
@@ -446,14 +453,261 @@ Each \TimeDerivative requires a \textit{variable} attribute. This should refer t
 
 It can be seen from the above that what is required is a program that translates the contents of various NMODL blocks into appropriate NineML formatting for the equivalent NineML class and back again. 
 
+%Questions. How many ports can a kinetic scheme have? Would a scheme that had two reactants have 4 ports. 1 send and 1 recieve port per ion channel concentration. It depends if I am modelling concentration of reactants, or number of ion channels in open or closed state.
+
 \begin{lstlisting}
 NMODL           NineML
+compiledCode    Component Class Instance (Component)
+PARAMETER  <->  Parameter
+  ?        <->  Ports
 STATE      <->  StateVariable.
 KINETICS   <->  TimeDerivative
-PARAMETERS <-> ?     
+  ?        <->  Aliases
+  
+\end{lstlisting}
+
+So far many of these functions PARAMETER, PORTS, and Aliases and STATE have been been implemented in the NMODL import in the NinePyPLine package, all that remains to be done is to translate the kinetic scheme syntax into the syntax required by TimeDerivative.
+
+In order to achieve this mapping on the NineML side a Component Class file must be written in the NineML syntax, this component class will have Parameters, which will be converted from NMDOL syntax to NineML syntax, it will have StateVariables which will similarily be converted, and it will have a NMODL kinetic equation which will be converted into NineML TimeDerivative XML syntax an example is below.
+
+
+
+\subsection{MultiCompartmental}
+\label{sec:MultiCompartmental}
+
+\begin{table}[H]
+  \begin{edtable}{tabular}{llr}
+    \toprule
+    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{MultiCompartmentClass Structure}}}\\
+    \toprule
+    \em{Attribute name} & \em{Type/Format} & \em{Required} \\
+    \midrule
+    name & \identifier & yes\\
+    \midrule
+    \em{Element type} & Multiplicity & \em{Required} \\
+    \midrule \relax
+    \Branches & singleton & yes\\
+    \Mapping & singleton & yes\\   
+    \Domain & set & yes\\
+    \MultiPortExposure & set & no\\     
+    \bottomrule
+  \end{edtable}
+\end{table}
+
+
+\subsection{Kinetic}
+%\label{sec:ComponentClass}
+
+\begin{table}[H]
+  \begin{edtable}{tabular}{llr}
+    \toprule
+    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{ComponentClass Structure}}}\\
+    \toprule
+    \em{Attribute name} & \em{Type/Format} & \em{Required} \\
+    \midrule
+    name & \identifier & yes\\
+    \midrule
+    \em{Element type} & \em{Multiplicity} & \em{Required} \\
+    \midrule
+    
+    \Parameter & set & yes \\
+    \StateVariable & set & yes \\
+
+    \ForwardRate & set & yes\\
+    \ReverseRate & set & yes\\
+    \Conserve & singleton & yes\\
+    \AnalogSendPort & set & yes\\
+    \AnalogReceivePort & set & yes\\
+    \AnalogReducePort & set & no \\ 
+    \EventSendPort & set & no\\    
+    \EventReceivePort & set & no\\ 
+    \PropertySendPort & set & no\\    
+    \PropertyReceivePort & set & no\\
+    \IndexSendPort & set & no\\
+    \IndexReceivePort & set & no\\
+    \Dynamics | \ConnectionRule | \Function & singleton & yes \\
+    \bottomrule
+  \end{edtable}
+\end{table}
+
+\begin{lstlisting}[label=code:xmliaf2]
+<?xml version='1.0' encoding='UTF-8'?>
+<NineML xmlns="http://nineml.net/9ML/2.0">
+  <ComponentClass name="KineticMechanism">
+	  <KineticEquation from='state1' to state2>
+	  	<Conserve></Conserve>
+	  	<ForwardRate></ForwardRate>
+		<ReverseRate></ReverseRate>
+		<AnalogSendPort></AnalogSendPort>
+		<AnalogRecievePort></AnalogRecievePort>
+	  </KineticEquation>
+  </ComponentClass>
+  
+\end{lstlisting}[label=code:xmliaf2]
+
+\begin{lstlisting}[label=code:xmliaf2]
+  
+  <ComponentClass name="Kinetic channels">
+	  <KineticEquation from='state1' to state2>
+	  	<Conserve></Conserve>
+	  	<ForwardRate></ForwardRate>
+		<ReverseRate></ReverseRate>
+		<AnalogSendPort></AnalogSendPort>
+		<AnalogRecievePort></AnalogRecievePort>
+	  </KineticEquation>
+
+    <AnalogSendPort dimension="voltage" name="iaf_V" />
+    <AnalogReducePort dimension="current" operator="+" name="iaf_ISyn" />
+    <AnalogSendPort dimension="current" name="cobaExcit_I" />
+    <EventSendPort name="iaf_spikeoutput"/>
+    <EventReceivePort name="cobaExcit_spikeinput"/>
+    <Parameter dimension="area" name="iaf_cm"/>
+    <Parameter dimension="time" name="iaf_taurefrac"/>
+    <Parameter dimension="conductance" name="iaf_gl"/>
+    <Parameter dimension="voltage" name="iaf_vreset"/>
+    <Parameter dimension="voltage" name="iaf_vrest"/>
+    <Parameter dimension="voltage" name="iaf_vthresh"/>
+    <Parameter dimension="time" name="cobaExcit_tau"/>
+    <Parameter dimension="conductance" name="cobaExcit_q"/>
+    <Parameter dimension="voltage" name="cobaExcit_vrev"/>
+    <Dynamics>
+      <StateVariable dimension="voltage" name="iaf_V"/>
+      <StateVariable dimension="time" name="iaf_tspike"/>
+      <StateVariable dimension="conductance" name="cobaExcit_g"/>
+      <Regime name="RefractoryRegime">
+        <TimeDerivative variable="iaf_V">
+          <MathInline>0</MathInline>
+        </TimeDerivative>
+        <TimeDerivative variable="cobaExcit_g">
+          <MathInline>-cobaExcit_g/cobaExcit_tau</MathInline>
+        </TimeDerivative>
+        <OnEvent target_regime="RefractoryRegime" src_port="cobaExcit_spikeinput">
+          <StateAssignment variable="cobaExcit_g">
+            <MathInline>cobaExcit_g+cobaExcit_q</MathInline>
+          </StateAssignment>
+        </OnEvent>
+        <OnCondition target_regime="RegularRegime">
+          <Trigger>
+            <MathInline>t &gt;= iaf_tspike + iaf_taurefrac</MathInline>
+          </Trigger>
+        </OnCondition>
+      </Regime>
+      <Regime name="RegularRegime">
+        <TimeDerivative variable="iaf_V">
+          <MathInline>( iaf_gl*( iaf_vrest - iaf_V ) + iaf_ISyn+cobaExcit_I)/(iaf_cm)</MathInline>
+        </TimeDerivative>
+        <TimeDerivative variable="cobaExcit_g">
+          <MathInline>-cobaExcit_g/cobaExcit_tau</MathInline>
+        </TimeDerivative>
+        <OnEvent target_regime="RegularRegime" src_port="cobaExcit_spikeinput">
+          <StateAssignment variable="cobaExcit_g">
+            <MathInline>cobaExcit_g+cobaExcit_q</MathInline>
+          </StateAssignment>
+        </OnEvent>
+        <OnCondition target_regime="RefractoryRegime">
+          <StateAssignment variable="iaf_tspike">
+            <MathInline>t</MathInline>
+          </StateAssignment>
+          <StateAssignment variable="iaf_V">
+            <MathInline>iaf_vreset</MathInline>
+          </StateAssignment>
+          <EventOut port="iaf_spikeoutput"/>
+          <Trigger>
+            <MathInline>iaf_V &gt; iaf_vthresh</MathInline>
+          </Trigger>
+        </OnCondition>
+      </Regime>
+      <Alias name="cobaExcit_I">
+        <MathInline>cobaExcit_g*(cobaExcit_vrev-iaf_V)</MathInline>
+      </Alias>
+    </Dynamics>
+  </ComponentClass>
+  <Dimension name="time" t="1"/>
+  <Dimension name="voltage" m="1" l="2" t="-3" i="-1"/>
+  <Dimension name="conductance" m="-1" t="3" l="-2" i="2"/>
+  <Dimension name="area" l="2"/>
+</NineML>
+\end{lstlisting}
+
+User Layer description for the above example:
+\begin{lstlisting}
+<?xml version='1.0' encoding='UTF-8'?>
+<NineML xmlns="http://nineml.net/9ML/2.0">
+  <Component name="IaFNeuron">
+    <Definition url="http://nineml.net/catalog/neurons/iafICoba.9ml"
+      >Iaf1Coba</Definition>
+    <Property name="iaf_V" units="mV">
+      <SingleValue>-60</SingleValue>
+    </Property>
+    <Property name="iaf_tspike" units="ms">
+      <SingleValue>-1</SingleValue>
+    </Property>
+    <Property name="cobaExcit_g" units="mS">
+      <SingleValue>0</SingleValue>
+    </Property>
+    <Property name="iaf_cm" units="cm_square">
+      <SingleValue>0.02</SingleValue>
+    </Property>
+    <Property name="iaf_taurefrac" units="ms">
+      <SingleValue>3</SingleValue>
+    </Property>
+    <Property name="iaf_gl" units="mS">
+      <SingleValue>0.1</SingleValue>
+    </Property>
+    <Property name="iaf_vreset" units="mV">
+      <SingleValue>-70</SingleValue>
+    </Property>
+    <Property name="iaf_vrest" units="mV">
+      <SingleValue>-60</SingleValue>
+    </Property>
+    <Property name="iaf_vthresh" units="mV">
+      <SingleValue>20</SingleValue>
+    </Property>
+    <Property name="cobaExcit_tau" units="ms">
+      <SingleValue>2</SingleValue>
+    </Property>
+    <Property name="cobaExcit_q" units="ms">
+      <SingleValue>1</SingleValue>
+    </Property>
+    <Property name="cobaExcit_vrev" units="mV">
+      <SingleValue>0</SingleValue>
+    </Property>
+  </Component>
+  <Dimension name="time" t="1"/>
+  <Dimension name="voltage" m="1" l="2" t="-3" i="-1"/>
+  <Dimension name="conductance" m="-1" t="3" l="-2" i="2"/>
+  <Dimension name="area" l="2"/>
+  <Unit symbol="mV" dimension="voltage" power="-3"/>
+  <Unit symbol="ms" dimension="time" power="-3"/>
+  <Unit symbol="cm_square" dimension="area" power="-4"/>
+  <Unit symbol="mS" dimension="conductance" power="-3"/>
+</NineML>
 \end{lstlisting}
 
 
+% <AnalogReducePort name="i_synapse" operator="+" dimension="current"/>
+%    <AnalogSendPort name="U" dimension="dimensionless"/>
+%    <AnalogSendPort name="V" dimension="voltage"/>
+%    <EventPort name="spikeOutput" mode="send"/>
+%    <Dynamics>
+%        <StateVariable name="V" dimension="voltage"/>
+
+%  <TimeDerivative variable="U">
+%            <MathInline>a*(b*V - U)</MathInline>
+%          </TimeDerivative>
+%          <TimeDerivative variable="V">
+%            <MathInline>0.04*V*V + 5*V + 140.0 - U + i_synapse + i_injected</MathInline>
+%          </TimeDerivative>
+%          <OnCondition>
+%            <Trigger>
+%              <MathInline>V &gt; theta </MathInline>
+%            </Trigger>
+%            <StateAssignment variable="V" >
+%              <MathInline>c</MathInline>
+%            </StateAssignment>
+%            <StateAssignment variable="U" >
+%              <MathInline>U+d</MathInline>
+%            </StateAssignment>
 
 
 %\note{To facilitate the reverse conversion from core to extended formats, NineML compliant tools must preserve all annotations during reading, writing and transformation, with the exception of when the return conversion is no longer possible due to the applied transformation or the annotations are explicitly added/deleted by the user.}
