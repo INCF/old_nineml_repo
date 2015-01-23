@@ -3,15 +3,8 @@
   <ComponentClass name="LaplaceDistribution">
     <Parameter name="location"/>
     <Parameter name="scale"/>
-    <PropertySendPort name="weight" dimension="dimensionless"/>
-    <Distribution>
-      <RandomVariable name="weight" dimension="dimensionless">
-        <un:laplace xmlns:un="http://www.uncertml.org/2.0">
-          <un:location>location</un:location>
-          <un:scale>scale</un:scale>
-        </un:laplace>
-      </RandomVariable>
-    </Distribution>
+    <RandomDistribution>
+      <StandardLibrary url="http://www.uncertml.org/distributions/laplace.xml">LaplaceDistribution</StandardLibrary>
+    </RandomDistribution>
   </ComponentClass>
-  <Dimension name="dimensionless"/>
 </NineML>

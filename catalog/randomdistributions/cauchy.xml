@@ -3,15 +3,8 @@
   <ComponentClass name="CauchyDistribution">
     <Parameter name="location"/>
     <Parameter name="scale"/>
-    <PropertySendPort name="weight" dimension="dimensionless"/>
-    <Distribution>
-      <RandomVariable name="weight" dimension="dimensionless">
-        <un:cauchy xmlns:un="http://www.uncertml.org/2.0">
-          <un:location>location</un:location>
-          <un:scale>scale</un:scale>
-        </un:cauchy>
-      </RandomVariable>
-    </Distribution>
+    <RandomDistribution>
+      <StandardLibrary url="http://www.uncertml.org/distributions/cauchy.xml">CauchyDistribution</StandardLibrary>
+    </RandomDistribution>
   </ComponentClass>
-  <Dimension name="dimensionless"/>
 </NineML>

@@ -3,15 +3,8 @@
   <ComponentClass name="WishartDistribution">
     <Parameter name="degreesOfFreedom"/>
     <Parameter name="scaleMatrix"/>
-    <PropertySendPort name="weight" dimension="dimensionless"/>
-    <Distribution>
-      <RandomVariable name="weight" dimension="dimensionless">
-        <un:wishart xmlns:un="http://www.uncertml.org/2.0">
-          <un:degreesOfFreedom>degreesOfFreedom</un:degreesOfFreedom>
-          <un:scaleMatrix>scaleMatrix</un:scaleMatrix>
-        </un:wishart>
-      </RandomVariable>
-    </Distribution>
+    <RandomDistribution>
+      <StandardLibrary url="http://www.uncertml.org/distributions/wishart.xml">WishartDistribution</StandardLibrary>
+    </RandomDistribution>
   </ComponentClass>
-  <Dimension name="dimensionless"/>
 </NineML>

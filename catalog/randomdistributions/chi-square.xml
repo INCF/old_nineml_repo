@@ -2,14 +2,8 @@
 <NineML xmlns="http://nineml.net/9ML/1.0">
   <ComponentClass name="ChiSquareDistribution">
     <Parameter name="degreesOfFreedom"/>
-    <PropertySendPort name="weight" dimension="dimensionless"/>
-    <Distribution>
-      <RandomVariable name="weight" dimension="dimensionless">
-        <un:chiSquare xmlns:un="http://www.uncertml.org/2.0">
-          <un:degreesOfFreedom>degreesOfFreedom</un:degreesOfFreedom>
-        </un:chiSquare>
-      </RandomVariable>
-    </Distribution>
+    <RandomDistribution>
+      <StandardLibrary url="http://www.uncertml.org/distributions/chi-square.xml">ChiSquareDistribution</StandardLibrary>
+    </RandomDistribution>
   </ComponentClass>
-  <Dimension name="dimensionless"/>
 </NineML>

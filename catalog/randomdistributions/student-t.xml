@@ -4,16 +4,8 @@
     <Parameter name="location"/>
     <Parameter name="scale"/>
     <Parameter name="degreesOfFreedom"/>
-    <PropertySendPort name="weight" dimension="dimensionless"/>
-    <Distribution>
-      <RandomVariable name="weight" dimension="dimensionless">
-        <un:studentTDistribution xmlns:un="http://www.uncertml.org/2.0">
-          <un:location>location</un:location>
-          <un:scale>scale</un:scale>
-          <un:degreesOfFreedom>degreesOfFreedom</un:degreesOfFreedom>
-        </un:studentTDistribution>
-      </RandomVariable>
-    </Distribution>
+    <RandomDistribution>
+      <StandardLibrary url="http://www.uncertml.org/distributions/student-t.xml">StudentTDistribution</StandardLibrary>
+    </RandomDistribution>
   </ComponentClass>
-  <Dimension name="dimensionless"/>
 </NineML>

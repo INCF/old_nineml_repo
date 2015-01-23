@@ -3,15 +3,8 @@
   <ComponentClass name="MultinomialDistribution">
     <Parameter name="numberOfTrials"/>
     <Parameter name="probabilities"/>
-    <PropertySendPort name="weight" dimension="dimensionless"/>
-    <Distribution>
-      <RandomVariable name="weight" dimension="dimensionless">
-        <un:multinomial xmlns:un="http://www.uncertml.org/2.0">
-          <un:numberOfTrials>numberOfTrials</un:numberOfTrials>
-          <un:probabilities>probabilities</un:probabilities>
-        </un:multinomial>
-      </RandomVariable>
-    </Distribution>
+    <RandomDistribution>
+      <StandardLibrary url="http://www.uncertml.org/distributions/multinomial.xml">MultinomialDistribution</StandardLibrary>
+    </RandomDistribution>
   </ComponentClass>
-  <Dimension name="dimensionless"/>
 </NineML>

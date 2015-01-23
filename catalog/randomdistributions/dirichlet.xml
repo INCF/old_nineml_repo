@@ -2,14 +2,8 @@
 <NineML xmlns="http://nineml.net/9ML/1.0">
   <ComponentClass name="DirichletDistribution">
     <Parameter name="concentration"/>
-    <PropertySendPort name="weight" dimension="dimensionless"/>
-    <Distribution>
-      <RandomVariable name="weight" dimension="dimensionless">
-        <un:dirichlet xmlns:un="http://www.uncertml.org/2.0">
-          <un:concentration>concentration</un:concentration>
-        </un:dirichlet>
-      </RandomVariable>
-    </Distribution>
+    <RandomDistribution>
+      <StandardLibrary url="http://www.uncertml.org/distributions/dirichlet.xml">DirichletDistribution</StandardLibrary>
+    </RandomDistribution>
   </ComponentClass>
-  <Dimension name="dimensionless"/>
 </NineML>

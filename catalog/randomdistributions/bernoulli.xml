@@ -2,14 +2,8 @@
 <NineML xmlns="http://nineml.net/9ML/1.0">
   <ComponentClass name="BernoulliDistribution">
     <Parameter name="probabilities"/>
-    <PropertySendPort name="weight" dimension="dimensionless"/>
-    <Distribution>
-      <RandomVariable name="weight" dimension="dimensionless">
-        <un:bernoulli xmlns:un="http://www.uncertml.org/2.0">
-          <un:probabilities>probabilities</un:probabilities>
-        </un:bernoulli>
-      </RandomVariable>
-    </Distribution>
+    <RandomDistribution>
+      <StandardLibrary url="http://www.uncertml.org/distributions/bernoulli.xml">BernoulliDistribution</StandardLibrary>
+    </RandomDistribution>
   </ComponentClass>
-  <Dimension name="dimensionless"/>
 </NineML>

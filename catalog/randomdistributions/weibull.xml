@@ -3,15 +3,8 @@
   <ComponentClass name="WeibullDistribution">
     <Parameter name="scale"/>
     <Parameter name="shape"/>
-    <PropertySendPort name="weight" dimension="dimensionless"/>
-    <Distribution>
-      <RandomVariable name="weight" dimension="dimensionless">
-        <un:weibull xmlns:un="http://www.uncertml.org/2.0">
-          <un:shape>shape</un:shape>
-          <un:scale>scale</un:scale>
-        </un:weibull>
-      </RandomVariable>
-    </Distribution>
+    <RandomDistribution>
+      <StandardLibrary url="http://www.uncertml.org/distributions/weibull.xml">WeibullDistribution</StandardLibrary>
+    </RandomDistribution>
   </ComponentClass>
-  <Dimension name="dimensionless"/>
 </NineML>
