@@ -1,39 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!--
-        Test XSD for NineML v0.2
-        Imports CoMoDL_v0.1.xsd which is the common format as discussed in INCF task force meeting May 2011
--->
+<!--XSD for NineML v1.0-->
 
-<xs:schema targetNamespace="http://nineml.org/9ML/0.3"
-    xmlns="http://nineml.org/9ML/0.3"
-    xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    xmlns:comodl="CoMoDL"
-    elementFormDefault="qualified"
-    attributeFormDefault="unqualified">
-
-    <!-- Note CoMoDL has been placed on NeuroML site due to NineML SVN not being publicly accessible. -->
-    <xs:import namespace="CoMoDL"
-        schemaLocation="http://neuroml.svn.sourceforge.net/viewvc/neuroml/NeuroML2/Schemas/CoMoDL/CoMoDL_v0.1.xsd"/>
+<xs:schema targetNamespace="http://nineml.net/9ML/1.0" xmlns="http://nineml.net/9ML/1.0"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified"
+    attributeFormDefault="unqualified" vc:minVersion="1.1"
+    xmlns:vc="http://www.w3.org/2007/XMLSchema-versioning">
 
 
-    <xs:element name="NineML" type="NineMLRoot">
+    <xs:element name="NineML">
         <xs:annotation>
             <xs:documentation>The root NineML element.</xs:documentation>
         </xs:annotation>
     </xs:element>
 
 
-    <xs:complexType name="NineMLRoot">
-        <xs:complexContent>
-            <xs:extension base="comodl:ComponentClassDefinitions">
-                <xs:sequence>
-                    <xs:element name="component" type="Component" minOccurs="0" maxOccurs="unbounded"/>
-                    <xs:element name="structure" type="Structure" minOccurs="0" maxOccurs="unbounded"/>
-                    <xs:element name="group" type="Group" minOccurs="0" maxOccurs="unbounded"/>
-                </xs:sequence>
-            </xs:extension>
-        </xs:complexContent>
+    <xs:complexType name="ComponentClass">
+        <xs:sequence>
+            <xs:element name="component" type="Component" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="structure" type="Structure" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="group" type="Group" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
     </xs:complexType>
 
 
@@ -52,7 +39,8 @@
 
     <xs:complexType name="Definition">
         <xs:sequence>
-            <xs:any processContents="skip" minOccurs="0" maxOccurs="unbounded"/> <!-- Further elements will be specified!! -->
+            <xs:any processContents="skip" minOccurs="0" maxOccurs="unbounded"/>
+            <!-- Further elements will be specified!! -->
         </xs:sequence>
         <xs:attribute name="language" type="xs:string" use="required"/>
     </xs:complexType>
@@ -61,28 +49,21 @@
 
     <xs:complexType name="Property">
         <xs:sequence>
-            <xs:element name="quantity" type="Quantity" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="SingleValue" type="SingleValue" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="ArrayValue" type="ArrayValue"/>
+            <xs:element name="ExternalArrayValue" type="ExternalArrayValue"/>
         </xs:sequence>
         <xs:attribute name="name" type="xs:string" use="required"/>
+        <xs:attribute name="units" type="xs:string"/>
     </xs:complexType>
 
-    <xs:complexType name="Quantity">
-        <xs:sequence>
-            <xs:element name="value" type="Value" minOccurs="1" maxOccurs="1"/>
-        </xs:sequence>
-    </xs:complexType>
-
-    <xs:complexType name="Value">
-        <xs:sequence>
-            <xs:element name="scalar" type="xs:string" minOccurs="1" maxOccurs="1"/>
-            <xs:element name="unit" type="xs:string" minOccurs="1" maxOccurs="1"/>
-        </xs:sequence>
-    </xs:complexType>
+    <xs:complexType name="SingleValue"> </xs:complexType>
 
 
     <xs:complexType name="Structure">
         <xs:sequence>
-            <xs:any processContents="skip" minOccurs="0" maxOccurs="unbounded"/> <!-- Further elements will be specified!! -->
+            <xs:any processContents="skip" minOccurs="0" maxOccurs="unbounded"/>
+            <!-- Further elements will be specified!! -->
         </xs:sequence>
 
         <xs:attribute name="name" type="xs:string" use="optional"/>
@@ -114,7 +95,8 @@
 
     <xs:complexType name="Set">
         <xs:sequence>
-            <xs:any processContents="skip" minOccurs="0" maxOccurs="unbounded"/> <!-- Further elements will be specified!! -->
+            <xs:any processContents="skip" minOccurs="0" maxOccurs="unbounded"/>
+            <!-- Further elements will be specified!! -->
         </xs:sequence>
         <xs:attribute name="name" type="xs:string" use="required"/>
     </xs:complexType>
@@ -122,12 +104,12 @@
 
     <xs:complexType name="Projection">
         <xs:sequence>
-            <xs:any processContents="skip" minOccurs="0" maxOccurs="unbounded"/> <!-- Further elements will be specified!! -->
+            <xs:any processContents="skip" minOccurs="0" maxOccurs="unbounded"/>
+            <!-- Further elements will be specified!! -->
         </xs:sequence>
         <xs:attribute name="name" type="xs:string" use="required"/>
     </xs:complexType>
 
+    <xs:complexType name="ArrayValue"/>
+    <xs:complexType name="ExternalArrayValue"/>
 </xs:schema>
-
-
-
