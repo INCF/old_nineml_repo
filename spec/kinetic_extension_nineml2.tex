@@ -262,51 +262,6 @@ Because NEURON is a dominant simulator within the field of neuroscience NineML m
 
 The purpose of the kinetic extension to NINEML is to provide a convenient means of converting the KINETIC scheme block in a model described by NMODL to the NINEML language. The kinetic extension must also provided a means of converting from the NINEML language back into the KINETIC block scheme specified by NMODL. Ultimately the kinetic scheme should be able to handle discontinuous state transitions.
 
-\begin{enumerate}
-\item NMODL
-%\item PARAMETER block
-%\item STATE block
-%\item DERIVATIVE block
-\item KINETIC block
-%\item NineML
-\item KineticState
-%\item TimeDerivative
-%\item Translation
-\end{enumerate}
-
-
-
-
-\subsection{NMDOL}
-NMODL provides a means of expanding the library of mechanisms available to NEURON simulator. The nervous system of any animal is typically made up of many species of neurons. Each species of neuron can be described by its own ionic and molecular properties. For example the concentration of Sodium ion channels may vary along the length of apical and distal dendrites. In the context of the NEURON simulator these ion channel and molecular properties are called mechanisms, and the NMODL language specifies a means to create new models of ionic and molecular mechanisms. By using a collection of compiled NMODL files the combined effects of many mechanisms can contribute to the resulting model output \cite{carnevale2006neuron}. 
-
-\section{NMODL Blocks}
-
-\subsection{PARAMETER block}
-
-Parameters refer to variables that are supplied by the user of the model. These values often refer to physical properties of neural tissue and often remain constant during the simulation.  By declaring a variable in PARAMETER block, you give that variable local scope, meaning that each instance of a mechanism is allowed to have its own varying values across spatially separated mechanisms. The values declared here are most often emperically derived default values, or initial conditions.
-%PARAMETERs values are visible to HOC interpreter.
-%variables who values are normally specified by the user are parameters, and are declared in a PARAMETER block. PARAMETERS generally remain constant during a simulation, but they can be changed in mid-run if necssary to emulate some external influence on the characteristic properties of a model.
-
-\subsection{STATE block}
-
-When a model invokes kinetic reaction schemes the unknown (dependent) variables belonging to the reaction scheme must be declared in the state block, this can include gating variables.
-
-In NMODL a {\it range variable} is a variable whose value is allowed to vary as a function of distance. This is in contrast to a {\it point process} whose values are only defined in a discrete point in space. All state variables are range variables in NEURON.  
-
-Typical state variables in a kinetic scheme are: closed, open and inactive states, these are denoted c, o, i respectively. The fraction of ion channels that are closed, open and inactive are all solved by differential equations. In the context of Kinetic schemes STATE variables will often follow a conservation rule, where the fraction of all possible open and closed states must equal one.
-
-
-\subsection{PROCEDURE block}
-The rate of change at which state variables can move between states is critical to the function of a kinetic scheme model. The function which describes rates is usually different for states that are changing in different directions for instance the function that describes moving from open to closed is different from the function that describes moving from closed to open.
-
-%Rates are often asymmetrical so that the rate at which a channel moves from open to closed may be different to the function that  than the rate at which a channel move from closed to open. 
-
-The procedure block provides an opportunity to define a procedure called { \it rates()}  which will allow us to state equations that determine the rate based on supplied PARAMETERS. The { \it rates()} procedure returns equilibrium constants.
-
-% If there are N state variables. Because of the conservation rule, there is always N-1 indipendent states. The Nth state is dependent and is implied by the conservation of states rule. The NINEML algotihm exploits this property in calculating states.
-
-\subsection{DERIVATIVE block}
 
 
 \subsection{KINETIC block}
@@ -319,38 +274,6 @@ The kinetics block can call a procedure such as { \it rates()}
 The rates function solves the equilibrium constants, using time constants which may have been derived theoretically.
 
 
-%Unknown variables which are solved 
-
-
-%Direct qoute from the NEURON book:
-\begin{lstlisting}[language=c]
-
-STATE { mc m }
-KINETIC scheme1 {
-	~ mc <-> m (a(v), b(v))
-}
-is equivalent to 
-
-DERIVATIVE scheme1{
-	mc' = -a(v)*mc + b(v)*m
-	m'  =  a(v)*mc - b(v)*m
-
-}
-
-\end{lstlisting}
-%Paraphrased:
-The two expressions in paranthesis a(v), and b(v) indicate the forward and reverse reaction rates. And variables directly adjacent to the tokens: $<->$ signify the reactants. Kinetic schemes use a basic notation where the tilde ~ signifies to the NMODL compiler that this is a Kinetic scheme. 
-
-
-% The voltage dependent rate constants are computed in produre rates(). That procedure computes the equilibrium constants K1 and K2 from the constants k1, d1, k2, and d2, whose emperically determined default values are given in the PARAMETER 
-% block, and membrane potential v. The time constants tau1 and tau2, however are found from tables created under hoc.
-%
-%
-
-\subsection{DERIVATIVE block}
-
-\subsection{BREAKPOINT}
-In the NEURON book \cite{carnevale2006neuron} it is recommended that sparse METHOD should be used for SOLVE a kinetic scheme. This is specified inside the BREAKPOINT block.
 
 \section{NINEML Components}
 
@@ -431,8 +354,9 @@ Each \TimeDerivative requires a \textit{variable} attribute. This should refer t
 \subsection{Kinetic}
 %\label{sec:ComponentClass}
 
-Maps onto a \Dynamics block. A reaction is a process that facilitates the transition of a molecular entity between states. A kinetic scheme usually contains a multiple number of states, and a multiple number of reactions. Within the Kinetics block the user of the Kinetics block can instantiate any number of KineticStates, and Reactions. 
-%Ie flattening of the tree is facilitated by mapping onto a dynamics block.
+The motivation for Kinetic Component Class extension to nineml is to provide an opportunity for electro-physiologists to express kinetic schemes in a notation that is consistent with their field.
+%Ie flattening of the tree is facilitated by mapping onto a dynamics component.
+The Kinetic Component Class can be flattened into a \Dynamics component. A kinetic scheme usually contains a multiple number of states, and a multiple number of reactions. A reaction is a process that facilitates the transition of a molecular entity between states. %Within the Kinetics component the user of the Kinetics component can instantiate any number of KineticStates, and Reactions. 
 
 \begin{table}[H]
   \begin{edtable}{tabular}{llr}
@@ -564,167 +488,50 @@ The concept of conservation of matter is central in calculating the fraction mol
 <?xml version='1.0' encoding='UTF-8'?>
 <NineML xmlns="http://nineml.net/9ML/2.0">
   <ComponentClass name="Kinetic">
-    <KineticState name C2 > 
+    <KineticState name C2> 
       <to> O </to>
       <from> C1 </from>
-    </KineticState>  
+    </KineticState>
+    <Alias name="K1">    
+      <mathinline>  K1=exp(k2*(d2-v)-k1*(d1-v)) </MathInline>
+    <Alias>
+    <Alias name="K2">    
+  	  <mathinline>  K2=exp(-k2*(d2-v)) </MathInline>
+    <Alias>    
     <Reaction>
-      <Alias name="K1">
-	    <mathinline>  K1=exp(k2*(d2-v)-k1*(d1-v)) </MathInline> 
-  	  </Alias>
-
-	  <ForwardRate>kf1=k1/(tau1(v)*(1+K1))</ForwardRate>
-		 </mathinline> 
-      </ForwardRate>
-      
-      
-      
+      <ForwardRate> <mathinline> kf2= K2/(tau2v)*(1+K2)) </mathinline> </ForwardRate>
+      <ReverseRate> <mathinline> kb1=1/(tau1(v)*(1+K1)) </mathinline>  </ReverseRate>      
     </Reaction>
   
-    <KineticState name = O > 
+    <KineticState name = O> 
+      <to> C2 </to>
+      <from> C2  </from>
+    </KineticState>
+    <Alias name="K2">    
+  	  <mathinline>  K2=exp(-k2*(d2-v)) </MathInline>
+    <Alias>       
+    <Reaction>
+      <ForwardRate> <mathinline> kf2= K2/(tau2v)*(1+K2)) </mathinline> </ForwardRate>
+      <ReverseRate> <mathinline> kb2=t/(tau2(v)+(1+K2) </mathinline> </ReverseRate>
+    </Reaction>
+    
+    <KineticState name = C1> 
       <to> C2 </to>
       <from> C2  </from>
     </KineticState>  
+      <Alias name="K1">
+	  	<mathinline>  K1=exp(k2*(d2-v)-k1*(d1-v)) </MathInline> 
+  	  </Alias>	
     <Reaction>
-      <ForwardRate> <mathinline>  </mathinline> </ForwardRate>
-      <ReverseRate> <mathinline>  </mathinline> </ReverseRate>
-    </Reaction>
-    
-    <KineticState name = C1 > 
-      <to> C2 </to>
-      <from> C2  </from>
-    </KineticState>  
-    <Reaction>
-      <ForwardRate> <mathinline>  </mathinline> </ForwardRate>
-      <ReverseRate> <mathinline>  </mathinline> </ReverseRate>
-    </Reaction>
-
-    
-    <constraint> c1+c2+o=1    </constraint>
+      <ForwardRate> <mathinline> kf1=k1/(tau1(v)*(1+K1)) </mathinline>  </ForwardRate>
+      <ReverseRate> <mathinline> kb1=1/(tau1(v)*(1+K1)) </mathinline>  </ReverseRate>
+    </Reaction> 
+     
+    <constraint> c1+c2+o=1 </constraint>
   <ComponentClass>  
       
-
-
-      <Conserve> <mathinline> C1+C2+O=1 </mathinline> </Conserve>
 	  	
-	  
-
-\end{lstlisting}
-
-\begin{lstlisting}[label=code:xmliaf2]
-<?xml version='1.0' encoding='UTF-8'?>
-<NineML xmlns="http://nineml.net/9ML/2.0">
-  <ComponentClass name="KineticMechanism">
-	<Parameter name="v" dimension="voltage"/>
-    <Parameter dimension="dimensionless" name="C1"/>
-    <Parameter dimension="dimensionless" name="C2"/>
-    <Parameter dimension="dimensionless" name="O"/>
-    <Dynamics>
-      <KineticState dimension="voltage" name v/> 
-      <KineticState dimension="dimensionless" name="C1"/>
-      <KineticState dimension="dimensionless" name="C2"/>
-      <KineticState dimension="dimensionless" name="O"/>
-
-
-
-
-	  <TimeDerivative variable="C1">
-	  	<MathInline>( kf1*C1+kf2*)</MathInline>
- 	  </TimeDerivative>
-
-    
-	 
-	  <KineticEquation from='C1 to C2'>
-	 	
-	 	<AnalogRecievePort> v </AnalogRecievePort>
-
-	 	<Conserve> 
-	 	  C1+C2+O=1  
-	 	</Conserve>    
-    	
-    	<Alias name="K1">
-	 	  <MathInline> K1=exp(k2*(d2-v)-k1*(d1-v)) </MathInline> 
-  	    </Alias>
-
-	  	<ForwardRate>kf1=k1/(tau1(v)*(1+K1))</ForwardRate>
-		
-		
-		<AnalogSendPort></AnalogSendPort>
-	  </KineticEquation>
-
-	  <KineticEquation from='C2 to O'>
-	  	<Conserve>  
-	  	  C1+C2+O=1  
-	  	</Conserve>
-	  	
-		<Alias name="K2">
-	 	  <MathInline> K2=exp(-k2*(d2-v))  </MathInline>
-	 	</Alias>
-	 	<ForwardRate>kf2=k2/(tau2(v)*(1+K2))</ForwardRate>
-
-	  	<ForwardRate></ForwardRate>
-		<ReverseRate></ReverseRate>
-		<AnalogSendPort></AnalogSendPort>
-		<AnalogRecievePort></AnalogRecievePort>
-	 </KineticEquation>
-
-
-     <KineticEquation from='0 to C2'>
-	  	<Conserve>  C1+C2+O=1  </Conserve>
-	  	
-		<Alias name="K2">
-	 	  <MathInline> K2=exp(-k2*(d2-v))  </MathInline>
-	 	</Alias>
-		<ReverseRate>kb1=1/(tau1(v)*(1+K1))</ReverseRate>
-
-	  	<ForwardRate></ForwardRate>
-		<ReverseRate></ReverseRate>
-		<AnalogSendPort></AnalogSendPort>
-		<AnalogRecievePort></AnalogRecievePort>
-	 </KineticEquation>
-
-
-     <KineticEquation from='C2' to C1>
-	   <Conserve>  C1+C2+O=1  </Conserve>
-	  	
-	   <Alias name="K2">
-	 	  <MathInline> K2=exp(-k2*(d2-v))  </MathInline>
-	   </Alias>
-		<ReverseRate>kb2=1/(tau2(v)*(1+K2))</ReverseRate>
-
-	   <ForwardRate></ForwardRate>
-	   <ReverseRate></ReverseRate>
-	   <AnalogSendPort></AnalogSendPort>
-	   <AnalogRecievePort></AnalogRecievePort>
-
-
-	 <Function>
-       rates
-	 </Function>
-
-	 </KineticEquation>
-
-     <KineticEq from='C2' to C1>
-       rates(v) 
-       c1   &lt; - &gt; c2 (kf1,kb1) #forwards1, backwards1
-       c2   &lt; - &gt; o  (kf2,kb2) #forwards, backwards2 
-       
-	   <Conserve>  C1+C2+O=1  </Conserve>
-	  	
-	   <Alias name="K2">
-	 	  <MathInline> K2=exp(-k2*(d2-v))  </MathInline>
-	   </Alias>
-		<ReverseRate>kb2=1/(tau2(v)*(1+K2))</ReverseRate>
-
-	   <ForwardRate></ForwardRate>
-	   <ReverseRate></ReverseRate>
-	   <AnalogSendPort></AnalogSendPort>
-	   <AnalogRecievePort></AnalogRecievePort>
-	 </KineticEquation>
-
-	  
-  </ComponentClass>
-  
+	   
 \end{lstlisting}[label=code:xmliaf2]
 
 
