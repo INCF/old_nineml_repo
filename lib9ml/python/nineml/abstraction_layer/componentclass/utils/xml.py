@@ -52,24 +52,25 @@ class ComponentClassXMLLoader(object):
         expr = self.load_single_internmaths_block(element,
                                                   checkOnlyBlock=False)
         condition = self.load_condition(
-            expect_single(element.findall(NINEML + 'Condition')))
+            expect_single(element.findall(NINEML + Condition.element_name)))
         return Piece(expr, condition)
 
     @read_annotations
     def load_otherwise(self, element):
-        return self.load_single_internmaths_block(element)
+        return Otherwise(self.load_single_internmaths_block(element))
 
     @read_annotations
     def load_condition(self, element):
-        return self.load_single_internmaths_block(element)
+        return Condition(self.load_single_internmaths_block(element))
 
     @read_annotations
     def load_piecewise(self, element):
-        blocks = ('Piece', 'Otherwise')
+        blocks = (Piece.element_name, Otherwise.element_name)
         subnodes = self._load_blocks(element, blocks=blocks)
         return Piecewise(name=element.get('name'),
-                         pieces=subnodes['Piece'],
-                         otherwise=expect_single(subnodes['Otherwise']),
+                         pieces=subnodes[Piece.element_name],
+                         otherwise=expect_single(
+                             subnodes[Otherwise.element_name]),
                          units=self.document[element.get('units')])
 
     def load_single_internmaths_block(self, element, checkOnlyBlock=True):
@@ -308,3 +309,5 @@ class ComponentClassXMLReader(object):
         loader.load_componentclasses(
             xmlroot=root, xml_node_filename_map=xml_node_filename_map)
         return loader.components
+
+from nineml.document import Document

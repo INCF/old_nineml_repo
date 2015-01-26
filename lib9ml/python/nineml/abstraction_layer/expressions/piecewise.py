@@ -42,7 +42,7 @@ class Piecewise(BaseALObject):
 
 class Piece(Expression, BaseALObject):
 
-    element_name = "Otherwise"
+    element_name = "Piece"
     defining_attributes = ('_rhs', 'condition')
 
     def __init__(self, expr, condition):
