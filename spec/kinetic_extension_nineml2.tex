@@ -205,7 +205,12 @@
 
 {\Large\bf Editors: }
 \begin{itemize}
-\item Tom Close %probably the same whole list as NineML Spec?
+\item Alex Cope
+\item Andrew P. Davison
+\item Erik De Schutter
+\item Ivan Raikov
+\item Paul Richmond
+\item Thomas G. Close
 \item Russell Jarvis
 \end{itemize}
 
@@ -237,126 +242,22 @@ This document is under the Common Creative license BY-NC-SA:\\ http://creativeco
 %\maketitlepage
 %\maketableofcontents
 
-% -----------------------------------------------------------------------------
-\section{Introduction}
-
-The purpose of NineML is to provide a simulator independent language for describing neuron relevant molecular, single cell, and neural network models. NineML is a declarative language which means that it is only necessary to describe the logic of the desired neural model, it is not necessary to provide implementation details. Because NineML provides a means to instantiate a model on any neural network simulator this will increase reproducibility of research.\\
-\\
-Because NEURON is a dominant simulator within the field of neuroscience NineML must be able to translate a complete model written in NMODL into an appropriate NineML format. NineML must also be able to translate appropriately formatted NineML model back to NMODL code. To successfully translate NMODL the KINETICs BLOCK of an NMODL mechanism must also be translated and it is this process that is described herein.
-
-%insert paragraph 4 here.
-
-%The Dynamics block represents the internal mechanisms governing the behaviour of the component. These
-%dynamics are based on ordinary differential equations (ODE) but may contain non-linear transitions between
-%different ODE regimes. The regime graph (e.g. Figure 2) must contain at least one Regime element, and contain
-%no regime islands. At any given time, a component will be in a single regime, and can change which regime it is in
-%through transitions.
-
-
-
-% -----------------------------------------------------------------------------
-%\vspace{-12.5pc} % A bit of a hack to reverse the vspace added by the Appendix name
-
-
 \subsection{Scope}
 
-The purpose of the kinetic extension to NINEML is to provide a convenient means of converting the KINETIC scheme block in a model described by NMODL to the NINEML language. The kinetic extension must also provided a means of converting from the NINEML language back into the KINETIC block scheme specified by NMODL. Ultimately the kinetic scheme should be able to handle discontinuous state transitions.
-
-
+The main motivation for Kinetic Component Class extension to NineML is to provide an opportunity for electro-physiologists to express kinetic schemes in a notation that is consistent with their field. The Kinetic Component Class can be flattened into a \Dynamics component. Another purpose of the kinetic extension to NINEML is to provide a convenient means of converting the KINETIC scheme block in a model described by NMODL to the NINEML language. %The kinetic extension must also provided a means of converting from the NINEML language back into the KINETIC block scheme specified by NMODL. Ultimately the kinetic scheme should be able to handle discontinuous state transitions.
 
 \subsection{KINETIC block}
 
-The NMODL translator converts the content of the kinetic scheme block into a family of Ordinary Differential Equations. An equivalent but less readable method of doing this would be to declare the appropriate differential equations to be solved in a NEURON DERIVATIVE block\cite{carnevale2006neuron}
-
-The concept of conservation of matter is central in calculating the fraction of ion channels that occupy a particular state. This is because ion transition from one state equals ion transition into another state.
-
-The kinetics block can call a procedure such as { \it rates()}
-The rates function solves the equilibrium constants, using time constants which may have been derived theoretically.
-
-
+The NMODL translator converts the content of the kinetic scheme block into a family of Ordinary Differential Equations. An equivalent but less readable method of doing this would be to declare the appropriate differential equations to be solved in a NEURON DERIVATIVE block \cite{carnevale2006neuron}.
 
 \section{NINEML Components}
-
-
-The \Dynamics block represents the \emph{internal} mechanisms
-governing the behaviour of the component. These dynamics are based on ordinary differential equations (ODE) but may contain non-linear transitions between
-different ODE regimes. The regime graph (e.g. \ref{fig:simple_regime_graph}) must contain at least one \Regime element, and contain no regime islands. At any given time, a component will be in a single regime, and can change which regime it is in through transitions.
-
-\note{\Alias objects are defined in Dynamics blocks, \emph{not} \Regime blocks. This means that aliases are the same across all regimes.}
-
-
-\subsection{KineticState}
-\label{sec:KineticState}
-
-\begin{table}[H]
-  \begin{edtable}{tabular}{llr}
-    \toprule
-    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{KineticState Structure}}}\\
-    \toprule
-    \em{Attribute name} & \em{Type/Format} & \em{Required} \\
-    \midrule
-    name & \identifier & yes\\
-    dimension & \Dimension{}@name & yes\\
-    \bottomrule
-  \end{edtable}
-\end{table}
-
-The internal state of a component is defined by a set of state variables
- -- variables that can change either continuously or discontinuously as a
-function of time.
-
-The value of a \KineticState can change in two ways:
-\begin{quote}
-\begin{itemize}
-\item continuously through \TimeDerivative elements (in {\Regime} elements),
-which define how the {\KineticState} evolves over time, e.g.
-$dX/dt=1-X$.
-\item discretely through \StateAssignment (in \OnCondition or \OnEvent transition elements),
-which make discrete changes to a \KineticState value, e.g. $X = X + 1$.
-\end{itemize}
-\end{quote}
-
-Only continuous changes are relevant to NineML KINETICs scheme.
-
-
-
-\subsection{TimeDerivative}
-\label{sec:TimeDerivative}
-
-\begin{table}[H]
-  \begin{edtable}{tabular}{llr}
-    \toprule
-    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{TimeDerivative Structure}}}\\
-    \toprule
-    \em{Attribute name} & \em{Type/Format} & \em{Required} \\
-    \midrule
-    variable & \KineticState{}@name & yes\\
-    \midrule
-    \em{Element type} & \em{Multiplicity} & \em{Required} \\
-    \midrule
-    \MathInline & singleton & yes \\ 
-    \bottomrule
-  \end{edtable}
-\end{table}
-
-\TimeDerivative elements contain a mathematical expression for the right-hand side of the ODE
-\begin{equation}
-\frac{\mathrm{d} variable}{\mathrm{d} t} = expression
-\end{equation}
-which can contain of references to any combination of \KineticState, \Parameter, \AnalogReceivePort, \AnalogReducePort and \Alias. Therefore, only one \TimeDerivative element is allowed per \KineticState per \Regime. If a {\TimeDerivative} for a \KineticState is not defined in a \Regime, it is assumed to be zero.
-
-\subsubsection{Variable attribute}
-Each \TimeDerivative requires a \textit{variable} attribute. This should refer to the name of a \KineticState in the \ComponentClass. Only one \TimeDerivative is allowed per \textit{variable} in each \Regime.
-
-
-
 
 \subsection{Kinetic}
 %\label{sec:ComponentClass}
 
-The motivation for Kinetic Component Class extension to nineml is to provide an opportunity for electro-physiologists to express kinetic schemes in a notation that is consistent with their field.
+
 %Ie flattening of the tree is facilitated by mapping onto a dynamics component.
-The Kinetic Component Class can be flattened into a \Dynamics component. A kinetic scheme usually contains a multiple number of states, and a multiple number of reactions. A reaction is a process that facilitates the transition of a molecular entity between states. %Within the Kinetics component the user of the Kinetics component can instantiate any number of KineticStates, and Reactions. 
+The Kinetic component provides all of the information required to fully specify a Kinetic scheme. Because a kinetic scheme usually contains a multiple number of states, and a multiple number of reactions within the Kinetics component the user of the Kinetics component can instantiate any number of KineticStates, and Reactions. 
 
 \begin{table}[H]
   \begin{edtable}{tabular}{llr}
@@ -369,7 +270,7 @@ The Kinetic Component Class can be flattened into a \Dynamics component. A kinet
     \Reaction & set & yes \\
     \Constraint & set & no \\
     \Alias & set & no \\
-    \Constant & set & no \\
+    \Constant & set & no \\ %I think this should be singleton and required.
     \bottomrule
   \end{edtable}
 \end{table}
@@ -377,13 +278,12 @@ The Kinetic Component Class can be flattened into a \Dynamics component. A kinet
 
 \subsection{KineticState}
 \label{sec:KineticState}
-
-Each Kinetic scheme is able to accommodate an arbitrary number of states. 
+The KineticState container provides all of the information to fully describe one kinetic state variable that may constitute a greater kinetic scheme. %Each Kinetic scheme is able to accommodate an arbitrary number of states, and also a variable number of Reactions between states.
 
 \begin{table}[H]
   \begin{edtable}{tabular}{llr}
     \toprule
-    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{Kinetic Structure}}}\\
+    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{KineticState}}}\\
     \toprule
     \em{Attribute name} & \em{Type/Format} & \em{Required} \\
     \midrule
@@ -393,11 +293,15 @@ Each Kinetic scheme is able to accommodate an arbitrary number of states.
 \end{table}
 
 \subsubsection{Name attribute}
+Each KineticState requires a name attribute, which is a valid identifier and uniquely identifies the StateVariable from all other elements in the ComponentClass.
 
+\subsubsection{Dimension attribute}
+Each KineticState Variable requires a dimension attribute. This attribute specifies the dimension of the units of the quantities that KineticState is expected to be initialised and updated with and should refer to the name of a Dimension element in the global scope.
+
+%ie in the example of ion channel states the units of a kinetic state variable would be in energy. 
 
 \subsection{Reaction}
-\label{sec:Reaction}
-Because the number of possible ion channel states is variable the number of reactions between states must also be variable, however it is expected that the number of possible reactions should be at least one less than the number of possible states. Reactions have a from and a to attribute, which describes which state variable, they are moving from and which state varible the moving to.
+\label{sec:Reaction} A reaction is a process that facilitates the transition of a molecular entity between states. Reactions have a single to and single from attribute, which describes which state  they are transitioning from and which state they are transitioning into. The forward rate and reverse rate of chemical reactions are described inside the Reaction Component class.
 
 \begin{table}[H]
   \begin{edtable}{tabular}{llr}
@@ -424,13 +328,13 @@ name identifier yes
 
 \subsubsection{To attribute}
 
-Attribute name Type/Format Required
+Attribute name Type/Format Required 
 name identifier yes
 
 
 \subsection{ForwardRate}
 \label{sec:ForwardRate}
-The forward rate describes the rate of change of a molecular entity from one state to another  an example might be ion channels as they move from a closed state to an open state. At most one forward rate equation and one reverse rate per Reaction.  
+The forward rate describes the rate of change of a molecular entity from one state to another.  An example of a forward reaction might be an ion channel protein as it moves from a closed state to an open state. %At most there can only be one forward rate equation and one reverse rate per Reaction.  
 \begin{table}[H]
   \begin{edtable}{tabular}{llr}
     \toprule
@@ -446,7 +350,7 @@ The forward rate describes the rate of change of a molecular entity from one sta
 
 \subsection{ReverseRate}
 \label{sec:ReverseRate}
-The reverse rate describes that rate of change for the reverse process described in ForwardRate.
+The reverse rate describes that rate of change for the reverse process described in ForwardRate. For example an ion channel protein might be ion channel protein as it moves from an open state to a closed state.
 
 \begin{table}[H]
   \begin{edtable}{tabular}{llr}
@@ -464,9 +368,8 @@ The reverse rate describes that rate of change for the reverse process described
 \subsection{Constraint}
 \label{sec:Constraint}
 
-The right hand side of the kinetics equation must be stated in a format where left hand side is equal to unity. If a kinetic equation is expressed with a non unity right hand side they may require a basic manipulation. At most the user can specify only one constraint equation per Kinetic Component.
+The concept of conservation of matter is central in calculating the fraction of ion channels that occupy a particular state. This is because when a molecular entity transitions into a new state it necessarily transitions out of its previous state. The fraction of ion channels that occupy each state can change, but the sum of all the fractions must balance to unity. For this reason the right hand side of the kinetics equation must be stated in a format where left hand side is equal to unity. If a kinetic equation is expressed with a non unity right hand side the equation requires basic manipulation to make it the case that the right hand side equals unity. At most the user can specify only one constraint equation per Kinetic Component.
 
-The concept of conservation of matter is central in calculating the fraction molecular entities that occupy a particular state. This is because molecular transition out of one state equals molecular transition into another state.
 
 \begin{table}[H]
   \begin{edtable}{tabular}{llr}
@@ -482,6 +385,7 @@ The concept of conservation of matter is central in calculating the fraction mol
 
 
 \subsection{Example use of kinetic scheme}.
+
 
 
 \begin{lstlisting}[label=code:xmliaf2]
