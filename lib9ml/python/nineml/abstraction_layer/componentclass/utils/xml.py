@@ -137,7 +137,10 @@ class ComponentClassXMLLoader(object):
     base_tag_to_loader = {
         "Parameter": load_parameter,
         "Alias": load_alias,
-        "Piecewise": load_piecewise
+        "Piecewise": load_piecewise,
+        "Piece": load_piece,
+        "Otherwise": load_otherwise,
+        "Condition": load_condition
     }
 
 
@@ -155,7 +158,10 @@ class ComponentClassXMLWriter(ComponentVisitor):
 
     @annotate_xml
     def visit_piecewise(self, piecewise):
-        return E('Piecewise', str(piecewise.value),
+        pieces = [piece.accept_visitor(self) for piece in self.pieces]
+        pieces.append(self.otherwise.accept_visitor(self))
+        return E('Piecewise',
+                 *pieces,
                  name=piecewise.name,
                  units=piecewise.units.name)
 
