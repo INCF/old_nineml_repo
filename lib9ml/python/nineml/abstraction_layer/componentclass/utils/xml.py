@@ -158,7 +158,7 @@ class ComponentClassXMLWriter(ComponentVisitor):
 
     @annotate_xml
     def visit_piecewise(self, piecewise):
-        pieces = [piece.accept_visitor(self) for piece in self.pieces]
+        pieces = [piece.accept_visitor(self) for piece in piecewise.pieces]
         pieces.append(self.otherwise.accept_visitor(self))
         return E('Piecewise',
                  *pieces,
