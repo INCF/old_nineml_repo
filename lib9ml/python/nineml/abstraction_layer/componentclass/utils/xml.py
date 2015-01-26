@@ -10,7 +10,7 @@ from lxml import etree
 from itertools import chain
 from nineml.xmlns import E
 from . import ComponentVisitor
-from ...expressions import Alias, RandomVariable
+from ...expressions import Alias, RandomVariable, RandomDistribution
 from nineml.abstraction_layer.componentclass.base import Parameter
 from nineml.annotations import annotate_xml, read_annotations
 from nineml.utils import expect_single, filter_expect_single
@@ -49,9 +49,12 @@ class ComponentClassXMLLoader(object):
 
     @read_annotations
     def load_randomvariable(self, element):
+        # RandomDistributions are defined in Uncertml (http://uncertml.org)
+        # so have their own reader/writing functions.
         return RandomVariable(name=element.get('name'),
-                        value=float(element.text),
-                        units=self.document[element.get('units')])
+                              distribution=RandomDistribution.from_xml(
+                                  expect_single(element.getchildren())),
+                              units=self.document[element.get('units')])
 
     def load_single_internmaths_block(self, element, checkOnlyBlock=True):
         if checkOnlyBlock:
@@ -136,7 +139,8 @@ class ComponentClassXMLWriter(ComponentVisitor):
 
     @annotate_xml
     def visit_randomvariable(self, randomvariable):
-        return E('RandomVariable', str(randomvariable.value),
+        return E('RandomVariable',
+                 self.distribution.to_xml(),
                  name=randomvariable.name,
                  units=randomvariable.units.name)
 
