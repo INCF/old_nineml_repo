@@ -1,0 +1,96 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<NineML xmlns="http://nineml.incf.org/9ML/0.1">
+  <Component name="HHid19">
+    <Parameter name="theta"/>
+    <AnalogSendPort name="n_kn"/>
+    <AnalogSendPort name="t"/>
+    <AnalogSendPort name="n_kd"/>
+    <analog-port symbol="Isyn" mode="reduce" op="+"/>
+    <AnalogSendPort name="m"/>
+    <AnalogSendPort name="h"/>
+    <AnalogSendPort name="V"/>
+    <Regime name="hhid19_regime">
+      <TimeDerivative variable="h">
+        <MathInline>alpha_h_na(V)*(1-h)-beta_m_na(V)*h</MathInline>
+      </TimeDerivative>
+      <TimeDerivative variable="n_kd">
+        <MathInline>alpha_n_kd(V)*(1-n_kd)-beta_n_kd(V)*n_kd</MathInline>
+      </TimeDerivative>
+      <TimeDerivative variable="m">
+        <MathInline>alpha_m_na(V)*(1-m)-beta_m_na(V)*m</MathInline>
+      </TimeDerivative>
+      <TimeDerivative variable="V">
+        <MathInline>(-g_L*(V-E_L)-I_Na(V,m,h)-I_kd(V,n_kd)-I_M(V,n_kn)-Isyn)/C_m</MathInline>
+      </TimeDerivative>
+      <TimeDerivative variable="n_kn">
+        <MathInline>akpha_n_kn(V)*(1-n_kn)-beta_n_kn(V)*n_kn</MathInline>
+      </TimeDerivative>
+    </Regime>
+    <binding name="beta_n_kn(V)">
+      <MathInline>-0.0001*(V+30)/(1-exp())</MathInline>
+    </binding>
+    <binding name="beta_m_na(V)">
+      <MathInline>0.28*(V-VT-40)/(exp((V-VT-40)/5)-1)</MathInline>
+    </binding>
+    <binding name="I_Na(V, m, h)">
+      <MathInline>g_Na_bar*m*m*m*h*(V-E_Na)</MathInline>
+    </binding>
+    <binding name="g_m_bar">
+      <MathInline>0.28</MathInline>
+    </binding>
+    <binding name="g_L">
+      <MathInline>15.7</MathInline>
+    </binding>
+    <binding name="beta_n_kd(V)">
+      <MathInline>0.5*exp(-(V-VT-10)/40)</MathInline>
+    </binding>
+    <binding name="C_m">
+      <MathInline>0.35</MathInline>
+    </binding>
+    <binding name="alpha_h_na(V)">
+      <MathInline>0.128*exp(-(V-VT-VS-17)/18)</MathInline>
+    </binding>
+    <binding name="VS">
+      <MathInline>-10</MathInline>
+    </binding>
+    <binding name="beta_h_na(V)">
+      <MathInline>4/(1+exp(-(V-VT-VS-40)/5))</MathInline>
+    </binding>
+    <binding name="g_kd_bar">
+      <MathInline>3.46</MathInline>
+    </binding>
+    <binding name="I_M(V, n_kn)">
+      <MathInline>g_m_bar*n_kn*(V-E_k)</MathInline>
+    </binding>
+    <binding name="alpha_n_kn(V)">
+      <MathInline>0.0001*(V+30)/(1-exp(-(V+30)/9))</MathInline>
+    </binding>
+    <binding name="VT">
+      <MathInline>-58</MathInline>
+    </binding>
+    <binding name="I_kd(V, n_kd)">
+      <MathInline>g_kd_bar*n_kd*n_kd*n_kd*n_kd*(V-E_k)</MathInline>
+    </binding>
+    <binding name="alpha_m_na(V)">
+      <MathInline>-0.32*(V-VT-13)/(exp(-(V-VT-13)/4)-1)</MathInline>
+    </binding>
+    <binding name="g_Na_bar">
+      <MathInline>17.87</MathInline>
+    </binding>
+    <binding name="E_k">
+      <MathInline>-90</MathInline>
+    </binding>
+    <binding name="alpha_n_kd(V)">
+      <MathInline>-0.032*(V-VT-15)/(exp(-(V-VT-15)/5)-1)</MathInline>
+    </binding>
+    <binding name="E_Na">
+      <MathInline>50</MathInline>
+    </binding>
+    <binding name="E_L">
+      <MathInline>-80</MathInline>
+    </binding>
+    <transition to="hhid19_regime" from="hhid19_regime" name="Transition0" condition="V &gt; theta">
+      <event-port symbol="spike_output" mode="send"/>
+    </transition>
+  </Component>
+</NineML>

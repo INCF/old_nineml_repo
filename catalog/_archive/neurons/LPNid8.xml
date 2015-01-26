@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<NineML xmlns="http://nineml.incf.org/9ML/0.1">
+  <Component name="LPNid8">
+    <Parameter name="W"/>
+    <Parameter name="N"/>
+    <AnalogSendPort name="pfire"/>
+    <AnalogSendPort name="p"/>
+    <Regime name="inter_event_regime"/>
+    <Regime name="firing_regime"/>
+    <transition to="firing_regime" from="inter_event_regime" name="Transition0">
+      <condition-on-event-port>
+        <event-port symbol="spike_input" mode="recv"/>
+      </condition-on-event-port>
+      <assignment to="pfire" name="Assignment0">
+        <MathInline>W/N</MathInline>
+      </assignment>
+      <assignment to="p" name="Assignment1">
+        <MathInline>rand()</MathInline>
+      </assignment>
+    </transition>
+    <transition to="inter_event_regime" from="firing_regime" name="Transition1" condition="pfire &gt;= p">
+      <event-port symbol="spike_output" mode="send"/>
+    </transition>
+    <transition to="inter_event_regime" from="firing_regime" name="Transition2" condition="pfire &lt; p"/>
+  </Component>
+</NineML>

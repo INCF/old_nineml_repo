@@ -1,0 +1,50 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<NineML xmlns="http://nineml.incf.org/9ML/0.1">
+  <Component name="GuetigSTDP">
+    <Parameter name="mu"/>
+    <Parameter name="alpha"/>
+    <Parameter name="tau_minus"/>
+    <Parameter name="learning_rate"/>
+    <Parameter name="tau_plus"/>
+    <AnalogSendPort name="W"/>
+    <AnalogSendPort name="r"/>
+    <AnalogSendPort name="o"/>
+    <AnalogSendPort name="t"/>
+    <Regime name="Regime0">
+      <TimeDerivative variable="r">
+        <MathInline>-r/tau_plus</MathInline>
+      </TimeDerivative>
+      <TimeDerivative variable="o">
+        <MathInline>-o/tau_minus</MathInline>
+      </TimeDerivative>
+    </Regime>
+    <transition to="Regime0" from="Regime0" name="Transition0">
+      <condition-on-event-port>
+        <event-port symbol="spike_pre" mode="recv"/>
+      </condition-on-event-port>
+      <inplace to="W" name="InplaceSub0" op="-=">
+        <MathInline>o*learning_rate*alpha*W**mu</MathInline>
+      </inplace>
+      <assignment to="W" name="Assignment0">
+        <MathInline>max(W,0.0)</MathInline>
+      </assignment>
+      <inplace to="r" name="InplaceAdd1" op="+=">
+        <MathInline>1.0</MathInline>
+      </inplace>
+    </transition>
+    <transition to="Regime0" from="Regime0" name="Transition1">
+      <condition-on-event-port>
+        <event-port symbol="spike_post" mode="recv"/>
+      </condition-on-event-port>
+      <inplace to="W" name="InplaceAdd2" op="+=">
+        <MathInline>r*learning_rate*(1-W)**mu</MathInline>
+      </inplace>
+      <assignment to="W" name="Assignment1">
+        <MathInline>min(W,1.0)</MathInline>
+      </assignment>
+      <inplace to="o" name="InplaceAdd3" op="+=">
+        <MathInline>1.0</MathInline>
+      </inplace>
+    </transition>
+  </Component>
+</NineML>

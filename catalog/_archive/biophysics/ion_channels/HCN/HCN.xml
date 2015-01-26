@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<NineML xmlns="http://nineml.incf.org/9ML/0.3" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://nineml.incf.org/9ML/0.3../NineML_v0.3.xsd">
+    <Dimension name="per_time" t="-1"/>
+    <Dimension name="voltage" m="1" l="2" t="-3" i="-1"/>  
+    <Dimension name="temperature" k="1"/>
+    <Dimension name="conductanceDensity" m="-1" l="-4" t="3" i="2"/>
+    <Dimension name="temperature" k="1"/>
+    <Dimension name="currentDensity" i="1" l="-2"/>
+    <Dimension name="concentration" l="-3" n="1"/>
+    <ComponentClass name="HCN"
+        xmlns="http://nineml.incf.org/9ML/0.3">
+        <Parameter name="gbar" dimension="conductanceDensity"/>
+        <Parameter name="e_reversal" dimension="voltage"/>
+        <Parameter name="Ehalf" dimension="voltage"/>
+        <Parameter name="c" dimension="inverse_voltage"/>
+        <Parameter name="rA" dimension="inverse_voltage"/>
+        <Parameter name="rB"/>
+        <Parameter name="tCs"/>
+        <Parameter name="tDs" dimension="voltage"/>
+        <Parameter name="tEs" dimension="inverse_voltage"/>
+        <Parameter name="tCf"/>
+        <Parameter name="tDf" dimension="inverse_voltage"/>
+        <Parameter name="tEf" dimension="voltage"/>
+        <AnalogPort mode="recv" name="v" dimension="voltage"/>
+        <AnalogPort mode="send" name="g" dimension="conductanceDensity"/>
+        <Dynamics>
+            <StateVariable name="o_slow">
+                <Initial>o_slow_inf</Initial>
+            </StateVariable>
+            <StateVariable name="o_fast">
+                <Initial>o_fast_inf</Initial>
+            </StateVariable>            
+            <Regime>
+                <TimeDerivative variable="o_slow">
+                    <MathInline>(o_slow_inf - o_slow) / tau_slow</MathInline>
+                </TimeDerivative>
+                <TimeDerivative variable="o_fast">
+                    <MathInline>(o_fast_inf - o_fast) / tau_fast</MathInline>
+                </TimeDerivative>
+            </Regime>
+            <Alias name="g">
+                <MathInline>gbar * o_slow * o_fast</MathInline>
+            </Alias>    
+            <Alias name="tau_slow">
+                <MathInline>exp(tEs * (tCs * v - tDs))</MathInline>
+            </Alias>
+            <Alias name="tau_fast">
+                <MathInline>exp(tEf * (tCf * v - tDf))</MathInline>
+            </Alias>
+            <Alias name="o_slow_inf">
+                <MathInline>(1 - r) * o_inf</MathInline>
+            </Alias>
+            <Alias name="o_fast_inf">
+                <MathInline>r * o_inf</MathInline>
+            </Alias>
+            <Alias name="o_inf">
+                <MathInline>1 / (1 + exp((v - Ehalf) * c))</MathInline>
+            </Alias>
+            <Alias name="r">
+                <MathInline>rA * v + rB</MathInline>
+            </Alias>
+            <Alias name="i">
+                 <MathInline>g * (v - e_reversal)</MathInline>
+            </Alias>
+        </Dynamics>
+    </ComponentClass>
+</NineML>

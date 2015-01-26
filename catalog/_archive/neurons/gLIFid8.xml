@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<NineML xmlns="http://nineml.incf.org/9ML/0.1">
+  <Component name="gLIFid8">
+    <Parameter name="Vth"/>
+    <Parameter name="Vrest"/>
+    <Parameter name="Cm"/>
+    <Parameter name="Rm"/>
+    <AnalogSendPort name="V"/>
+    <analog-port symbol="Isyn" mode="reduce" op="+"/>
+    <AnalogSendPort name="tspike"/>
+    <AnalogSendPort name="t"/>
+    <Regime name="sub-threshold-regime">
+      <TimeDerivative variable="V">
+        <MathInline>(Vrest - V)/(Rm*Cm) + Isyn/Cm</MathInline>
+      </TimeDerivative>
+    </Regime>
+    <transition to="sub-threshold-regime" from="sub-threshold-regime" name="Transition0" condition="V&gt;Vth">
+      <assignment to="tspike" name="Assignment0">
+        <MathInline>t</MathInline>
+      </assignment>
+      <assignment to="V" name="Assignment1">
+        <MathInline>Vrest</MathInline>
+      </assignment>
+      <event-port symbol="spike_output" mode="send"/>
+    </transition>
+  </Component>
+</NineML>

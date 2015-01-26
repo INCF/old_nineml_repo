@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<NineML xmlns="http://nineml.incf.org/9ML/0.1">
+  <Component name="Izhikevich">
+    <Parameter name="V"/>
+    <Parameter name="U"/>
+    <Parameter name="t"/>
+    <Parameter name="spike"/>
+    <Parameter name="Isyn"/>
+    <Parameter name="a"/>
+    <Parameter name="b"/>
+    <Parameter name="c"/>
+    <Parameter name="d"/>
+    <Parameter name="theta"/>
+    <sequence name="subthreshold_regime">
+      <union name="Regime0">
+        <ode bound_variable="t" name="V_equation" dependent_variable="V">
+          <MathInline>0.04*V*V + 5*V + 140.0 - U + Isyn</MathInline>
+        </TimeDerivative>
+        <ode bound_variable="t" name="U_equation" dependent_variable="U">
+          <MathInline>a*(b*V - U)</MathInline>
+        </TimeDerivative>
+      </union>
+      <assignment to="spike" name="threshold_detect">
+        <MathInline>V &gt; theta</MathInline>
+      </assignment>
+    </sequence>
+    <union name="post_spike_regime">
+      <assignment to="V" name="reset_V">
+        <MathInline>c</MathInline>
+      </assignment>
+      <assignment to="U" name="increment_U">
+        <MathInline>U + d</MathInline>
+      </assignment>
+    </union>
+    <transition to="post_spike_regime" from="subthreshold_regime" name="spike_transition" condition="spike"/>
+    <transition to="subthreshold_regime" from="post_spike_regime" name="return_transition" condition="true"/>
+  </Component>
+</NineML>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<NineML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="http://nineml.incf.org/9ML/0.3"
+    xsi:schemaLocation="http://nineml.incf.org/9ML/NineML_v0.3.xsd">
+    <ComponentClass name="multiDoubleExpSynapse">
+        <Parameter name="tau1" dimension="time"/>
+        <Parameter name="tau2" dimension="time"/>
+        <Parameter name="e_reversal" dimension="voltage"/>
+        <AnalogPort mode="recv" name="v" dimension="voltage"/>
+        <EventPort mode="recv" name="wSpike" dimension="conductanceDensity"/>
+        <AnalogPort mode="send" name="g" dimension="conductanceDensity"/>
+        <Dynamics>
+            <StateVariable name="g1">
+                <Initial>
+                    <Value units="S/cm^2">0</Value>
+                </Initial>
+            </StateVariable>
+            <StateVariable name="g2">
+                <Initial>
+                    <Value units="S/cm^2">0</Value>
+                </Initial>
+            </StateVariable>
+            <Alias name="tp">
+                <MathInline> tau1 * tau2 / (tau2 - tau1) * ln(tau2 / tau1)
+                </MathInline>
+            </Alias>
+            <Alias name="scale_factor">
+                <MathInline> 1 / (exp(-tp / tau2) - exp(-tp / tau1))
+                </MathInline>
+            </Alias>
+            <Alias name="i">
+                 <MathInline>(g2 - g1) * (v - eReversal)</MathInline>
+            </Alias>
+            <Regime>
+                <TimeDerivative variable="g1">
+                    <MathInline>-g1 / tau1</MathInline>
+                </TimeDerivative>
+                <TimeDerivative variable="g2">
+                    <MathInline>-g2 / tau2</MathInline>
+                </TimeDerivative>
+                <OnCondition>
+                    <Trigger>wSpike</Trigger>
+                    <Assignment variable="g1">
+                        <MathInline>g1 + (wSpike * scale_factor)</MathInline>
+                    </Assignment>
+                    <Assignment variable="g2">
+                        <MathInline>g2 + (wSpike * scale_factor)</MathInline>
+                    </Assignment>
+                </OnCondition>
+            </Regime>
+        </Dynamics>
+    </ComponentClass>
+</NineML>
