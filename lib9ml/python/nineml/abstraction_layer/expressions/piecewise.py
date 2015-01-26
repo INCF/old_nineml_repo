@@ -51,6 +51,10 @@ class Piece(Expression, BaseALObject):
             condition = Condition(condition)
         self.condition = condition
 
+    def accept_visitor(self, visitor, **kwargs):
+        """ |VISITATION| """
+        return visitor.visit_piece(self, **kwargs)
+
     @property
     def rhs_atoms(self):
         return chain(super(Piece, self).rhs_atoms,
@@ -61,6 +65,10 @@ class Otherwise(Expression, BaseALObject):
 
     element_name = "Otherwise"
 
+    def accept_visitor(self, visitor, **kwargs):
+        """ |VISITATION| """
+        return visitor.visit_otherwise(self, **kwargs)
+
 
 class Condition(Expression, BaseALObject):
 
@@ -69,4 +77,6 @@ class Condition(Expression, BaseALObject):
     def _parse_rhs(self, rhs):
         return parse.cond(rhs)
 
-
+    def accept_visitor(self, visitor, **kwargs):
+        """ |VISITATION| """
+        return visitor.visit_condition(self, **kwargs)

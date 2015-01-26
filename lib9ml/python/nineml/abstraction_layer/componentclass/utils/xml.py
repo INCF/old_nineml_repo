@@ -76,8 +76,9 @@ class ComponentClassXMLLoader(object):
         if checkOnlyBlock:
             elements = list(element.iterchildren(tag=etree.Element))
             if len(elements) != 1:
-                print elements
-                assert 0, 'Unexpected tags found'
+                raise NineMLRuntimeError(
+                    "Unexpected tags found '{}'"
+                    .format("', '".join(e.tag for e in elements)))
         assert (len(element.findall(MATHML + "MathML")) +
                 len(element.findall(NINEML + "MathInline"))) == 1
         if element.find(NINEML + "MathInline") is not None:
@@ -109,11 +110,13 @@ class ComponentClassXMLLoader(object):
         return loaded_objects
 
     def _get_loader(self, tag):
+        # Try class specific loaders (better to ask for forgiveness philosophy)
         try:
             loader = self.tag_to_loader[tag]
         except KeyError:
+            # Otherwise try base class loaders for generic elements
             try:
-                loader = self.base_tag_to_loader[tag]
+                loader = ComponentClassXMLLoader.tag_to_loader[tag]
             except KeyError:
                 assert False, "Did not finder loader for '{}' tag".format(tag)
         return loader
@@ -134,7 +137,7 @@ class ComponentClassXMLLoader(object):
             class_type = "Distribution"
         return class_type
 
-    base_tag_to_loader = {
+    tag_to_loader = {
         "Parameter": load_parameter,
         "Alias": load_alias,
         "Piecewise": load_piecewise,
@@ -148,22 +151,40 @@ class ComponentClassXMLWriter(ComponentVisitor):
 
     @annotate_xml
     def visit_parameter(self, parameter):
-        return E('Parameter',
+        return E(Parameter.element_name,
                  name=parameter.name,
                  dimension=parameter.dimension.name)
 
     @annotate_xml
     def visit_alias(self, alias):
-        return E('Alias', E("MathInline", alias.rhs), name=alias.lhs)
+        return E(Alias.element_name,
+                 E("MathInline", alias.rhs),
+                 name=alias.lhs)
 
     @annotate_xml
     def visit_piecewise(self, piecewise):
         pieces = [piece.accept_visitor(self) for piece in piecewise.pieces]
-        pieces.append(self.otherwise.accept_visitor(self))
-        return E('Piecewise',
+        pieces.append(piecewise.otherwise.accept_visitor(self))
+        return E(Piecewise.element_name,
                  *pieces,
                  name=piecewise.name,
                  units=piecewise.units.name)
+
+    @annotate_xml
+    def visit_piece(self, piece):
+        return E(Piece.element_name,
+                 E('MathInline', piece.rhs),
+                 piece.condition.accept_visitor(self))
+
+    @annotate_xml
+    def visit_condition(self, piece):
+        return E(Condition.element_name,
+                 E('MathInline', piece.rhs))
+
+    @annotate_xml
+    def visit_otherwise(self, piece):
+        return E(Otherwise.element_name,
+                 E('MathInline', piece.rhs))
 
 
 class ComponentClassXMLReader(object):
