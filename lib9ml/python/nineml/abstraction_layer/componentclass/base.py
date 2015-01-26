@@ -74,12 +74,24 @@ class ComponentClass(BaseALObject, TopLevelObject):
         return self._main_block.aliases_map
 
     @property
+    def piecewises(self):
+        return self._main_block.piecewises
+
+    @property
+    def piecewises_map(self):
+        return self._main_block.piecewises_map
+
+    @property
     def dimensions(self):
         return set(a.dimension for a in self.attributes_with_dimension)
 
     @property
     def attributes_with_dimension(self):
         return self.parameters
+
+    @property
+    def attributes_with_units(self):
+        return self.piecewises
 
     def standardize_unit_dimensions(self, reference_set=None):
         """

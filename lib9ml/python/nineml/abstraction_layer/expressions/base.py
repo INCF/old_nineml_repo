@@ -4,8 +4,6 @@ This file defines mathematical classes and derived classes
 :copyright: Copyright 2010-2013 by the Python lib9ML team, see AUTHORS.
 :license: BSD-3, see LICENSE for details.
 """
-
-import re
 import itertools
 import quantities as pq
 
@@ -57,7 +55,7 @@ class Expression(object):
                 assert name not in self._rhs_funcs
             for func in self._rhs_funcs:
                 assert func not in self._rhs_names
-        elif isinstance(rhs, pq.Quantity):  # FIXME: This should be in Constant
+        elif isinstance(rhs, pq.Quantity):  # FIXME: This should be in Piecewise
             self._rhs_names = []
             self._rhs_funcs = []
         else:
@@ -263,6 +261,7 @@ class Alias(BaseALObject, ExpressionWithSimpleLHS):
 
 
     """
+    element_name = 'Alias'
     defining_attributes = ('_lhs', '_rhs')
 
     def __init__(self, lhs=None, rhs=None):
@@ -299,3 +298,33 @@ class Alias(BaseALObject, ExpressionWithSimpleLHS):
     def is_alias_str(cls, alias_str):
         """ Returns True if the string could be an alias"""
         return ':=' in alias_str
+
+
+class Piecewise(BaseALObject):
+
+    element_name = 'Piecewise'
+    defining_attributes = ('name', 'value', 'units')
+
+    def __init__(self, name, value, units):
+        self.name = name
+        self.value = value
+        self.units = units
+
+    def __repr__(self):
+        return ("Piecewise(name={}, value={}, units={})"
+                .format(self.name, self.value, self.units))
+
+    def accept_visitor(self, visitor, **kwargs):
+        """ |VISITATION| """
+        return visitor.visit_constant(self, **kwargs)
+
+    def name_transform_inplace(self, name_map):
+        try:
+            self.name = name_map[self.name]
+        except KeyError:
+            assert False, "'{}' was not found in name_map".format(self.name)
+
+    def set_units(self, units):
+        assert self.units == units, \
+            "Renaming units with ones that do not match"
+        self.units = units
