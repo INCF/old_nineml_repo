@@ -35,14 +35,7 @@ class Expression(object):
 
     # Subclasses can over-ride this, if need be.
     def _parse_rhs(self, rhs):
-        # A temporary measure, this is until the parser is
-        # generalised to handle conditionals
-        # return parse.expr_parse(rhs)
-        if isinstance(rhs, str):
-            parsed = parse.expr(rhs)
-        elif not isinstance(rhs, pq.quantity):
-            raise NotImplementedError
-        return parsed
+        return parse.expr(rhs)
 
     # If we assign to rhs, then we need to update the
     # cached names and funcs:
