@@ -44,7 +44,7 @@
 \newcommand{\Expression}{\defRef{\textbf{\class{Expression}}\xspace}{sec:Expression}}
 \newcommand{\Condition}{\defRef{\textbf{\class{Condition}}\xspace}{sec:Condition}}
 \newcommand{\Otherwise}{\defRef{\textbf{\class{Otherwise}}\xspace}{sec:Otherwise}}
-\newcommand{\StateVariable}{\defRef{\textbf{\class{StateVariable}}\xspace}{sec:StateVariable}}
+\newcommand{\KineticState}{\defRef{\textbf{\class{KineticState}}\xspace}{sec:KineticState}}
 \newcommand{\StateAssignment}{\defRef{\textbf{\class{StateAssignment}}\xspace}{sec:StateAssignment}}
 \newcommand{\TimeDerivative}{\defRef{\textbf{\class{TimeDerivative}}\xspace}{sec:TimeDerivative}}
 \newcommand{\Alias}{\defRef{\textbf{\class{Alias}}\xspace}{sec:Alias}}
@@ -87,11 +87,11 @@
 \newcommand{\Definition}{\defRef{\textbf{\class{Definition}}\xspace}{sec:Definition}}
 \newcommand{\Prototype}{\defRef{\textbf{\class{Prototype}}\xspace}{sec:Prototype}}
 \newcommand{\Reference}{\defRef{\textbf{\class{Reference}}\xspace}{sec:Reference}}
-\newcommand{\Population}{\defRef{\textbf{\class{Population}}\xspace}{sec:Population}}
+\newcommand{\Constraint}{\defRef{\textbf{\class{Constraint}}\xspace}{sec:Constraint}}
 \newcommand{\Cell}{\defRef{\textbf{\class{Cell}}\xspace}{sec:Cell}}
 \newcommand{\Size}{\defRef{\textbf{\class{Size}}\xspace}{sec:Size}}
 \newcommand{\AdditionalProperty}{\defRef{\textbf{\class{AdditionalProperty}}\xspace}{sec:AdditionalProperty}}
-\newcommand{\Projection}{\defRef{\textbf{\class{Projection}}\xspace}{sec:Projection}}
+\newcommand{\Reaction}{\defRef{\textbf{\class{Reaction}}\xspace}{sec:Reaction}}
 \newcommand{\Source}{\defRef{\textbf{\class{Source}}\xspace}{sec:Source}}
 \newcommand{\Destination}{\defRef{\textbf{\class{Destination}}\xspace}{sec:Destination}}
 \newcommand{\Connectivity}{\defRef{\textbf{\class{Connectivity}}\xspace}{sec:Connectivity}}
@@ -130,7 +130,7 @@
 \newcommand{\FromProximal}{\defRef{\textbf{\class{FromProximal}}\xspace}{sec:FromProximal}}
 \newcommand{\FromDistal}{\defRef{\textbf{\class{FromDistal}}\xspace}{sec:FromDistal}}
 \newcommand{\MultiCompartmental}{\defRef{\textbf{\class{MultiCompartmental}}\xspace}{sec:MultiCompartmental}}
-\newcommand{\MultiCompartmentProjection}{\defRef{\textbf{\class{MultiCompartmentProjection}}\xspace}{sec:MultiCompartmentProjection}}
+\newcommand{\MultiCompartmentReaction}{\defRef{\textbf{\class{MultiCompartmentReaction}}\xspace}{sec:MultiCompartmentReaction}}
 \newcommand{\CompartmentConnectivity}{\defRef{\textbf{\class{CompartmentConnectivity}}\xspace}{sec:CompartmentConnectivity}}
 
 % Macros just for this document:
@@ -205,7 +205,12 @@
 
 {\Large\bf Editors: }
 \begin{itemize}
-\item Tom Close %probably the same whole list as NineML Spec?
+\item Alex Cope
+\item Andrew P. Davison
+\item Erik De Schutter
+\item Ivan Raikov
+\item Paul Richmond
+\item Thomas G. Close
 \item Russell Jarvis
 \end{itemize}
 
@@ -237,480 +242,201 @@ This document is under the Common Creative license BY-NC-SA:\\ http://creativeco
 %\maketitlepage
 %\maketableofcontents
 
-% -----------------------------------------------------------------------------
-\section{Introduction}
-
-The purpose of NineML is to provide a simulator independent language for describing neuron relevant molecular, single cell, and neural network models. NineML is a declarative language which means that it is only necessary to describe the logic of the desired neural model, it is not necessary to provide implementation details. Because NineML provides a means to instantiate a model on any neural network simulator this will increase reproducibility of research.\\
-\\
-Because NEURON is a dominant simulator within the field of neuroscience NineML must be able to translate a complete model written in NMODL into an appropriate NineML format. NineML must also be able to translate appropriately formatted NineML model back to NMODL code. To successfully translate NMODL the KINETICs BLOCK of an NMODL mechanism must also be translated and it is this process that is described herein.
-
-%insert paragraph 4 here.
-
-%The Dynamics block represents the internal mechanisms governing the behaviour of the component. These
-%dynamics are based on ordinary differential equations (ODE) but may contain non-linear transitions between
-%different ODE regimes. The regime graph (e.g. Figure 2) must contain at least one Regime element, and contain
-%no regime islands. At any given time, a component will be in a single regime, and can change which regime it is in
-%through transitions.
-
-
-
-% -----------------------------------------------------------------------------
-%\vspace{-12.5pc} % A bit of a hack to reverse the vspace added by the Appendix name
-
-
 \subsection{Scope}
 
-The purpose of the kinetic extension to NINEML is to provide a convenient means of converting the KINETIC scheme block in a model described by NMODL to the NINEML language. The kinetic extension must also provided a means of converting from the NINEML language back into the KINETIC block scheme specified by NMODL. Ultimately the kinetic scheme should be able to handle discontinuous state transitions.
-
-\begin{enumerate}
-\item NMODL
-\item PARAMETER block
-\item STATE block
-\item DERIVATIVE block
-\item KINETIC block
-\item NineML
-\item StateVariable
-\item TimeDerivative
-\item Translation
-\end{enumerate}
-
-
-
-
-\subsection{NMDOL}
-NMODL provides a means of expanding the library of mechanisms available to NEURON simulator. The nervous system of any animal is typically made up of many species of neurons. Each species of neuron can be described by its own ionic and molecular properties. For example the concentration of Sodium ion channels may vary along the length of apical and distal dendrites. In the context of the NEURON simulator these ion channel and molecular properties are called mechanisms, and the NMODL language specifies a means to create new models of ionic and molecular mechanisms. By using a collection of compiled NMODL files the combined effects of many mechanisms can contribute to the resulting model output \cite{carnevale2006neuron}. 
-
-\section{NMODL Blocks}
-
-\subsection{PARAMETER block}
-
-Parameters refer to variables that are supplied by the user of the model. These values often refer to physical properties of neural tissue and often remain constant during the simulation.  By declaring a variable in PARAMETER block, you give that variable local scope, meaning that each instance of a mechanism is allowed to have its own varying values across spatially separated mechanisms. The values declared here are most often emperically derived default values, or initial conditions.
-%PARAMETERs values are visible to HOC interpreter.
-%variables who values are normally specified by the user are parameters, and are declared in a PARAMETER block. PARAMETERS generally remain constant during a simulation, but they can be changed in mid-run if necssary to emulate some external influence on the characteristic properties of a model.
-
-\subsection{STATE block}
-
-When a model invokes kinetic reaction schemes the unknown (dependent) variables belonging to the reaction scheme must be declared in the state block, this can include gating variables.
-
-In NMODL a {\it range variable} is a variable whose value is allowed to vary as a function of distance. This is in contrast to a {\it point process} whose values are only defined in a discrete point in space. All state variables are range variables in NEURON.  
-
-Typical state variables in a kinetic scheme are: closed, open and inactive states, these are denoted c, o, i respectively. The fraction of ion channels that are closed, open and inactive are all solved by differential equations. In the context of Kinetic schemes STATE variables will often follow a conservation rule, where the fraction of all possible open and closed states must equal one.
-
-
-\subsection{PROCEDURE block}
-The rate of change at which state variables can move between states is critical to the function of a kinetic scheme model. The function which describes rates is usually different for states that are changing in different directions for instance the function that describes moving from open to closed is different from the function that describes moving from closed to open.
-
-%Rates are often asymmetrical so that the rate at which a channel moves from open to closed may be different to the function that  than the rate at which a channel move from closed to open. 
-
-The procedure block provides an opportunity to define a procedure called { \it rates()}  which will allow us to state equations that determine the rate based on supplied PARAMETERS. The { \it rates()} procedure returns equilibrium constants.
-
-% If there are N state variables. Because of the conservation rule, there is always N-1 indipendent states. The Nth state is dependent and is implied by the conservation of states rule. The NINEML algotihm exploits this property in calculating states.
-
-\subsection{DERIVATIVE block}
-
+The main motivation for Kinetic Component Class extension to NineML is to provide an opportunity for electro-physiologists to express kinetic schemes in a notation that is consistent with their field. The Kinetic Component Class can be flattened into a \Dynamics component. Another purpose of the kinetic extension to NINEML is to provide a convenient means of converting the KINETIC scheme block in a model described by NMODL to the NINEML language. %The kinetic extension must also provided a means of converting from the NINEML language back into the KINETIC block scheme specified by NMODL. Ultimately the kinetic scheme should be able to handle discontinuous state transitions.
 
 \subsection{KINETIC block}
 
-The NMODL translator converts the content of the kinetic scheme block into a family of Ordinary Differential Equations. An equivalent but less readable method of doing this would be to declare the appropriate differential equations to be solved in a NEURON DERIVATIVE block\cite{carnevale2006neuron}
+The NMODL translator converts the content of the kinetic scheme block into a family of Ordinary Differential Equations. An equivalent but less readable method of doing this would be to declare the appropriate differential equations to be solved in a NEURON DERIVATIVE block \cite{carnevale2006neuron}.
 
-The concept of conservation of matter is central in calculating the fraction of ion channels that occupy a particular state. This is because ion transition from one state equals ion transition into another state.
-
-The kinetics block can call a procedure such as { \it rates()}
-The rates function solves the equilibrium constants, using time constants which may have been derived theoretically.
-
-
-%Unknown variables which are solved 
-
-
-%Direct qoute from the NEURON book:
-\begin{lstlisting}[language=c]
-
-STATE { mc m }
-KINETIC scheme1 {
-	~ mc <-> m (a(v), b(v))
-}
-is equivalent to 
-
-DERIVATIVE scheme1{
-	mc' = -a(v)*mc + b(v)*m
-	m'  =  a(v)*mc - b(v)*m
-
-}
-
-\end{lstlisting}
-%Paraphrased:
-The two expressions in paranthesis a(v), and b(v) indicate the forward and reverse reaction rates. And variables directly adjacent to the tokens: $<->$ signify the reactants. Kinetic schemes use a basic notation where the tilde ~ signifies to the NMODL compiler that this is a Kinetic scheme. 
-
-
-% The voltage dependent rate constants are computed in produre rates(). That procedure computes the equilibrium constants K1 and K2 from the constants k1, d1, k2, and d2, whose emperically determined default values are given in the PARAMETER 
-% block, and membrane potential v. The time constants tau1 and tau2, however are found from tables created under hoc.
-%
-%
-
-\subsection{DERIVATIVE block}
-
-\subsection{BREAKPOINT}
-In the NEURON book \cite{carnevale2006neuron} it is recommended that sparse METHOD should be used for SOLVE a kinetic scheme. This is specified inside the BREAKPOINT block.
-
-\section{NINEML Blocks}
-
-
-NineML was designed to separate core concepts and mathematical descriptions with which model variables and state update rules are explicitly described in parametrized form.  From the syntax used to specify the instantiation and the value of parameters of all these components of a network model. This distinction is summarised as the abstraction layer and the user layer.
-
-Whithin the user layer a \Dynamics block can be included within a component class of the abstraction layer. The dynamics block allows the NineML user a way of expressing the different types of neuron behaviour that are expressed under changing conditions.
-
-
-\subsection{Dynamics}
-\label{sec:Dynamics}
-
-\begin{table}[H]
-  \begin{edtable}{tabular}{llr}
-    \toprule
-    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{Dynamics Structure}}}\\
-    \toprule
-    \em{Element type} & \em{Multiplicity} & \em{Required} \\
-    \midrule
-    \StateVariable & set & no \\ 
-    \Regime & set & yes\\
-    \Alias & set & no\\
-    \Constant & set & no\\    
-    \bottomrule
-  \end{edtable}
-\end{table}
-
-
-The \Dynamics block represents the \emph{internal} mechanisms
-governing the behaviour of the component. These dynamics are based on ordinary differential equations (ODE) but may contain non-linear transitions between
-different ODE regimes. The regime graph (e.g. \ref{fig:simple_regime_graph}) must contain at least one \Regime element, and contain no regime islands. At any given time, a component will be in a single regime, and can change which regime it is in through transitions.
-
-\note{\Alias objects are defined in Dynamics blocks, \emph{not} \Regime blocks. This means that aliases are the same across all regimes.}
-
-
-\subsection{StateVariable}
-\label{sec:StateVariable}
-
-\begin{table}[H]
-  \begin{edtable}{tabular}{llr}
-    \toprule
-    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{StateVariable Structure}}}\\
-    \toprule
-    \em{Attribute name} & \em{Type/Format} & \em{Required} \\
-    \midrule
-    name & \identifier & yes\\
-    dimension & \Dimension{}@name & yes\\
-    \bottomrule
-  \end{edtable}
-\end{table}
-
-The internal state of a component is defined by a set of state variables
- -- variables that can change either continuously or discontinuously as a
-function of time.
-
-The value of a \StateVariable can change in two ways:
-\begin{quote}
-\begin{itemize}
-\item continuously through \TimeDerivative elements (in {\Regime} elements),
-which define how the {\StateVariable} evolves over time, e.g.
-$dX/dt=1-X$.
-\item discretely through \StateAssignment (in \OnCondition or \OnEvent transition elements),
-which make discrete changes to a \StateVariable value, e.g. $X = X + 1$.
-\end{itemize}
-\end{quote}
-
-Only continuous changes are relevant to NineML KINETICs scheme.
-
-
-
-\subsection{TimeDerivative}
-\label{sec:TimeDerivative}
-
-\begin{table}[H]
-  \begin{edtable}{tabular}{llr}
-    \toprule
-    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{TimeDerivative Structure}}}\\
-    \toprule
-    \em{Attribute name} & \em{Type/Format} & \em{Required} \\
-    \midrule
-    variable & \StateVariable{}@name & yes\\
-    \midrule
-    \em{Element type} & \em{Multiplicity} & \em{Required} \\
-    \midrule
-    \MathInline & singleton & yes \\ 
-    \bottomrule
-  \end{edtable}
-\end{table}
-
-\TimeDerivative elements contain a mathematical expression for the right-hand side of the ODE
-\begin{equation}
-\frac{\mathrm{d} variable}{\mathrm{d} t} = expression
-\end{equation}
-which can contain of references to any combination of \StateVariable, \Parameter, \AnalogReceivePort, \AnalogReducePort and \Alias. Therefore, only one \TimeDerivative element is allowed per \StateVariable per \Regime. If a {\TimeDerivative} for a \StateVariable is not defined in a \Regime, it is assumed to be zero.
-
-\subsubsection{Variable attribute}
-Each \TimeDerivative requires a \textit{variable} attribute. This should refer to the name of a \StateVariable in the \ComponentClass. Only one \TimeDerivative is allowed per \textit{variable} in each \Regime.
-
-\section{Translation}
-
-It can be seen from the above that what is required is a program that translates the contents of various NMODL blocks into appropriate NineML formatting for the equivalent NineML class and back again. 
-
-%Questions. How many ports can a kinetic scheme have? Would a scheme that had two reactants have 4 ports. 1 send and 1 recieve port per ion channel concentration. It depends if I am modelling concentration of reactants, or number of ion channels in open or closed state.
-
-\begin{lstlisting}
-NMODL           NineML
-compiledCode    Component Class Instance (Component)
-PARAMETER  <->  Parameter
-  ?        <->  Ports
-STATE      <->  StateVariable.
-KINETICS   <->  TimeDerivative
-  ?        <->  Aliases
-  
-\end{lstlisting}
-
-So far many of these functions PARAMETER, PORTS, and Aliases and STATE have been been implemented in the NMODL import in the NinePyPLine package, all that remains to be done is to translate the kinetic scheme syntax into the syntax required by TimeDerivative.
-
-In order to achieve this mapping on the NineML side a Component Class file must be written in the NineML syntax, this component class will have Parameters, which will be converted from NMDOL syntax to NineML syntax, it will have StateVariables which will similarily be converted, and it will have a NMODL kinetic equation which will be converted into NineML TimeDerivative XML syntax an example is below.
-
-
-
-\subsection{MultiCompartmental}
-\label{sec:MultiCompartmental}
-
-\begin{table}[H]
-  \begin{edtable}{tabular}{llr}
-    \toprule
-    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{MultiCompartmentClass Structure}}}\\
-    \toprule
-    \em{Attribute name} & \em{Type/Format} & \em{Required} \\
-    \midrule
-    name & \identifier & yes\\
-    \midrule
-    \em{Element type} & Multiplicity & \em{Required} \\
-    \midrule \relax
-    \Branches & singleton & yes\\
-    \Mapping & singleton & yes\\   
-    \Domain & set & yes\\
-    \MultiPortExposure & set & no\\     
-    \bottomrule
-  \end{edtable}
-\end{table}
-
+\section{NINEML Components}
 
 \subsection{Kinetic}
 %\label{sec:ComponentClass}
 
+
+%Ie flattening of the tree is facilitated by mapping onto a dynamics component.
+The Kinetic component provides all of the information required to fully specify a Kinetic scheme. Because a kinetic scheme usually contains a multiple number of states, and a multiple number of reactions within the Kinetics component the user of the Kinetics component can instantiate any number of KineticStates, and Reactions. 
+
 \begin{table}[H]
   \begin{edtable}{tabular}{llr}
     \toprule
-    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{ComponentClass Structure}}}\\
+    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{Kinetic Structure}}}\\
     \toprule
-    \em{Attribute name} & \em{Type/Format} & \em{Required} \\
-    \midrule
-    name & \identifier & yes\\
-    \midrule
     \em{Element type} & \em{Multiplicity} & \em{Required} \\
     \midrule
-    
-    \Parameter & set & yes \\
-    \StateVariable & set & yes \\
-
-    \ForwardRate & singleton & yes\\
-    \ReverseRate & singleton & yes\\
-    \Conserve & singleton & yes\\
-    \AnalogSendPort & set & yes\\
-    \AnalogReceivePort & set & yes\\
-    \AnalogReducePort & set & no \\ 
-    \EventSendPort & set & no\\    
-    \EventReceivePort & set & no\\ 
-    \PropertySendPort & set & no\\    
-    \PropertyReceivePort & set & no\\
-    \IndexSendPort & set & no\\
-    \IndexReceivePort & set & no\\
-    \Dynamics | \ConnectionRule | \Function & singleton & yes \\
+    \KineticState & set & yes \\
+    \Reaction & set & yes \\
+    \Constraint & set & no \\
+    \Alias & set & no \\
+    \Constant & set & no \\ %I think this should be singleton and required.
     \bottomrule
   \end{edtable}
 \end{table}
 
+
+\subsection{KineticState}
+\label{sec:KineticState}
+The KineticState container provides all of the information to fully describe one kinetic state variable that may constitute a greater kinetic scheme. %Each Kinetic scheme is able to accommodate an arbitrary number of states, and also a variable number of Reactions between states.
+
+\begin{table}[H]
+  \begin{edtable}{tabular}{llr}
+    \toprule
+    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{KineticState}}}\\
+    \toprule
+    \em{Attribute name} & \em{Type/Format} & \em{Required} \\
+    \midrule
+    name & \identifier & yes\\
+    \bottomrule
+  \end{edtable}
+\end{table}
+
+\subsubsection{Name attribute}
+Each KineticState requires a name attribute, which is a valid identifier and uniquely identifies the StateVariable from all other elements in the ComponentClass.
+
+\subsubsection{Dimension attribute}
+Each KineticState Variable requires a dimension attribute. This attribute specifies the dimension of the units of the quantities that KineticState is expected to be initialised and updated with and should refer to the name of a Dimension element in the global scope.
+
+%ie in the example of ion channel states the units of a kinetic state variable would be in energy. 
+
+\subsection{Reaction}
+\label{sec:Reaction} A reaction is a process that facilitates the transition of a molecular entity between states. Reactions have a single to and single from attribute, which describes which state  they are transitioning from and which state they are transitioning into. The forward rate and reverse rate of chemical reactions are described inside the Reaction Component class.
+
+\begin{table}[H]
+  \begin{edtable}{tabular}{llr}
+    \toprule
+    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{Reaction Structure}}}\\
+    \toprule
+    \em{Attribute name} & \em{Type/Format} & \em{Required} \\
+    \midrule
+    from & \KineticState{}@name & yes\\
+    to & \KineticState{}@name & yes\\
+    \midrule
+    \em{Element type} & \em{Multiplicity} & \em{Required} \\
+    \midrule
+    \ForwardRate & singleton & yes\\
+    \ReverseRate & singleton & yes\\
+    \bottomrule
+  \end{edtable}
+\end{table}
+
+\subsubsection{From attribute}
+
+Attribute name Type/Format Required
+name identifier yes
+
+\subsubsection{To attribute}
+
+Attribute name Type/Format Required 
+name identifier yes
+
+
+\subsection{ForwardRate}
+\label{sec:ForwardRate}
+The forward rate describes the rate of change of a molecular entity from one state to another.  An example of a forward reaction might be an ion channel protein as it moves from a closed state to an open state. %At most there can only be one forward rate equation and one reverse rate per Reaction.  
+\begin{table}[H]
+  \begin{edtable}{tabular}{llr}
+    \toprule
+    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{ForwardRate Structure}}}\\
+    \toprule
+    \em{Element type} & \em{Multiplicity} & \em{Required} \\
+    \midrule
+    \MathInline & singleton & yes\\
+    \bottomrule
+  \end{edtable}
+\end{table}
+
+
+\subsection{ReverseRate}
+\label{sec:ReverseRate}
+The reverse rate describes that rate of change for the reverse process described in ForwardRate. For example an ion channel protein might be ion channel protein as it moves from an open state to a closed state.
+
+\begin{table}[H]
+  \begin{edtable}{tabular}{llr}
+    \toprule
+    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{ReverseRate Structure}}}\\
+    \toprule
+    \em{Element type} & \em{Multiplicity} & \em{Required} \\
+    \midrule
+    \MathInline & singleton & yes\\
+    \bottomrule
+  \end{edtable}
+\end{table}
+
+
+\subsection{Constraint}
+\label{sec:Constraint}
+
+The concept of conservation of matter is central in calculating the fraction of ion channels that occupy a particular state. This is because when a molecular entity transitions into a new state it necessarily transitions out of its previous state. The fraction of ion channels that occupy each state can change, but the sum of all the fractions must balance to unity. For this reason the right hand side of the kinetics equation must be stated in a format where left hand side is equal to unity. If a kinetic equation is expressed with a non unity right hand side the equation requires basic manipulation to make it the case that the right hand side equals unity. At most the user can specify only one constraint equation per Kinetic Component.
+
+
+\begin{table}[H]
+  \begin{edtable}{tabular}{llr}
+    \toprule
+    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{Constraint Structure}}}\\
+    \toprule
+    \em{Element type} & \em{Multiplicity} & \em{Required} \\
+    \midrule
+    \MathInline & singleton & yes\\
+    \bottomrule
+  \end{edtable}
+\end{table}
+
+
+\subsection{Example use of kinetic scheme}.
+
+
+
 \begin{lstlisting}[label=code:xmliaf2]
 <?xml version='1.0' encoding='UTF-8'?>
 <NineML xmlns="http://nineml.net/9ML/2.0">
-  <ComponentClass name="KineticMechanism">
-	  <KineticEquation from='state1' to state2>
-	  	<Conserve></Conserve>
-	  	<ForwardRate></ForwardRate>
-		<ReverseRate></ReverseRate>
-		<AnalogSendPort></AnalogSendPort>
-		<AnalogRecievePort></AnalogRecievePort>
-	  </KineticEquation>
-  </ComponentClass>
+  <ComponentClass name="Kinetic">
+    <KineticState name C2> 
+      <to> O </to>
+      <from> C1 </from>
+    </KineticState>
+    <Alias name="K1">    
+      <mathinline>  K1=exp(k2*(d2-v)-k1*(d1-v)) </MathInline>
+    <Alias>
+    <Alias name="K2">    
+  	  <mathinline>  K2=exp(-k2*(d2-v)) </MathInline>
+    <Alias>    
+    <Reaction>
+      <ForwardRate> <mathinline> kf2= K2/(tau2v)*(1+K2)) </mathinline> </ForwardRate>
+      <ReverseRate> <mathinline> kb1=1/(tau1(v)*(1+K1)) </mathinline>  </ReverseRate>      
+    </Reaction>
   
+    <KineticState name = O> 
+      <to> C2 </to>
+      <from> C2  </from>
+    </KineticState>
+    <Alias name="K2">    
+  	  <mathinline>  K2=exp(-k2*(d2-v)) </MathInline>
+    <Alias>       
+    <Reaction>
+      <ForwardRate> <mathinline> kf2= K2/(tau2v)*(1+K2)) </mathinline> </ForwardRate>
+      <ReverseRate> <mathinline> kb2=t/(tau2(v)+(1+K2) </mathinline> </ReverseRate>
+    </Reaction>
+    
+    <KineticState name = C1> 
+      <to> C2 </to>
+      <from> C2  </from>
+    </KineticState>  
+      <Alias name="K1">
+	  	<mathinline>  K1=exp(k2*(d2-v)-k1*(d1-v)) </MathInline> 
+  	  </Alias>	
+    <Reaction>
+      <ForwardRate> <mathinline> kf1=k1/(tau1(v)*(1+K1)) </mathinline>  </ForwardRate>
+      <ReverseRate> <mathinline> kb1=1/(tau1(v)*(1+K1)) </mathinline>  </ReverseRate>
+    </Reaction> 
+     
+    <constraint> c1+c2+o=1 </constraint>
+  <ComponentClass>  
+      
+	  	
+	   
 \end{lstlisting}[label=code:xmliaf2]
-
-\begin{lstlisting}[label=code:xmliaf2]
-  
-  <ComponentClass name="Kinetic channels">
-	  <KineticEquation from='state1' to state2>
-	  	<Conserve></Conserve>
-	  	<ForwardRate></ForwardRate>
-		<ReverseRate></ReverseRate>
-		<AnalogSendPort></AnalogSendPort>
-		<AnalogRecievePort></AnalogRecievePort>
-	  </KineticEquation>
-
-    <AnalogSendPort dimension="voltage" name="iaf_V" />
-    <AnalogReducePort dimension="current" operator="+" name="iaf_ISyn" />
-    <AnalogSendPort dimension="current" name="cobaExcit_I" />
-    <EventSendPort name="iaf_spikeoutput"/>
-    <EventReceivePort name="cobaExcit_spikeinput"/>
-    <Parameter dimension="area" name="iaf_cm"/>
-    <Parameter dimension="time" name="iaf_taurefrac"/>
-    <Parameter dimension="conductance" name="iaf_gl"/>
-    <Parameter dimension="voltage" name="iaf_vreset"/>
-    <Parameter dimension="voltage" name="iaf_vrest"/>
-    <Parameter dimension="voltage" name="iaf_vthresh"/>
-    <Parameter dimension="time" name="cobaExcit_tau"/>
-    <Parameter dimension="conductance" name="cobaExcit_q"/>
-    <Parameter dimension="voltage" name="cobaExcit_vrev"/>
-    <Dynamics>
-      <StateVariable dimension="voltage" name="iaf_V"/>
-      <StateVariable dimension="time" name="iaf_tspike"/>
-      <StateVariable dimension="conductance" name="cobaExcit_g"/>
-      <Regime name="RefractoryRegime">
-        <TimeDerivative variable="iaf_V">
-          <MathInline>0</MathInline>
-        </TimeDerivative>
-        <TimeDerivative variable="cobaExcit_g">
-          <MathInline>-cobaExcit_g/cobaExcit_tau</MathInline>
-        </TimeDerivative>
-        <OnEvent target_regime="RefractoryRegime" src_port="cobaExcit_spikeinput">
-          <StateAssignment variable="cobaExcit_g">
-            <MathInline>cobaExcit_g+cobaExcit_q</MathInline>
-          </StateAssignment>
-        </OnEvent>
-        <OnCondition target_regime="RegularRegime">
-          <Trigger>
-            <MathInline>t &gt;= iaf_tspike + iaf_taurefrac</MathInline>
-          </Trigger>
-        </OnCondition>
-      </Regime>
-      <Regime name="RegularRegime">
-        <TimeDerivative variable="iaf_V">
-          <MathInline>( iaf_gl*( iaf_vrest - iaf_V ) + iaf_ISyn+cobaExcit_I)/(iaf_cm)</MathInline>
-        </TimeDerivative>
-        <TimeDerivative variable="cobaExcit_g">
-          <MathInline>-cobaExcit_g/cobaExcit_tau</MathInline>
-        </TimeDerivative>
-        <OnEvent target_regime="RegularRegime" src_port="cobaExcit_spikeinput">
-          <StateAssignment variable="cobaExcit_g">
-            <MathInline>cobaExcit_g+cobaExcit_q</MathInline>
-          </StateAssignment>
-        </OnEvent>
-        <OnCondition target_regime="RefractoryRegime">
-          <StateAssignment variable="iaf_tspike">
-            <MathInline>t</MathInline>
-          </StateAssignment>
-          <StateAssignment variable="iaf_V">
-            <MathInline>iaf_vreset</MathInline>
-          </StateAssignment>
-          <EventOut port="iaf_spikeoutput"/>
-          <Trigger>
-            <MathInline>iaf_V &gt; iaf_vthresh</MathInline>
-          </Trigger>
-        </OnCondition>
-      </Regime>
-      <Alias name="cobaExcit_I">
-        <MathInline>cobaExcit_g*(cobaExcit_vrev-iaf_V)</MathInline>
-      </Alias>
-    </Dynamics>
-  </ComponentClass>
-  <Dimension name="time" t="1"/>
-  <Dimension name="voltage" m="1" l="2" t="-3" i="-1"/>
-  <Dimension name="conductance" m="-1" t="3" l="-2" i="2"/>
-  <Dimension name="area" l="2"/>
-</NineML>
-\end{lstlisting}
-
-User Layer description for the above example:
-\begin{lstlisting}
-<?xml version='1.0' encoding='UTF-8'?>
-<NineML xmlns="http://nineml.net/9ML/2.0">
-  <Component name="IaFNeuron">
-    <Definition url="http://nineml.net/catalog/neurons/iafICoba.9ml"
-      >Iaf1Coba</Definition>
-    <Property name="iaf_V" units="mV">
-      <SingleValue>-60</SingleValue>
-    </Property>
-    <Property name="iaf_tspike" units="ms">
-      <SingleValue>-1</SingleValue>
-    </Property>
-    <Property name="cobaExcit_g" units="mS">
-      <SingleValue>0</SingleValue>
-    </Property>
-    <Property name="iaf_cm" units="cm_square">
-      <SingleValue>0.02</SingleValue>
-    </Property>
-    <Property name="iaf_taurefrac" units="ms">
-      <SingleValue>3</SingleValue>
-    </Property>
-    <Property name="iaf_gl" units="mS">
-      <SingleValue>0.1</SingleValue>
-    </Property>
-    <Property name="iaf_vreset" units="mV">
-      <SingleValue>-70</SingleValue>
-    </Property>
-    <Property name="iaf_vrest" units="mV">
-      <SingleValue>-60</SingleValue>
-    </Property>
-    <Property name="iaf_vthresh" units="mV">
-      <SingleValue>20</SingleValue>
-    </Property>
-    <Property name="cobaExcit_tau" units="ms">
-      <SingleValue>2</SingleValue>
-    </Property>
-    <Property name="cobaExcit_q" units="ms">
-      <SingleValue>1</SingleValue>
-    </Property>
-    <Property name="cobaExcit_vrev" units="mV">
-      <SingleValue>0</SingleValue>
-    </Property>
-  </Component>
-  <Dimension name="time" t="1"/>
-  <Dimension name="voltage" m="1" l="2" t="-3" i="-1"/>
-  <Dimension name="conductance" m="-1" t="3" l="-2" i="2"/>
-  <Dimension name="area" l="2"/>
-  <Unit symbol="mV" dimension="voltage" power="-3"/>
-  <Unit symbol="ms" dimension="time" power="-3"/>
-  <Unit symbol="cm_square" dimension="area" power="-4"/>
-  <Unit symbol="mS" dimension="conductance" power="-3"/>
-</NineML>
-\end{lstlisting}
-
-
-% <AnalogReducePort name="i_synapse" operator="+" dimension="current"/>
-%    <AnalogSendPort name="U" dimension="dimensionless"/>
-%    <AnalogSendPort name="V" dimension="voltage"/>
-%    <EventPort name="spikeOutput" mode="send"/>
-%    <Dynamics>
-%        <StateVariable name="V" dimension="voltage"/>
-
-%  <TimeDerivative variable="U">
-%            <MathInline>a*(b*V - U)</MathInline>
-%          </TimeDerivative>
-%          <TimeDerivative variable="V">
-%            <MathInline>0.04*V*V + 5*V + 140.0 - U + i_synapse + i_injected</MathInline>
-%          </TimeDerivative>
-%          <OnCondition>
-%            <Trigger>
-%              <MathInline>V &gt; theta </MathInline>
-%            </Trigger>
-%            <StateAssignment variable="V" >
-%              <MathInline>c</MathInline>
-%            </StateAssignment>
-%            <StateAssignment variable="U" >
-%              <MathInline>U+d</MathInline>
-%            </StateAssignment>
-
-
-%\note{To facilitate the reverse conversion from core to extended formats, NineML compliant tools must preserve all annotations during reading, writing and transformation, with the exception of when the return conversion is no longer possible due to the applied transformation or the annotations are explicitly added/deleted by the user.}
 
 
 \clearpage
