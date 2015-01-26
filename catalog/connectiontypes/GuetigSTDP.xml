@@ -1,0 +1,51 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<NineML xmlns="http://nineml.net/9ML/0.1">
+  <Annotations>
+    <Comment>
+      This file was updated from an old version of 9ML. Not sure if this
+      is correct (Tom Close 26/1/15). Not sure about the dimensions so have put
+      them all as dimensionless.
+    </Comment>
+  </Annotations>
+  <ComponentClass name="GuetigSTDP">
+    <Parameter name="mu" dimension="dimensionless"/>
+    <Parameter name="alpha" dimension="dimensionless"/>
+    <Parameter name="tau_minus" dimension="dimensionless"/>
+    <Parameter name="learning_rate" dimension="dimensionless"/>
+    <Parameter name="tau_plus" dimension="dimensionless"/>
+    <AnalogSendPort name="W" dimension="dimensionless"/>
+    <AnalogSendPort name="r" dimension="dimensionless"/>
+    <AnalogSendPort name="o" dimension="dimensionless"/>
+    <AnalogSendPort name="t" dimension="dimensionless"/>
+    <Dynamics>
+      <StateVariable name="W" dimension="dimensionless"/>
+      <StateVariable name="r" dimension="dimensionless"/>
+      <StateVariable name="o" dimension="dimensionless"/>
+      <Regime name="Regime0">
+        <TimeDerivative variable="r">
+          <MathInline>-r/tau_plus</MathInline>
+        </TimeDerivative>
+        <TimeDerivative variable="o">
+          <MathInline>-o/tau_minus</MathInline>
+        </TimeDerivative>
+        <OnEvent port="spike_pre" target="Regime0">
+          <StateAssignment variable="W">
+            <MathInline>max(W - o*learning_rate*alpha*W**mu, 0.0)</MathInline>
+          </StateAssignment>
+          <StateAssignment variable="r">
+            <MathInline>r + 1.0</MathInline>
+          </StateAssignment>
+        </OnEvent>
+        <OnEvent port="spike_post" target="Regime0">
+          <StateAssignment variable="W">
+            <MathInline>min(W + r*learning_rate*(1-W)**mu, 1.0)</MathInline>
+          </StateAssignment>
+          <StateAssignment variable="o">
+            <MathInline>o + 1.0</MathInline>
+          </StateAssignment>
+        </OnEvent>
+      </Regime>
+    </Dynamics>
+  </ComponentClass>
+  <Dimension name="dimensionless"/>
+</NineML>
