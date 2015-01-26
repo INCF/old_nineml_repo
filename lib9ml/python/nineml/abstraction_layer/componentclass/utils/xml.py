@@ -10,7 +10,7 @@ from lxml import etree
 from itertools import chain
 from nineml.xmlns import E
 from . import ComponentVisitor
-from ...expressions import Alias, Piecewise
+from ...expressions import Alias, Piecewise, Piece, Condition, Otherwise
 from nineml.abstraction_layer.componentclass.base import Parameter
 from nineml.annotations import annotate_xml, read_annotations
 from nineml.utils import expect_single, filter_expect_single
@@ -48,10 +48,29 @@ class ComponentClassXMLLoader(object):
         return Alias(lhs=name, rhs=rhs)
 
     @read_annotations
+    def load_piece(self, element):
+        expr = self.load_single_internmaths_block(element,
+                                                  checkOnlyBlock=False)
+        condition = self.load_condition(
+            expect_single(element.findall(NINEML + 'Condition')))
+        return Piece(expr, condition)
+
+    @read_annotations
+    def load_otherwise(self, element):
+        return self.load_single_internmaths_block(element)
+
+    @read_annotations
+    def load_condition(self, element):
+        return self.load_single_internmaths_block(element)
+
+    @read_annotations
     def load_piecewise(self, element):
+        blocks = ('Piece', 'Otherwise')
+        subnodes = self._load_blocks(element, blocks=blocks)
         return Piecewise(name=element.get('name'),
-                        value=float(element.text),
-                        units=self.document[element.get('units')])
+                         pieces=subnodes['Piece'],
+                         otherwise=expect_single(subnodes['Otherwise']),
+                         units=self.document[element.get('units')])
 
     def load_single_internmaths_block(self, element, checkOnlyBlock=True):
         if checkOnlyBlock:
