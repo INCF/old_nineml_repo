@@ -298,12 +298,12 @@ class Piecewise_test(unittest.TestCase):
 
         class PiecewiseTestVisitor(TestVisitor):
 
-            def visit_timederivative(self, component, **kwargs):  # @UnusedVariable @IgnorePep8
+            def visit_piecewise(self, component, **kwargs):  # @UnusedVariable @IgnorePep8
                 return kwargs
 
         v = PiecewiseTestVisitor()
         self.assertEqual(
-            v.visit(self.piecewise, kwarg1='Hello', kwarg2='Hello2'),
+            v.visit(self.pw, kwarg1='Hello', kwarg2='Hello2'),
             {'kwarg1': 'Hello', 'kwarg2': 'Hello2'}
         )
 

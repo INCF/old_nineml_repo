@@ -1,6 +1,7 @@
 from itertools import chain
 from .. import BaseALObject
 from .base import Expression
+from . import parse
 
 
 class Piecewise(BaseALObject):
@@ -20,7 +21,7 @@ class Piecewise(BaseALObject):
 
     def accept_visitor(self, visitor, **kwargs):
         """ |VISITATION| """
-        return visitor.visit_constant(self, **kwargs)
+        return visitor.visit_piecewise(self, **kwargs)
 
     def name_transform_inplace(self, name_map):
         try:
@@ -35,11 +36,11 @@ class Piecewise(BaseALObject):
 
     @property
     def rhs_atoms(self):
-        return set(*chain([p.rhs_atoms for p in self.pieces] +
-                          [self.otherwise.rhs_atoms]))
+        return set(chain(*([p.rhs_atoms for p in self.pieces] +
+                           [self.otherwise.rhs_atoms])))
 
 
-class Piece(BaseALObject, Expression):
+class Piece(Expression, BaseALObject):
 
     element_name = "Otherwise"
     defining_attributes = ('_rhs', 'condition')
@@ -52,16 +53,20 @@ class Piece(BaseALObject, Expression):
 
     @property
     def rhs_atoms(self):
-        return chain(super(Piece, self).rhs_atoms + self.condition.rhs_atoms)
+        return chain(super(Piece, self).rhs_atoms,
+                     self.condition.rhs_atoms)
 
 
-class Otherwise(BaseALObject, Expression):
+class Otherwise(Expression, BaseALObject):
 
     element_name = "Otherwise"
 
 
-class Condition(BaseALObject, Expression):
+class Condition(Expression, BaseALObject):
 
     element_name = "Condition"
+
+    def _parse_rhs(self, rhs):
+        return parse.cond(rhs)
 
 

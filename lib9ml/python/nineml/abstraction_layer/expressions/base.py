@@ -49,17 +49,11 @@ class Expression(object):
     def _set_rhs(self, rhs):
         rhs = rhs.strip()
         self._rhs = rhs
-        if isinstance(rhs, str):
-            self._rhs_names, self._rhs_funcs = self._parse_rhs(rhs)
-            for name in self._rhs_names:
-                assert name not in self._rhs_funcs
-            for func in self._rhs_funcs:
-                assert func not in self._rhs_names
-        elif isinstance(rhs, pq.Quantity):  # FIXME: This should be in Piecewise
-            self._rhs_names = []
-            self._rhs_funcs = []
-        else:
-            raise NotImplementedError
+        self._rhs_names, self._rhs_funcs = self._parse_rhs(rhs)
+        for name in self._rhs_names:
+            assert name not in self._rhs_funcs
+        for func in self._rhs_funcs:
+            assert func not in self._rhs_names
 
     def _get_rhs(self):
         return self._rhs
