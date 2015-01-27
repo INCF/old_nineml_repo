@@ -1,6 +1,7 @@
 from lxml import etree
 from lxml.builder import ElementMaker
 import os.path
+from operator import itemgetter
 from nineml.abstraction_layer import BaseALObject
 from nineml.exceptions import NineMLRuntimeError
 from nineml.xmlns import uncertml_namespace, UNCERTML
@@ -41,6 +42,8 @@ class RandomDistribution(BaseALObject):
     A base class for reading and writing distributions defined in UncertML
     """
 
+    defining_attributes = ('name', 'parameters')
+
     # Load UncertML schema from file
     with open(os.path.join(os.path.dirname(__file__), 'uncertml.xsd')) as f:
         uncertml_schema = etree.XMLSchema(etree.parse(f))
@@ -49,18 +52,37 @@ class RandomDistribution(BaseALObject):
                      nsmap={"un": uncertml_namespace})
 
     valid_distributions = ('normal',)
+    non_alphabetical = {'StudentT': ('location', 'scale', 'degreesOfFreedom'),
+                        'GammaDistribution':
+                            ('shape', 'scale'),
+                        'InverseGamma':
+                            ('shape', 'scale'),
+                        'NormalInverseGamma':
+                            ('mean', 'varianceScaling', 'shape', 'scale'),
+                        'Uniform': ('minimum', 'maximum', 'numberOfClasses')}
 
     def __init__(self, name, parameters, validate=True):
         self.name = name
         self.parameters = parameters
-        # Convert to xml and run schema validation
+        # Convert to xml and check against UncertML schema
         if validate:
-            self._validate_xml(self.to_xml())
+            try:
+                self._validate_xml(self.to_xml())
+            except NineMLRuntimeError:
+                raise NineMLRuntimeError(
+                    "Invalid parameters/values to random distribution '{}':\n"
+                    "  {}\nSee {} for valid parameter/values."
+                    .format(self.name, self.parameters, uncertml_namespace))
 
     def to_xml(self):
+        if self.name in self.non_alphabetical:
+            sorted_params = ((n, self.parameters[n])
+                             for n in self.non_alphabetical[self.name])
+        else:
+            sorted_params = sorted(self.parameters.iteritems(),
+                                   key=itemgetter(0))
         return self.E(self.name + 'Distribution',
-                      *(self.E(n, str(v))
-                        for n, v in self.parameters.iteritems()))
+                      *((self.E(n, str(v)) for n, v in sorted_params)))
 
     @classmethod
     def from_xml(cls, element, document):  # @UnusedVariable

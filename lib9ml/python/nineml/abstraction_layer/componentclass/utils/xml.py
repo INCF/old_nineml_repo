@@ -51,10 +51,11 @@ class ComponentClassXMLLoader(object):
     def load_randomvariable(self, element):
         # RandomDistributions are defined in Uncertml (http://uncertml.org)
         # so have their own reader/writing functions.
-        return RandomVariable(name=element.get('name'),
-                              distribution=RandomDistribution.from_xml(
-                                  expect_single(element.getchildren())),
-                              units=self.document[element.get('units')])
+        return RandomVariable(
+            name=element.get('name'),
+            distribution=RandomDistribution.from_xml(
+                expect_single(element.getchildren()), self.document),
+            units=self.document[element.get('units')])
 
     def load_single_internmaths_block(self, element, checkOnlyBlock=True):
         if checkOnlyBlock:
@@ -140,7 +141,7 @@ class ComponentClassXMLWriter(ComponentVisitor):
     @annotate_xml
     def visit_randomvariable(self, randomvariable):
         return E('RandomVariable',
-                 self.distribution.to_xml(),
+                 randomvariable.distribution.to_xml(),
                  name=randomvariable.name,
                  units=randomvariable.units.name)
 
