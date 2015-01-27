@@ -32,53 +32,53 @@
         <TimeDerivative variable="m">
           <MathInline>(m_inf - m) / m_tau</MathInline>
         </TimeDerivative>
-        <Alias name="m_inf">
-          <MathInline>(1 / (1 + exp((neg(v - V0_minf)) / B_minf)))</MathInline>
-        </Alias>
-        <Alias name="m_tau">
-          <MathInline>(5 / (alpha_m + beta_m))</MathInline>
-        </Alias>
-        <Alias name="Q10">
-          <MathInline>pow(3, ((temperature - 30) / 10))</MathInline>
-        </Alias>
-        <Alias name="alpha_m">
-          <MathInline>Q10 * Aalpha_m * linoid((v - V0alpha_m)
-            Kalpha_m)</MathInline>
-        </Alias>
-        <Alias name="beta_m">
-          <MathInline>Q10 * Abeta_m * linoid((v - V0beta_m)
-            Kbeta_m)</MathInline>
-        </Alias>
-        <Alias name="linoid_test">
-          <MathInline>abs((v - V0alpha_m) / Kalpha_m)</MathInline>
-        </Alias>
-        <Alias name="linoid_bounded">
-          <MathInline>Kalpha_m * (1 - ((v - V0alpha_m) / Kalpha_m) / 2)</MathInline>
-        </Alias>            
-        <Alias name="linoid_unbounded">
-          <MathInline>(v - V0alpha_m) / (1 - exp((v - V0alpha_m) / Kalpha_m))</MathInline>
-        </Alias>
-        <Alias name="linoid_voltage_bound">
-          <Value>1e-6</Value>
-        </Alias>
-        <Alias name="linoid">
-          <MathML xmlns="http://www.w3.org/1998/Math/MathML">
-            <piecewise>
-              <piece>
-                <ci>linoid_bounded</ci>
-                <apply>
-                  <lt/>
-                  <ci>linoid_test</ci>
-                  <ci>linoid_voltage_bound</ci>
-                </apply>
-              </piece>
-              <otherwise>
-                <ci>linoid_unbounded</ci>
-              </otherwise>
-            </piecewise>
-          </MathML>
-        </Alias>        
-      </Regime>
+      </Regime>        
+      <Alias name="m_inf">
+        <MathInline>(1 / (1 + exp((neg(v - V0_minf)) / B_minf)))</MathInline>
+      </Alias>
+      <Alias name="m_tau">
+        <MathInline>(5 / (alpha_m + beta_m))</MathInline>
+      </Alias>
+      <Alias name="Q10">
+        <MathInline>pow(3, ((temperature - 30) / 10))</MathInline>
+      </Alias>
+      <Alias name="alpha_m">
+        <MathInline>Q10 * Aalpha_m * linoid((v - V0alpha_m)
+          Kalpha_m)</MathInline>
+      </Alias>
+      <Alias name="beta_m">
+        <MathInline>Q10 * Abeta_m * linoid((v - V0beta_m)
+          Kbeta_m)</MathInline>
+      </Alias>
+      <Alias name="linoid_test">
+        <MathInline>abs((v - V0alpha_m) / Kalpha_m)</MathInline>
+      </Alias>
+      <Alias name="linoid_bounded">
+        <MathInline>Kalpha_m * (1 - ((v - V0alpha_m) / Kalpha_m) / 2)</MathInline>
+      </Alias>            
+      <Alias name="linoid_unbounded">
+        <MathInline>(v - V0alpha_m) / (1 - exp((v - V0alpha_m) / Kalpha_m))</MathInline>
+      </Alias>
+      <Alias name="linoid_voltage_bound">
+        <Value>1e-6</Value>
+      </Alias>
+      <Alias name="linoid">
+        <MathML xmlns="http://www.w3.org/1998/Math/MathML">
+          <piecewise>
+            <piece>
+              <ci>linoid_bounded</ci>
+              <apply>
+                <lt/>
+                <ci>linoid_test</ci>
+                <ci>linoid_voltage_bound</ci>
+              </apply>
+            </piece>
+            <otherwise>
+              <ci>linoid_unbounded</ci>
+            </otherwise>
+          </piecewise>
+        </MathML>
+      </Alias>
     </Dynamics>
   </ComponentClass>
 </NineML>
