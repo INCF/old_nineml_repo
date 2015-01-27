@@ -7,7 +7,7 @@ from . import parse
 class Piecewise(BaseALObject):
 
     element_name = 'Piecewise'
-    defining_attributes = ('name', 'pieces', 'otherwise', 'units')
+    defining_attributes = ('name', 'pieces', 'otherwise')
 
     def __init__(self, name, pieces, otherwise):
         self.name = name
@@ -15,8 +15,8 @@ class Piecewise(BaseALObject):
         self.otherwise = otherwise
 
     def __repr__(self):
-        return ("Piecewise(name={}, value={}, units={})"
-                .format(self.name, self.value, self.units))
+        return ("Piecewise(name={}, value={})"
+                .format(self.name, self.value))
 
     def accept_visitor(self, visitor, **kwargs):
         """ |VISITATION| """

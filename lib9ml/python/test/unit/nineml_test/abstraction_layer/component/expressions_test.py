@@ -3,8 +3,7 @@ import unittest
 from nineml.abstraction_layer import (Expression,
                                       Alias, StateAssignment, TimeDerivative)
 from nineml.abstraction_layer.expressions import (ExpressionWithSimpleLHS,
-                                                  Piecewise, Piece, Otherwise,
-                                                  Condition)
+                                                  Piecewise, Piece, Otherwise)
 from nineml.exceptions import NineMLMathParseError
 from nineml.abstraction_layer.units import mV
 from nineml.abstraction_layer.componentclass.utils.xml import (
@@ -290,7 +289,7 @@ class TimeDerivative_test(unittest.TestCase):
 class Piecewise_test(unittest.TestCase):
 
     def setUp(self):
-        self.pw = Piecewise(name="saturated_v", units=mV,
+        self.pw = Piecewise(name="saturated_v",
                             pieces=[Piece('v ^ 2 + c', 'v < 10'),
                                     Piece('-k * v ^ 2 + c', 'v < 0')],
                             otherwise=Otherwise('100 + c'))
