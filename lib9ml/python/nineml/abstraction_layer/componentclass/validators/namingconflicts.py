@@ -67,6 +67,3 @@ class DimensionNameConflictsComponentValidator(PerNamespaceComponentValidator):
 
     def action_parameter(self, parameter, **kwargs):  # @UnusedVariable @IgnorePep8
         self.check_conflicting_dimension(parameter.dimension)
-
-    def action_piecewise(self, piecewise, **kwargs):  # @UnusedVariable @IgnorePep8
-        self.check_conflicting_dimension(piecewise.units.dimension)

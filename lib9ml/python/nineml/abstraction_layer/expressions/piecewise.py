@@ -9,11 +9,10 @@ class Piecewise(BaseALObject):
     element_name = 'Piecewise'
     defining_attributes = ('name', 'pieces', 'otherwise', 'units')
 
-    def __init__(self, name, pieces, otherwise, units):
+    def __init__(self, name, pieces, otherwise):
         self.name = name
         self.pieces = pieces
         self.otherwise = otherwise
-        self.units = units
 
     def __repr__(self):
         return ("Piecewise(name={}, value={}, units={})"
@@ -28,11 +27,6 @@ class Piecewise(BaseALObject):
             self.name = name_map[self.name]
         except KeyError:
             assert False, "'{}' was not found in name_map".format(self.name)
-
-    def set_units(self, units):
-        assert self.units == units, \
-            "Renaming units with ones that do not match"
-        self.units = units
 
     @property
     def rhs_atoms(self):
@@ -51,6 +45,13 @@ class Piece(Expression, BaseALObject):
             condition = Condition(condition)
         self.condition = condition
 
+    def __str__(self):
+        return '{},    {}'.format(self.rhs, self.condition)
+
+    def __repr__(self):
+        return "Piece(expr='{}', test='{}')".format(self.rhs,
+                                                    self.condition.rhs)
+
     def accept_visitor(self, visitor, **kwargs):
         """ |VISITATION| """
         return visitor.visit_piece(self, **kwargs)
@@ -60,10 +61,25 @@ class Piece(Expression, BaseALObject):
         return chain(super(Piece, self).rhs_atoms,
                      self.condition.rhs_atoms)
 
+    def __getitem__(self, i):
+        if i == 0:
+            return self.rhs
+        elif i == 1:
+            return self.condition.rhs
+        else:
+            raise IndexError("Index '{}' out of bounds (0 <= i <= 1)"
+                             .format(i))
+
 
 class Otherwise(Expression, BaseALObject):
 
     element_name = "Otherwise"
+
+    def __repr__(self):
+        return "Otherwise(expr='{}')".format(self.rhs)
+
+    def __str__(self):
+        return self.rhs
 
     def accept_visitor(self, visitor, **kwargs):
         """ |VISITATION| """
@@ -73,6 +89,12 @@ class Otherwise(Expression, BaseALObject):
 class Condition(Expression, BaseALObject):
 
     element_name = "Condition"
+
+    def __str__(self):
+        return self.rhs
+
+    def __repr__(self):
+        return "Condition('{}')".format(self.rhs)
 
     def _parse_rhs(self, rhs):
         return parse.cond(rhs)

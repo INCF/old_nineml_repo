@@ -72,8 +72,7 @@ class ComponentClassXMLLoader(object):
         return Piecewise(name=element.get('name'),
                          pieces=subnodes[Piece.element_name],
                          otherwise=expect_single(
-                             subnodes[Otherwise.element_name]),
-                         units=self.document[element.get('units')])
+                             subnodes[Otherwise.element_name]))
 
     def load_single_internmaths_block(self, element, checkOnlyBlock=True):
         if checkOnlyBlock:
@@ -170,8 +169,7 @@ class ComponentClassXMLWriter(ComponentVisitor):
         pieces.append(piecewise.otherwise.accept_visitor(self))
         return E(Piecewise.element_name,
                  *pieces,
-                 name=piecewise.name,
-                 units=piecewise.units.name)
+                 name=piecewise.name)
 
     @annotate_xml
     def visit_piece(self, piece):
