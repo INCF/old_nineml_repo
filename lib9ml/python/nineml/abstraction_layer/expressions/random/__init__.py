@@ -50,9 +50,12 @@ class RandomDistribution(BaseALObject):
 
     valid_distributions = ('normal',)
 
-    def __init__(self, name, parameters):
+    def __init__(self, name, parameters, validate=True):
         self.name = name
         self.parameters = parameters
+        # Convert to xml and run schema validation
+        if validate:
+            self._validate_xml(self.to_xml())
 
     def to_xml(self):
         return self.E(self.name + 'Distribution',
@@ -61,12 +64,7 @@ class RandomDistribution(BaseALObject):
 
     @classmethod
     def from_xml(cls, element, document):  # @UnusedVariable
-        if not cls.uncertml_schema.validate(element):
-            error = cls.uncertml_schema.error_log.last_error
-            raise NineMLRuntimeError(
-                "Invalid UncertML XML in Random distribution: {} - {}\n\n{}"
-                .format(error.domain_name, error.type_name,
-                        etree.tostring(element, pretty_print=True)))
+        cls._validate_xml(element)
         if not element.tag.endswith('Distribution'):
             raise NineMLRuntimeError(
                 "Only UncertML distribution elements can be used inside "
@@ -74,4 +72,13 @@ class RandomDistribution(BaseALObject):
         name = element.tag[len(UNCERTML):-len('Distribution')]
         params = dict((c.tag[len(UNCERTML):], float(c.text))
                       for c in element.getchildren())
-        return cls(name=name, parameters=params)
+        return cls(name=name, parameters=params, validate=False)
+
+    @classmethod
+    def _validate_xml(cls, xml):
+        if not cls.uncertml_schema.validate(xml):
+            error = cls.uncertml_schema.error_log.last_error
+            raise NineMLRuntimeError(
+                "Invalid UncertML XML in Random distribution: {} - {}\n\n{}"
+                .format(error.domain_name, error.type_name,
+                        etree.tostring(xml, pretty_print=True)))
