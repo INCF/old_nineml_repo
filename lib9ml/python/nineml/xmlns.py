@@ -7,9 +7,10 @@ docstring goes here
 from lxml.builder import ElementMaker
 
 nineml_namespace = 'http://nineml.net/9ML/1.0'
-NINEML = "{%s}" % nineml_namespace
+NINEML = '{' + nineml_namespace + '}'
 MATHML = "{http://www.w3.org/1998/Math/MathML}"
-UNCERTML = "{http://www.uncertml.org/2.0}"
+uncertml_namespace = "http://www.uncertml.org/2.0"
+UNCERTML = '{' + uncertml_namespace + '}'
 
 E = ElementMaker(namespace=nineml_namespace,
                  nsmap={"ni": nineml_namespace})
