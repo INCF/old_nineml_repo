@@ -9,6 +9,7 @@ from nineml.exceptions import NineMLMathParseError
 from nineml.abstraction_layer.units import mV
 from nineml.abstraction_layer.componentclass.utils.xml import (
     ComponentClassXMLWriter as XMLWriter, ComponentClassXMLLoader as XMLLoader)
+from nineml import Document
 
 
 class Expression_test(unittest.TestCase):
@@ -316,6 +317,6 @@ class Piecewise_test(unittest.TestCase):
     def test_xml_roundtrip(self):
         writer = XMLWriter()
         xml = self.pw.accept_visitor(writer)
-        loader = XMLLoader()
+        loader = XMLLoader(Document(mV))
         pw = loader.load_piecewise(xml)
         self.assertEqual(pw, self.pw, "Piecewise failed xml roundtrip")

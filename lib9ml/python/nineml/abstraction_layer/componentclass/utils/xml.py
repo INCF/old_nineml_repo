@@ -31,6 +31,8 @@ class ComponentClassXMLLoader(object):
     class_types = ('Dynamics', 'RandomDistribution', 'ConnectionRule')
 
     def __init__(self, document=None):
+        if document is None:
+            document = Document()
         self.document = document
 
     def load_connectports(self, element):

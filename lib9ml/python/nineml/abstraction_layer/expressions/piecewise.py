@@ -7,7 +7,7 @@ from . import parse
 class Piecewise(BaseALObject):
 
     element_name = 'Piecewise'
-    defining_attributes = ('name', 'value', 'units')
+    defining_attributes = ('name', 'pieces', 'otherwise', 'units')
 
     def __init__(self, name, pieces, otherwise, units):
         self.name = name
