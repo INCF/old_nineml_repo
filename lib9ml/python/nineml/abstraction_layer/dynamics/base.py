@@ -500,7 +500,11 @@ class DynamicsClass(ComponentClass, _NamespaceMixin):
 
     @property
     def num_states(self):
-        return len(self.dyanmics.state_variables_map)
+        return len(self.dynamics.state_variables_map)
+
+    @property
+    def num_regimes(self):
+        return len(self.dynamics.regimes_map)
 
     @property
     def attributes_with_dimension(self):
