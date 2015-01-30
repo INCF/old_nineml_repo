@@ -330,7 +330,7 @@ class DynamicsClass(ComponentClass, _NamespaceMixin):
         # the dynamics class. We check that we do not specify half-and-half:
         if dynamicsblock is not None:
             if (regimes or aliases or state_variables or constants or
-                randomvariables or piecewises):
+                    randomvariables or piecewises):
                 raise NineMLRuntimeError(
                     "Either specify a 'dynamicsblock' parameter, or "
                     "state_variables/regimes/aliases/constants/"
@@ -497,6 +497,10 @@ class DynamicsClass(ComponentClass, _NamespaceMixin):
                 raise NineMLRuntimeError(
                     "Can't find regime '{}'".format(trans.target_regime_name))
             trans.set_target_regime(regime_map[trans.target_regime_name])
+
+    @property
+    def num_states(self):
+        return len(self.dyanmics.state_variables_map)
 
     @property
     def attributes_with_dimension(self):
