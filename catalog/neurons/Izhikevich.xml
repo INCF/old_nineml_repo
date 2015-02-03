@@ -38,7 +38,7 @@
           </StateAssignment>
           <EventOut port="spikeOutput"/>
         </OnCondition>
-        <OnCondition targetRegime="subVb">
+        <OnCondition target_regime="subVb">
           <Trigger>
             <MathInline>V &lt; Vb</MathInline>
           </Trigger>
@@ -51,7 +51,7 @@
         <TimeDerivative variable="V">
           <MathInline>dV</MathInline>
         </TimeDerivative>
-        <OnCondition targetRegime="subthreshold">
+        <OnCondition target_regime="subthreshold">
           <Trigger>
             <MathInline>V &gt; Vb</MathInline>
           </Trigger>
@@ -87,9 +87,6 @@
     </Property>
     <Property name="Vt" units="mV">
       <SingleValue>-40</SingleValue>
-    </Property>
-    <Property name="Iext" units="pA">
-      <SingleValue>100</SingleValue>
     </Property>
     <Property name="Cm" units="uF">
       <SingleValue>20</SingleValue>
