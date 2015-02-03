@@ -5,7 +5,8 @@ from setuptools import setup, find_packages
 setup(
     name="9ML",
     version="0.3dev",
-    package_data={'nineml': ['examples/AL/demos/*.py', "examples/AL/sample_components/*.py"]},
+    package_data={'nineml': ['examples/AL/demos/*.py', "examples/AL/sample_components/*.py",
+                             'abstraction_layer/expressions/random/uncertml.xsd']},
     packages = find_packages(),
     author="Andrew P. Davison, Eilif Muller, Mike Hull, Tom Close",
     # add your name here if you contribute to the code
