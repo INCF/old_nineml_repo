@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<NineML xmlns="http://nineml.net/9ML/1.0">
+  <ComponentClass name="NormalDistribution">
+    <Parameter name="mean"/>
+    <Parameter name="variance"/>
+    <PropertySendPort name="weight" dimension="dimensionless"/>
+    <Distribution>
+      <RandomVariable name="weight" dimension="dimensionless">
+        <un:normal xmlns:un="http://www.uncertml.org/2.0">
+          <un:variance>variance</un:variance>
+          <un:mean>mean</un:mean>
+        </un:normal>
+      </RandomVariable>
+    </Distribution>
+  </ComponentClass>
+  <Dimension name="dimensionless"/>
+</NineML>

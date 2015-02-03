@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<NineML xmlns="http://nineml.net/9ML/1.0">
+  <ComponentClass name="HypergeometricDistribution">
+    <Parameter name="numberOfSuccesses"/>
+    <Parameter name="numberOfTrials"/>
+    <Parameter name="populationSize"/>
+    <PropertySendPort name="weight" dimension="dimensionless"/>
+    <Distribution>
+      <RandomVariable name="weight" dimension="dimensionless">
+        <un:hypergeometric xmlns:un="http://www.uncertml.org/2.0">
+          <un:numberOfSuccesses>numberOfSuccesses</un:numberOfSuccesses>
+          <un:numberOfTrials>numberOfTrials</un:numberOfTrials>
+          <un:populationSize>populationSize</un:populationSize>
+        </un:hypergeometric>
+      </RandomVariable>
+    </Distribution>
+  </ComponentClass>
+  <Dimension name="dimensionless"/>
+</NineML>

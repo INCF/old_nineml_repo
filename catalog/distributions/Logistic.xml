@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<NineML xmlns="http://nineml.net/9ML/1.0">
+  <ComponentClass name="LogisticDistribution">
+    <Parameter name="location"/>
+    <Parameter name="scale"/>
+    <PropertySendPort name="weight" dimension="dimensionless"/>
+    <Distribution>
+      <RandomVariable name="weight" dimension="dimensionless">
+        <un:logistic xmlns:un="http://www.uncertml.org/2.0">
+          <un:location>location</un:location>
+          <un:scale>scale</un:scale>
+        </un:logistic>
+      </RandomVariable>
+    </Distribution>
+  </ComponentClass>
+  <Dimension name="dimensionless"/>
+</NineML>

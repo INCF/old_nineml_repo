@@ -1,51 +1,55 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <NineML xmlns="http://nineml.net/9ML/1.0">
   <ComponentClass name="Kinetic">
+
+
     <KineticState name="C2"> 
       <Alias name="K1">    
-  <MathInline>  K1=exp(k2*(d2-v)-k1*(d1-v)) </MathInline>
+        <MathInline>  K1=exp(k2*(d2-v)-k1*(d1-v)) </MathInline>
       </Alias>
       <Alias name="K2">    
-  <MathInline>  K2=exp(-k2*(d2-v)) </MathInline>
-      </Alias>    
-      <Reaction> 
-  <to> O </to>
-  <from> C1 </from>
-  
-  <ForwardRate> <MathInline> kf2= K2/(tau2v)*(1+K2)) </MathInline> </ForwardRate>
-  <ReverseRate> <MathInline> kb1=1/(tau1(v)*(1+K1)) </MathInline>  </ReverseRate>      
-      </Reaction>
-    
-    </KineticState>
-    
-    <KineticState name = "O"> 
-      
-    <Alias name="K2">    
-      <MathInline>  K2=exp(-k2*(d2-v)) </MathInline>
-    </Alias>       
-    <Reaction>
-      <to> C2 </to>
-      <from> C2  </from>
-    
-      <ForwardRate> <MathInline> kf2= K2/(tau2v)*(1+K2)) </MathInline> </ForwardRate>
-      <ReverseRate> <MathInline> kb2=t/(tau2(v)+(1+K2) </MathInline> </ReverseRate>
-    </Reaction>
-    </KineticState>
-    
-    <KineticState name = "C1"> 
-      <Alias name="K1">
-  <MathInline>  K1=exp(k2*(d2-v)-k1*(d1-v)) </MathInline> 
-      </Alias>	
-    <Reaction>
-      <to> C2 </to>
-      <from> C2  </from>
-  
-      <ForwardRate> <MathInline> kf1=k1/(tau1(v)*(1+K1)) </MathInline>  </ForwardRate>
-      <ReverseRate> <MathInline> kb1=1/(tau1(v)*(1+K1)) </MathInline>  </ReverseRate>
-    </Reaction> 
+        <MathInline>  K2=exp(-k2*(d2-v)) </MathInline>
+      </Alias> 
 
-    </KineticState>
-     
-    <constraint> <MathInline> c1+c2+o=1 </MathInline> </constraint>
-  </ComponentClass>  
+      <Reaction> 
+        <to> O </to>
+        <from> C1 </from>
+  
+        <ForwardRate> <MathInline> kf2= K2/(tau2v)*(1+K2)) </MathInline> </ForwardRate>
+        <ReverseRate> <MathInline> kb1=1/(tau1(v)*(1+K1)) </MathInline>  </ReverseRate>      
+      </Reaction>
+      
+      </KineticState>
+      
+      <KineticState name = "O"> 
+        
+      <Alias name="K2">    
+        <MathInline>  K2=exp(-k2*(d2-v)) </MathInline>
+      </Alias>       
+      <Reaction>
+        <to> C2 </to>
+        <from> C2  </from>
+      
+        <ForwardRate> <MathInline> kf2= K2/(tau2v)*(1+K2)) </MathInline> </ForwardRate>
+        <ReverseRate> <MathInline> kb2=t/(tau2(v)+(1+K2) </MathInline> </ReverseRate>
+      </Reaction>
+      </KineticState>
+      
+      <KineticState name = "C1"> 
+        <Alias name="K1">
+          <MathInline>  K1=exp(k2*(d2-v)-k1*(d1-v)) </MathInline> 
+        </Alias>	
+      <Reaction>
+        <to> C2 </to>
+        <from> C2  </from>
+    
+        <ForwardRate> <MathInline> kf1=k1/(tau1(v)*(1+K1)) </MathInline>  </ForwardRate>
+        <ReverseRate> <MathInline> kb1=1/(tau1(v)*(1+K1)) </MathInline>  </ReverseRate>
+      </Reaction> 
+  
+      </KineticState>
+       
+      <constraint> <MathInline> c1+c2+o=1 </MathInline> </constraint>
+
+    </ComponentClass>  
   </NineML>
