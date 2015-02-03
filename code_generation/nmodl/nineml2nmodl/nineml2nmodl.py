@@ -337,12 +337,12 @@ def write_nmodldirect(component, mod_filename, weight_variables={},
 
 def call_nrnivmodl():
 
-    nineml.utility.Settings.enable_nmodl_gsl = False
-    if nineml.utility.Settings.enable_nmodl_gsl:
+    nineml.utils.Settings.enable_nmodl_gsl = False
+    if nineml.utils.Settings.enable_nmodl_gsl:
         flgs = ["-L%s"% get_ninemlnrnlibdir(), "-L/opt/gsl-1.15/lib", "-lninemlnrn -lgsl -lgslcblas"]
         subprocess.check_call(['nrnivmodl','-loadflags','"%s"'%(' '.join(flgs) ) ] )
     else:
-        subprocess.check_call(['nrnivmodl',] )
+        subprocess.check_call(['nrnivmodl',])
 
 
 if __name__ == "__main__":
