@@ -1,4 +1,4 @@
-#! /usr/bin/python
+#!/usr/bin/env python
 """
 Converts 9ML abstraction layer neuron files to NMODL.
 
@@ -16,8 +16,8 @@ import subprocess
 import nineml.abstraction_layer.dynamics as al
 from nineml.exceptions import NineMLRuntimeError
 import nineml
-from nineml.utility import filter_expect_single, expect_single
-from nineml.maths import MathUtil
+from nineml.utils import filter_expect_single, expect_single
+from nineml.abstraction_layer.expressions.utils import MathUtil
 
 #from jinja2 import Template
 from Cheetah.Template import Template
@@ -69,11 +69,11 @@ neuron_random_func_defs = {
         }
 
 
-class NeuronExprRandomBuilder(nineml.abstraction_layer.visitors.ActionVisitor):
+class NeuronExprRandomBuilder(nineml.abstraction_layer.dynamics.utils.visitors.DynamicsActionVisitor):
 
     def __init__(self,):
         self.required_random_functions = set([])
-        self.explicitly_require_action_overrides = False
+        self.require_explicit_overrides = False
     def get_modl_function_defs(self):
         return '\n'.join( neuron_random_func_defs[f] for f in self.required_random_functions )
     def has_random_functions(self):
@@ -291,8 +291,7 @@ def build_context(component, weight_variables,
 
 def write_nmodl(nineml_file, weight_variables={}, hierarchical_mode=False):
 
-    from nineml.abstraction_layer.dynamics.readers import XMLReader
-    components = XMLReader.read_components(nineml_file)
+    components = nineml.read(nineml_file)
 
     output_dir = os.path.dirname(nineml_file)
     basename = os.path.basename(nineml_file)
@@ -307,16 +306,17 @@ def write_nmodl(nineml_file, weight_variables={}, hierarchical_mode=False):
                           weight_variables=weight_variables,
                           hierarchical_mode=hierarchical_mode)
     else:
-        for c in components:
-            output_filename = basename.replace(".xml",
-                                               "_%s.mod" % c.name).replace("-",
+        for c in components.itervalues():
+            if isinstance(c, al.DynamicsClass):
+                output_filename = basename.replace(".xml",
+                                                   "_%s.mod" % c.name).replace("-",
                                                                            "_")
-            print "Converting %s to %s" % (nineml_file, output_filename)
-            write_nmodldirect(component=c,
-                              mod_filename=os.path.join(output_dir,
-                                                        output_filename),
-                              weight_variables=weight_variables,
-                              hierarchical_mode=hierarchical_mode)
+                print "Converting %s to %s" % (nineml_file, output_filename)
+                write_nmodldirect(component=c,
+                                  mod_filename=os.path.join(output_dir,
+                                                            output_filename),
+                                  weight_variables=weight_variables,
+                                  hierarchical_mode=hierarchical_mode)
 
 
 def write_nmodldirect(component, mod_filename, weight_variables={},
