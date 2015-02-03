@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<NineML xmlns="http://nineml.net/9ML/1.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://nineml.net/9ML/1.0/schema/NineML_v0.2.xsd">
+<NineML xmlns="http://nineml.net/9ML/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://nineml.net/9ML/1.0/schema/NineML_v1.0.xsd">
   <ComponentClass name="IzhikevichClass">
     <Parameter name="a"/>
     <Parameter name="b"/>
@@ -19,33 +18,48 @@
     <AnalogSendPort name="V" dimension="voltage"/>
     <EventSendPort name="spikeOutput" mode="send"/>
     <Dynamics>
-      <!-- Suggested addition Wednesday morning...-->
       <StateVariable name="V" dimension="voltage"/>
       <StateVariable name="U"/>
-      <Regime name="subthresholdRegime">
-        <!-- if "independent_variable" is missing, it should be assumed to be "t" -->
-        <!-- Should this "ODE" be called "Rate", RateODE, "RateEqn" ??-->
+      <Regime name="subthreshold">
         <TimeDerivative variable="U">
-          <MathInline>a * (UU - U)</MathInline>
+          <MathInline>a * (b (V - Vb) ^ 3 - U)</MathInline>
         </TimeDerivative>
         <TimeDerivative variable="V">
-          <MathInline>(k * (V - Vr) * (V - Vt) - U + iSyn + iExt) / Cm</MathInline>
+          <MathInline>dV</MathInline>
         </TimeDerivative>
         <OnCondition>
           <Trigger>
             <MathInline>V &gt; Vpeak</MathInline>
           </Trigger>
-          <StateAssignment variable="V" >
+          <StateAssignment variable="V">
             <MathInline>c</MathInline>
           </StateAssignment>
           <StateAssignment variable="U" >
             <MathInline>U</MathInline>
           </StateAssignment>
-          <EventOut port="spikeOutput" />
+          <EventOut port="spikeOutput"/>
+        </OnCondition>
+        <OnCondition targetRegime="subVb">
+          <Trigger>
+            <MathInline>V &lt; Vb</MathInline>
+          </Trigger>
         </OnCondition>
       </Regime>
-      <Alias name="UU">
-        <MathInline>heaviside(V - Vb) * b (V - Vb) ^ 3</MathInline>
+      <Regime name="subVb">
+        <TimeDerivative variable="U">
+          <MathInline>- U * a</MathInline>
+        </TimeDerivative>
+        <TimeDerivative variable="V">
+          <MathInline>dV</MathInline>
+        </TimeDerivative>
+        <OnCondition targetRegime="subthreshold">
+          <Trigger>
+            <MathInline>V &gt; Vb</MathInline>
+          </Trigger>
+        </OnCondition>
+      </Regime>
+      <Alias name="dV">
+        <MathInline>(k * (V - Vr) * (V - Vt) - U + iSyn + iExt) / Cm</MathInline>
       </Alias>
     </Dynamics>
   </ComponentClass>
