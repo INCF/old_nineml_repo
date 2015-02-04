@@ -20,7 +20,7 @@
         <TimeDerivative variable="tsince" value="1"/>
         <OnCondition test="tsince .gt. period">
             <StateAssignment variable="tsince" value="0"/>
-            <EventOut port="a"/>
+            <OutputEvent port="a"/>
         </OnCondition>
     </Behavior>
 </ComponentType>

@@ -50,7 +50,7 @@
 
         <OnCondition test="v .gt. thresh">
             <StateAssignment variable="v" value="reset"/>
-            <EventOut port="a"/>
+            <OutputEvent port="a"/>
         </OnCondition>
 
     </Behavior>
@@ -173,7 +173,7 @@
 
         <OnCondition test="v .gt. thresh .and. spiking .eq. 0">
             <StateAssignment variable="spiking" value="1"/>
-            <EventOut port="a"/>
+            <OutputEvent port="a"/>
         </OnCondition>
 
         <OnCondition test="v .lt. thresh">
@@ -369,7 +369,7 @@
 
         <OnCondition test="v .gt. thresh .and. spiking .eq. 0">
             <StateAssignment variable="spiking" value="1"/>
-            <EventOut port="a"/>
+            <OutputEvent port="a"/>
         </OnCondition>
 
         <OnCondition test="v .lt. thresh">
@@ -441,7 +441,7 @@
         <OnCondition test="v .gt. thresh">
             <StateAssignment variable="v" value="c*vscale"/>
             <StateAssignment variable="U" value="U+d"/>
-            <EventOut port="a"/>
+            <OutputEvent port="a"/>
         </OnCondition>
 
         <OnCondition test="t .gt. Idel .and. t .lt. Idel+Idur">
@@ -499,7 +499,7 @@
         <OnCondition test="v .gt. thresh">
             <StateAssignment variable="v" value="reset"/>
             <StateAssignment variable="w" value="w+b"/>
-            <EventOut port="a"/>
+            <OutputEvent port="a"/>
         </OnCondition>
 
         <OnCondition test="t .gt. Idel .and. t .lt. Idel+Idur">
