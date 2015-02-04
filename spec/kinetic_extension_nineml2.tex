@@ -383,60 +383,41 @@ The concept of conservation of matter is central in calculating the fraction of 
   \end{edtable}
 \end{table}
 
-
 \subsection{Example use of kinetic scheme}.
-
-
 
 \begin{lstlisting}[label=code:xmliaf2]
 <?xml version='1.0' encoding='UTF-8'?>
 <NineML xmlns="http://nineml.net/9ML/2.0">
   <ComponentClass name="Kinetic">
-    <KineticState name C2> 
-      <to> O </to>
-      <from> C1 </from>
-    </KineticState>
-    <Alias name="K1">    
-      <mathinline>  K1=exp(k2*(d2-v)-k1*(d1-v)) </MathInline>
-    <Alias>
-    <Alias name="K2">    
-  	  <mathinline>  K2=exp(-k2*(d2-v)) </MathInline>
-    <Alias>    
-    <Reaction>
-      <ForwardRate> <mathinline> kf2= K2/(tau2v)*(1+K2)) </mathinline> </ForwardRate>
-      <ReverseRate> <mathinline> kb1=1/(tau1(v)*(1+K1)) </mathinline>  </ReverseRate>      
-    </Reaction>
-  
-    <KineticState name = O> 
-      <to> C2 </to>
-      <from> C2  </from>
-    </KineticState>
-    <Alias name="K2">    
-  	  <mathinline>  K2=exp(-k2*(d2-v)) </MathInline>
-    <Alias>       
-    <Reaction>
-      <ForwardRate> <mathinline> kf2= K2/(tau2v)*(1+K2)) </mathinline> </ForwardRate>
-      <ReverseRate> <mathinline> kb2=t/(tau2(v)+(1+K2) </mathinline> </ReverseRate>
-    </Reaction>
-    
-    <KineticState name = C1> 
-      <to> C2 </to>
-      <from> C2  </from>
-    </KineticState>  
-      <Alias name="K1">
-	  	<mathinline>  K1=exp(k2*(d2-v)-k1*(d1-v)) </MathInline> 
-  	  </Alias>	
-    <Reaction>
-      <ForwardRate> <mathinline> kf1=k1/(tau1(v)*(1+K1)) </mathinline>  </ForwardRate>
-      <ReverseRate> <mathinline> kb1=1/(tau1(v)*(1+K1)) </mathinline>  </ReverseRate>
-    </Reaction> 
-     
-    <constraint> c1+c2+o=1 </constraint>
+    <KineticDynamics>
+		<KineticState name="C1"/>
+		<KineticState name="C2"/> 
+		<KineticState name="O"/>
+	    <Reaction from="C1" to="C2">
+		  <ForwardRate> <MathInline>k1/(tau1(v)*(1+K1)) </MathInline> </ForwardRate>
+		  <ReverseRate> <MathInline>1/(tau1(v)*(1+K1)) </MathInline> </ReverseRate>
+		</Reaction>
+		<Reaction from="C2" to="O"> 
+		  <ForwardRate> <MathInline>K2/(tau2v)*(1+K2)) </MathInline> </ForwardRate>
+		  <ReverseRate> <MathInline>1/(tau1(v)*(1+K1)) </MathInline>  </ReverseRate>      
+		</Reaction>
+		<Constraint> <MathInline>C1 + C2 + O - 1 </MathInline> </Constraint>
+		<Alias name="K1">    
+		  <MathInline>exp(k2*(d2-v)-k1*(d1-v)) </MathInline>
+		<Alias>
+		<Alias name="K2">    
+	  	  <MathInline>exp(-k2*(d2-v)) </MathInline>
+		<Alias>    
+		<Alias name="K2">    
+	  	  <MathInline>exp(-k2*(d2-v)) </MathInline>
+		<Alias>
+    </KineticDynamics>
   <ComponentClass>  
-      
-	  	
+  <Unit symbol="mV" dimension="voltage" power="-3"/>
+  <Unit symbol="ms" dimension="time" power="-3"/> 
+</NineML>  	
 	   
-\end{lstlisting}[label=code:xmliaf2]
+\end{lstlisting}
 
 
 \clearpage
