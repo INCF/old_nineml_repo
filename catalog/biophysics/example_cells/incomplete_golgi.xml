@@ -144,7 +144,7 @@
                             <gt/><ci>v</ci><ci>spikeThreshold</ci>
                         </MathML>
                     </Trigger>
-                    <EventOut port="spike"/>
+                    <OutputEvent port="spike"/>
                 </OnCondition>
             </Regime>
             <Alias name="iNav">
