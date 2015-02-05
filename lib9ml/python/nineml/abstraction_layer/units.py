@@ -1,10 +1,21 @@
-from ..base import E
-from .base import BaseALObject
-from nineml.base import annotate_xml, read_annotations
-from numpy.core.test_rational import numerator
+from nineml.xmlns import E
+from . import BaseALObject
+from nineml import TopLevelObject
+from nineml.annotations import annotate_xml, read_annotations
+
+# Might be an idea to subclass namedtuple to prevent dimensions being redefined
+# and therefore protect the hash
+#
+# class D(namedtuple('Base', 'name m l t i n k j'), A):
+#     def __new__(self, name, m=0, l=0, t=0, n=0, k=0, j=0):
+#         return super(D, self).__new__(self, name, t, k, m, l, n, j)
+#     def __init__(self, name, m=0, l=0, t=0, n=0, k=0, j=0):
+#         pass
+#
+# NB: Not sure this works
 
 
-class Dimension(BaseALObject):
+class Dimension(BaseALObject, TopLevelObject):
     """
     Defines the dimension used for quantity units
     """
@@ -64,8 +75,7 @@ class Dimension(BaseALObject):
     def to_xml(self):
         kwargs = {'name': self.name}
         kwargs.update(dict((k, str(v)) for k, v in self._dims.items()))
-        return E(self.element_name,
-                 **kwargs)
+        return E(self.element_name, **kwargs)
 
     @classmethod
     @read_annotations
@@ -76,7 +86,7 @@ class Dimension(BaseALObject):
         return cls(name, **kwargs)
 
 
-class Unit(BaseALObject):
+class Unit(BaseALObject, TopLevelObject):
     """
     Defines the units of a quantity
     """
@@ -110,8 +120,8 @@ class Unit(BaseALObject):
 
     def to_SI_units_str(self):
         if self.offset != 0.0:
-            raise Exception("Cannot convert to SI units string as offset is not"
-                            " zero ({})".format(self.offset))
+            raise Exception("Cannot convert to SI units string as offset is "
+                            "not zero ({})".format(self.offset))
         return (self.dimension.to_SI_units_str() +
                 ' * 10**({})'.format(self.power) if self.power else '')
 
@@ -124,6 +134,12 @@ class Unit(BaseALObject):
         return self._dimension
 
     def set_dimension(self, dimension):
+        """
+        Used to standardize dimension names across a NineML document. The
+        actual dimension (in terms of fundamental dimension powers) should
+        not change.
+        """
+        assert self.dimension == dimension, "dimensions do not match"
         self._dimension = dimension
 
     @property
@@ -149,9 +165,9 @@ class Unit(BaseALObject):
 
     @classmethod
     @read_annotations
-    def from_xml(cls, element, context):
+    def from_xml(cls, element, document):
         name = element.attrib['symbol']
-        dimension = context[element.attrib['dimension']]
+        dimension = document[element.attrib['dimension']]
         power = int(element.get('power', 0))
         offset = float(element.attrib.get('name', 0.0))
         return cls(name, dimension, power, offset)

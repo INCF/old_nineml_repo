@@ -1,12 +1,13 @@
-from .base import BaseULObject, resolve_reference, write_reference
-from ..base import NINEML, E
-from .utility import check_tag
-from .components import BaseComponent
-from ..utility import expect_single
-from nineml.base import annotate_xml, read_annotations
+from itertools import chain
+from . import BaseULObject
+from .component import resolve_reference, write_reference, Component
+from nineml import TopLevelObject
+from nineml.xmlns import NINEML, E
+from nineml.utils import expect_single, check_tag
+from nineml.annotations import annotate_xml, read_annotations
 
 
-class Population(BaseULObject):
+class Population(BaseULObject, TopLevelObject):
     """
     A collection of spiking neurons all of the same type.
 
@@ -17,7 +18,8 @@ class Population(BaseULObject):
             an integer, the number of neurons in the population
         *cell*
             a :class:`Component`, or :class:`Reference` to a component defining
-            the cell type (i.e. the mathematical model and its parameterisation).
+            the cell type (i.e. the mathematical model and its
+            parameterisation).
         *positions*
             TODO: need to check if positions/structure are in the v1 spec
     """
@@ -51,11 +53,15 @@ class Population(BaseULObject):
         if self.cell:
             components.append(self.cell)
             components.extend(self.cell.properties.get_random_distributions())
-            components.extend(self.cell.initial_values.\
-                                                    get_random_distributions())
+            components.extend(
+                self.cell.initial_values.get_random_distributions())
         if self.positions is not None:
             components.extend(self.positions.get_components())
         return components
+
+    @property
+    def attributes_with_units(self):
+        return chain(*[c.attributes_with_units for c in self.get_components()])
 
     @write_reference
     @annotate_xml
@@ -70,27 +76,25 @@ class Population(BaseULObject):
     @classmethod
     @resolve_reference
     @read_annotations
-    def from_xml(cls, element, context):
+    def from_xml(cls, element, document):
         check_tag(element, cls)
         layout_elem = element.find(NINEML + 'Layout')
         kwargs = {}
         if layout_elem:
-            kwargs['positions'] = BaseComponent.from_xml(layout_elem, context)
+            kwargs['positions'] = Component.from_xml(layout_elem, document)
         cell = expect_single(element.findall(NINEML + 'Cell'))
+        cell_component = cell.find(NINEML + 'Component')
+        if cell_component is None:
+            cell_component = cell.find(NINEML + 'Reference')
         return cls(name=element.attrib['name'],
                    number=int(element.find(NINEML + 'Number').text),
-                   cell=BaseComponent.from_xml(cell.find(NINEML + 'Component')
-                                               or cell.find(NINEML +
-                                                            'Reference'),
-                                               context),
-                   **kwargs)
+                   cell=Component.from_xml(cell_component, document), **kwargs)
 
 
-class PositionList(BaseULObject):
-
+class PositionList(BaseULObject, TopLevelObject):
     """
-    Represents a list of network node positions. May contain either an
-    explicit list of positions or a :class:`Structure` instance that can be used to
+    Represents a list of network node positions. May contain either an explicit
+    list of positions or a :class:`Structure` instance that can be used to
     generate positions.
 
     Either `positions` or `structure` should be provided. Providing both
@@ -108,6 +112,13 @@ class PositionList(BaseULObject):
     def __init__(self, positions=[], structure=None):
         """
         Create a new PositionList.
+
+        Either `positions` or `structure` should be provided. Providing both
+        will raise an Exception.
+
+        `positions` should be a list of (x,y,z) tuples or a 3xN (Nx3?) numpy
+                    array.
+        `structure` should be a Structure componentclass.
         """
         super(PositionList, self).__init__()
         if positions and structure:
@@ -170,15 +181,15 @@ class PositionList(BaseULObject):
     @classmethod
     @resolve_reference
     @read_annotations
-    def from_xml(cls, element, context):
+    def from_xml(cls, element, document):
         if element is None:
             return None
         else:
             check_tag(element, cls)
             structure_element = element.find(NINEML + 'structure')
             if structure_element is not None:
-                return cls(structure=context.resolve_ref(structure_element,
-                                                         Structure))
+                return cls(structure=document.resolve_ref(
+                    structure_element, Structure))
             else:
                 positions = [(float(p.attrib['x']), float(p.attrib['y']),
                               float(p.attrib['z']))
@@ -193,7 +204,7 @@ def qstr(obj):
         return obj.__str__()
 
 
-class Structure(BaseComponent):
+class Structure(Component):
 
     """
     Component representing the structure of a network, e.g. 2D grid, random
