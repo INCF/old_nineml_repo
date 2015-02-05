@@ -15,7 +15,6 @@ from nineml.user_layer import kinetic_extension
 from nineml.user_layer import BaseULObject # just a wrapper for BaseNineMLObject
 
 from nineml import read
-#from nineml.user_layer import kinetic_extension
 import nineml.abstraction_layer as al
 from nineml.abstraction_layer  import dynamics
 from nineml.abstraction_layer.dynamics import kinetic_extension
@@ -57,6 +56,8 @@ root = xml.getroot()
 contents=nineml.load(root)
 print etree.tostring(root)
 print contents
+
+
 #etree.tostring(contents)
 #pe.from_xml(e,document)
 #a=KineticExtension()    
