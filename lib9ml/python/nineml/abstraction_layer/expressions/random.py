@@ -51,9 +51,16 @@ class RandomDistribution(BaseALObject):
     E = ElementMaker(namespace=uncertml_namespace,
                      nsmap={"un": uncertml_namespace})
 
-    valid_distributions = ('normal',)
+    valid_distributions = (
+        'Normal', 'Bernoulli', 'Beta', 'Binomial', 'Cauchy',
+        'ChiSquare', 'Dirichlet', 'Exponential', 'F', 'Gamma', 'Geometric',
+        'Hypergeometric', 'InverseGamma', 'Laplace', 'Logistic', 'LogNormal',
+        'MixtureModel Multinomial', 'NegativeBinomial', 'Normal',
+        'NormalInverseGamma', 'Pareto', 'Poisson', 'StudentT', 'Uniform',
+        'Weibull')
+
     non_alphabetical = {'StudentT': ('location', 'scale', 'degreesOfFreedom'),
-                        'GammaDistribution':
+                        'Gamma':
                             ('shape', 'scale'),
                         'InverseGamma':
                             ('shape', 'scale'),
