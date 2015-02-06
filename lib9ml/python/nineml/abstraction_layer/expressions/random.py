@@ -1,10 +1,9 @@
 from lxml import etree
 from lxml.builder import ElementMaker
-import os.path
 from operator import itemgetter
 from nineml.abstraction_layer import BaseALObject
 from nineml.exceptions import NineMLRuntimeError
-from nineml.xmlns import uncertml_namespace, UNCERTML
+from nineml.xmlns import uncertml_namespace, UNCERTML, uncertml_schema_path
 
 
 class RandomVariable(BaseALObject):
@@ -45,7 +44,7 @@ class RandomDistribution(BaseALObject):
     defining_attributes = ('name', 'parameters')
 
     # Load UncertML schema from file
-    with open(os.path.join(os.path.dirname(__file__), 'uncertml.xsd')) as f:
+    with open(uncertml_schema_path) as f:
         uncertml_schema = etree.XMLSchema(etree.parse(f))
 
     E = ElementMaker(namespace=uncertml_namespace,
@@ -60,12 +59,10 @@ class RandomDistribution(BaseALObject):
         'Weibull')
 
     non_alphabetical = {'StudentT': ('location', 'scale', 'degreesOfFreedom'),
-                        'Gamma':
-                            ('shape', 'scale'),
-                        'InverseGamma':
-                            ('shape', 'scale'),
-                        'NormalInverseGamma':
-                            ('mean', 'varianceScaling', 'shape', 'scale'),
+                        'Gamma': ('shape', 'scale'),
+                        'InverseGamma': ('shape', 'scale'),
+                        'NormalInverseGamma': ('mean', 'varianceScaling',
+                                               'shape', 'scale'),
                         'Uniform': ('minimum', 'maximum', 'numberOfClasses')}
 
     def __init__(self, name, parameters, validate=True):
@@ -82,6 +79,8 @@ class RandomDistribution(BaseALObject):
                     .format(self.name, self.parameters, uncertml_namespace))
 
     def to_xml(self):
+        # UncertML is order-specific, whereas NineML-UncertML is not in keeping
+        # with the general design philosophy of NineML
         if self.name in self.non_alphabetical:
             sorted_params = ((n, self.parameters[n])
                              for n in self.non_alphabetical[self.name])

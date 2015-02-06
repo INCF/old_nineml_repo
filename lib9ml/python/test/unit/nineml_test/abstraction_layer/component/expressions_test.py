@@ -9,8 +9,6 @@ from nineml.abstraction_layer.units import S_per_cm2
 from nineml.abstraction_layer.componentclass.utils.xml import (
     ComponentClassXMLWriter as XMLWriter, ComponentClassXMLLoader as XMLLoader)
 from nineml import Document
-from StringIO import StringIO
-from lxml import etree
 
 
 class Expression_test(unittest.TestCase):
@@ -310,25 +308,6 @@ class RandomVariable_test(unittest.TestCase):
             v.visit(self.rv, kwarg1='Hello', kwarg2='Hello2'),
             {'kwarg1': 'Hello', 'kwarg2': 'Hello2'}
         )
-
-    def test_from_xml(self):
-        with open('/Users/tclose/git/nineml/lib9ml/python/nineml/'
-                  'abstraction_layer/expressions/random/uncertml.xsd') as f:
-            xmlschema = etree.XMLSchema(etree.parse(f))
-        xmlstr = StringIO("""
-                <un:NormalDistribution xmlns:un="http://www.uncertml.org/2.0">
-                  <un:mean>3.14</un:mean>
-                  <un:variance>3.14</un:variance>
-                </un:NormalDistribution>
-                 """)
-        xmlstr = StringIO("""
-        <un:NormalDistribution xmlns:un="http://www.uncertml.org/2.0">
-          <un:mean>0.0</un:mean>
-          <un:variance>0.01</un:variance>
-        </un:NormalDistribution>
-        """)
-        xml = etree.parse(xmlstr)
-        print xmlschema.validate(xml)
 
     def test_xml_roundtrip(self):
         writer = XMLWriter()
