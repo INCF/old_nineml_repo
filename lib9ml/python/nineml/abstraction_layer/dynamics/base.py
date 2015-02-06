@@ -305,9 +305,9 @@ class DynamicsClass(ComponentClass, _NamespaceMixin):
         # the dynamics class. We check that we do not specify half-and-half:
         if dynamicsblock is not None:
             if regimes or aliases or state_variables or piecewises:
-                err = "Either specify a 'dynamics' parameter, or "
-                err += "state_variables /regimes/aliases, but not both!"
-                raise NineMLRuntimeError(err)
+                raise NineMLRuntimeError(
+                    "Either specify a 'dynamicsblock' parameter, or "
+                    "state_variables/regimes/aliases etc..., but not both!")
         else:
             dynamicsblock = DynamicsBlock(regimes=regimes, aliases=aliases,
                                           state_variables=state_variables,
