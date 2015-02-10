@@ -119,7 +119,7 @@ class Reaction(BaseALObject):
     future, wrapping in into its own object may make the transition easier
     """
 
-    defining_attributes = ('to', 'from', 'ForwardRate', 'ReverseRate')
+    defining_attributes = ('next', 'prev', 'ForwardRate', 'ReverseRate')
 
     def accept_visitor(self, visitor, **kwargs):
         """ |VISITATION| """
@@ -130,25 +130,23 @@ class Reaction(BaseALObject):
 
         :param name:  The name of the state variable.
         """
-        self._to = name.strip()
-        self._from = dimension if dimension is not None else dimensionless
+        self._next = name.strip()
+        self._prev = dimension if dimension is not None else dimensionless
         ensure_valid_identifier(self._name)
 
     @property
     def name(self):
         print reaction__
-        #return ('reaction__from{}_to{}'.format(reaction.from, reaction.to))
-
-
+        return (('reaction__prev{}_next{}').format(reaction._prev, reaction._next ))
 
 
     @property
-    #def to(self):
-        #return self._to
+    def next(self):
+        return self._next
 
     @property
-    #def from(self):
-        #return self._from
+    def prev(self):
+        return self._prev
 
     def set_dimension(self, dimension):
         self._dimension = dimension
