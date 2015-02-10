@@ -1,0 +1,50 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<NineML xmlns="http://nineml.incf.org/9ML/0.3">
+  <ComponentClass name="LeakyIntegrateAndFire">
+    <AnalogSendPort name="V" dimension="voltage"/>
+    <AnalogReducePort operator="+" name="ISyn" dimension="current"/>
+    <EventSendPort name="spikeoutput"/>
+    <Parameter dimension="specificCapacitance" name="cm"/>
+    <Parameter dimension="time" name="taurefrac"/>
+    <Parameter dimension="conductanceDensity" name="gl"/>
+    <Parameter dimension="voltage" name="vreset"/>
+    <Parameter dimension="voltage" name="vrest"/>
+    <Parameter dimension="voltage" name="vthresh"/>
+    <Dynamics>
+      <Regime name="subthresholdregime">
+        <TimeDerivative variable="V">
+          <MathInline>( gl*( vrest - V ) + ISyn)/(cm)</MathInline>
+        </TimeDerivative>
+        <OnCondition target_regime="refractoryregime">
+          <StateAssignment variable="tspike">
+            <MathInline>t</MathInline>
+          </StateAssignment>
+          <StateAssignment variable="V">
+            <MathInline>vreset</MathInline>
+          </StateAssignment>
+          <EventOut port="spikeoutput"/>
+          <Trigger>
+            <MathInline>V &gt; vthresh</MathInline>
+          </Trigger>
+        </OnCondition>
+      </Regime>
+      <Regime name="refractoryregime">
+        <TimeDerivative variable="V">
+          <MathInline>0</MathInline>
+        </TimeDerivative>
+        <OnCondition target_regime="subthresholdregime">
+          <Trigger>
+            <MathInline>t &gt;= tspike + taurefrac</MathInline>
+          </Trigger>
+        </OnCondition>
+      </Regime>
+      <StateVariable dimension="voltage" name="V"/>
+      <StateVariable dimension="time" name="tspike"/>
+    </Dynamics>
+  </ComponentClass>
+  <Dimension name="time" t="1"/>
+  <Dimension name="voltage" m="1" l="2" t="-3" i="-1"/>
+  <Dimension name="conductanceDensity" m="-1" l="-4" t="3" i="2"/>
+  <Dimension name="specificCapacitance" m="-1" l="-4" t="4" i="2"/>
+  <Dimension name="current" i="1"/>
+</NineML>
