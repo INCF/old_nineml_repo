@@ -7,7 +7,7 @@ docstring needed
 
 from ..utils import ComponentActionVisitor
 from ..base import ComponentClass, Parameter
-from ...expressions import Alias, Constant
+from ...expressions import Alias, Constant, RandomVariable
 
 
 class TypesComponentValidator(ComponentActionVisitor):
@@ -28,3 +28,6 @@ class TypesComponentValidator(ComponentActionVisitor):
 
     def action_constant(self, constant, **kwargs):  # @UnusedVariable
         assert isinstance(constant, Constant)
+
+    def action_randomvariable(self, randomvariable, **kwargs):  # @UnusedVariable
+        assert isinstance(randomvariable, RandomVariable)        

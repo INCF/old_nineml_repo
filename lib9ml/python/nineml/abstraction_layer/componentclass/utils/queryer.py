@@ -31,6 +31,11 @@ class ComponentQueryer(object):
         return dict([(p.name, p) for p in self.componentclass.parameters])
 
     @property
+    def randomvariables_map(self):
+        """Returns a map of names to |Parameter| objects"""
+        return dict([(c.name, c) for c in self.componentclass.randomvariables])
+
+    @property
     def constants_map(self):
         """Returns a map of names to |Parameter| objects"""
         return dict([(c.name, c) for c in self.componentclass.constants])

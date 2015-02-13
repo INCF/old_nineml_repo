@@ -82,6 +82,14 @@ class ComponentClass(BaseALObject, TopLevelObject):
         return self._main_block.constants_map
 
     @property
+    def randomvariables(self):
+        return self._main_block.randomvariables
+
+    @property
+    def randomvariables_map(self):
+        return self._main_block.randomvariables_map
+
+    @property
     def dimensions(self):
         return set(a.dimension for a in self.attributes_with_dimension)
 
@@ -91,7 +99,7 @@ class ComponentClass(BaseALObject, TopLevelObject):
 
     @property
     def attributes_with_units(self):
-        return self.constants
+        return chain(self.constants, self.randomvariables)
 
     def standardize_unit_dimensions(self, reference_set=None):
         """

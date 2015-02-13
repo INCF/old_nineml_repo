@@ -30,6 +30,9 @@ class ComponentActionVisitor(ComponentVisitor):
     def visit_alias(self, alias, **kwargs):
         self.action_alias(alias, **kwargs)
 
+    def visit_randomvariable(self, randomvariable, **kwargs):
+        self.action_randomvariable(randomvariable, **kwargs)
+
     def visit_constant(self, constant, **kwargs):
         self.action_constant(constant, **kwargs)
 
@@ -48,6 +51,9 @@ class ComponentActionVisitor(ComponentVisitor):
         self.check_pass()
 
     def action_alias(self, alias, **kwargs):  # @UnusedVariable
+        self.check_pass()
+
+    def action_randomvariable(self, randomvariable, **kwargs):  # @UnusedVariable
         self.check_pass()
 
     def action_constant(self, constant, **kwargs):  # @UnusedVariable

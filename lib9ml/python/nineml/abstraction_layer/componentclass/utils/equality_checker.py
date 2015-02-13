@@ -84,3 +84,4 @@ class ComponentEqualityChecker(object):
 
         # Check Constants:
         assert_equal_list(comp1.constants, comp2.constants)
+        assert_equal_list(comp1.randomvariables, comp2.randomvariables)
