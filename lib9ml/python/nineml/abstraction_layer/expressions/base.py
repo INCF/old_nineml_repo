@@ -5,7 +5,6 @@ This file defines mathematical classes and derived classes
 :license: BSD-3, see LICENSE for details.
 """
 import itertools
-import quantities as pq
 
 # import math_namespace
 from nineml.exceptions import NineMLRuntimeError
@@ -130,7 +129,7 @@ class ExpressionWithSimpleLHS(ExpressionWithLHS):
     That is, a single symbol, for example 's = t+1'
     """
 
-    defining_attributes = ('_lhs', '_rhs')
+    defining_attributes = ('_name', '_rhs')
 
     def __init__(self, lhs, rhs):
         ExpressionWithLHS.__init__(self, rhs)
@@ -142,18 +141,22 @@ class ExpressionWithSimpleLHS(ExpressionWithLHS):
             err = 'Invalid LHS target: %s' % lhs
             raise NineMLRuntimeError(err)
 
-        self._lhs = lhs.strip()
+        self._name = lhs.strip()
+
+    @property
+    def name(self):
+        return self._name
 
     @property
     def lhs(self):
-        return self._lhs
+        return self._name
 
     @property
     def lhs_atoms(self):
         return [self.lhs]
 
     def lhs_name_transform_inplace(self, name_map):
-        self._lhs = name_map.get(self.lhs, self.lhs)
+        self._name = name_map.get(self.lhs, self.lhs)
 
 
 class ODE(ExpressionWithLHS):
@@ -249,7 +252,7 @@ class Alias(BaseALObject, ExpressionWithSimpleLHS):
 
     """
     element_name = 'Alias'
-    defining_attributes = ('_lhs', '_rhs')
+    defining_attributes = ('_name', '_rhs')
 
     def __init__(self, lhs=None, rhs=None):
         """ Constructor for an Alias
@@ -290,12 +293,24 @@ class Alias(BaseALObject, ExpressionWithSimpleLHS):
 class Constant(BaseALObject):
 
     element_name = 'Constant'
-    defining_attributes = ('name', 'value', 'units')
+    defining_attributes = ('_name', '_value', '_units')
 
     def __init__(self, name, value, units):
-        self.name = name
-        self.value = value
-        self.units = units
+        self._name = name
+        self._value = value
+        self._units = units
+
+    @property
+    def name(self):
+        return self._name
+
+    @property
+    def value(self):
+        return self._value
+
+    @property
+    def units(self):
+        return self._units
 
     def __repr__(self):
         return ("Constant(name={}, value={}, units={})"
