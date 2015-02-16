@@ -82,6 +82,7 @@ class ComponentEqualityChecker(object):
         a2 = [(a.lhs, a.rhs) for a in d2.aliases]
         assert_equal_list(a1, a2)
 
-        # Check Constants:
+        # Check Constants, RandomVariables and Piecewises:
         assert_equal_list(comp1.constants, comp2.constants)
         assert_equal_list(comp1.randomvariables, comp2.randomvariables)
+        assert_equal_list(comp1.piecewises, comp2.piecewises)

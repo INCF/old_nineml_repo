@@ -104,6 +104,14 @@ class ComponentRenameSymbol(ComponentActionVisitor):
             self.note_lhs_changed(constant)
             constant.name_transform_inplace(self.namemap)
 
+    def action_piecewise(self, piecewise, **kwargs):  # @UnusedVariable
+        if piecewise.name == self.old_symbol_name:
+            self.note_lhs_changed(piecewise)
+            piecewise.name_transform_inplace(self.namemap)
+        elif self.old_symbol_name in piecewise.atoms:
+            self.note_rhs_changed(piecewise)
+            piecewise.name_transform_inplace(self.namemap)
+
 
 class ComponentClonerVisitor(ComponentVisitor):
 
@@ -145,3 +153,11 @@ class ComponentClonerVisitor(ComponentVisitor):
                                           value=constant.value,
                                           units=constant.units)
         return new_constant
+    
+    def visit_piecewise(self, piecewise, **kwargs):  # @UnusedVariable
+        # FIXME: This would be handled better by a copy constructor?? TGC 1/15
+        new_piecewise = piecewise.__class__(name=piecewise.name,
+                                            pieces=piecewise.pieces,
+                                            otherwise=piecewise.otherwise,
+                                            units=piecewise.units)
+        return new_piecewise

@@ -35,31 +35,18 @@ class Expression(object):
 
     # Subclasses can over-ride this, if need be.
     def _parse_rhs(self, rhs):
-        # A temporary measure, this is until the parser is
-        # generalised to handle conditionals
-        # return parse.expr_parse(rhs)
-        if isinstance(rhs, str):
-            parsed = parse.expr(rhs)
-        elif not isinstance(rhs, pq.quantity):
-            raise NotImplementedError
-        return parsed
+        return parse.expr(rhs)
 
     # If we assign to rhs, then we need to update the
     # cached names and funcs:
     def _set_rhs(self, rhs):
         rhs = rhs.strip()
         self._rhs = rhs
-        if isinstance(rhs, str):
-            self._rhs_names, self._rhs_funcs = self._parse_rhs(rhs)
-            for name in self._rhs_names:
-                assert name not in self._rhs_funcs
-            for func in self._rhs_funcs:
-                assert func not in self._rhs_names
-        elif isinstance(rhs, pq.Quantity):  # FIXME: This should be in Constant
-            self._rhs_names = []
-            self._rhs_funcs = []
-        else:
-            raise NotImplementedError
+        self._rhs_names, self._rhs_funcs = self._parse_rhs(rhs)
+        for name in self._rhs_names:
+            assert name not in self._rhs_funcs
+        for func in self._rhs_funcs:
+            assert func not in self._rhs_names
 
     def _get_rhs(self):
         return self._rhs
