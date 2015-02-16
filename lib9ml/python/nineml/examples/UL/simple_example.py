@@ -7,13 +7,13 @@ catalog = "https://raw.githubusercontent.com/apdavison/nineml/modular/catalog/"
 
 tau_distr = nineml.RandomDistribution(
     "normal(20.0,3.0)",
-    catalog + "randomdistributions/normal_distribution.xml",
+    catalog + "distributions/normal_distribution.xml",
     {'standardDeviation': (10.0, "dimensionless"),
      'mean': (50.0, "dimensionless")})
 
 reset_distr = nineml.RandomDistribution(
     "uniform(-70.0,-60.0)",
-    catalog + "randomdistributions/uniform_distribution.xml",
+    catalog + "distributions/uniform_distribution.xml",
     {'lowerBound': (-70.0, "dimensionless"),
      'upperBound': (-60.0, "dimensionless")})
 

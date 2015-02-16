@@ -56,7 +56,7 @@ def build_model(g, eta):
                                            R=(1.5, Mohm))  # units??
     psr_parameters = nineml.PropertySet(tau_syn=(tau_syn, ms))
     #v_init = nineml.RandomDistribution("uniform(rest,threshold)",
-    #                                   "catalog/randomdistributions/uniform_distribution.xml",  # hack - this file doesn't exist
+    #                                   "catalog/distributions/uniform_distribution.xml",  # hack - this file doesn't exist
     #                                   {'lowerBound': (0.0, "dimensionless"),
     #                                    'upperBound': (theta, "dimensionless")})
     v_init = 0.0
@@ -67,7 +67,7 @@ def build_model(g, eta):
     celltype = nineml.SpikingNodeType("nrn", "BrunelIaF.xml", neuron_parameters, initial_values=neuron_initial_values)
 
     #tpoisson_init = nineml.RandomDistribution("exponential(beta)",
-    #                                          "catalog/randomdistributions/exponential_distribution.xml",
+    #                                          "catalog/distributions/exponential_distribution.xml",
     #                                          {"beta": (1000.0/input_rate, "dimensionless")})
     tpoisson_init = 5.0
     ext_stim = nineml.SpikingNodeType("stim", "Poisson.xml",

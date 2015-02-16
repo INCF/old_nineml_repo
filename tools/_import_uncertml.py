@@ -10,8 +10,8 @@ E = ElementMaker()
 uncertml_ns = '{http://www.uncertml.org/2.0}'
 len_ns = len(uncertml_ns)
 
-uncert_dir = '/home/tclose/git/nineml/catalog/randomdistributions/uncertml_examples'
-import_dir = '/home/tclose/git/nineml/catalog/randomdistributions/imported'
+uncert_dir = '/home/tclose/git/nineml/catalog/distributions/uncertml_examples'
+import_dir = '/home/tclose/git/nineml/catalog/distributions/imported'
 for fname in os.listdir(uncert_dir):
     with open(os.path.join(uncert_dir, fname)) as f:
         in_xml = etree.parse(f)

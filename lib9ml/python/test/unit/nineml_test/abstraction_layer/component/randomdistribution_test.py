@@ -6,7 +6,7 @@ from nineml.abstraction_layer.distribution import DistributionClass
 import tempfile
 
 examples_dir = os.path.join(os.path.dirname(__file__), '..', '..', '..', '..',
-                            '..', '..', '..', 'catalog', 'randomdistributions')
+                            '..', '..', '..', 'catalog', 'distributions')
 
 
 class TestDistribution(unittest.TestCase):
