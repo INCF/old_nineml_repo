@@ -20,7 +20,7 @@ from nineml.utils import (check_list_contain_same_items, invert_dictionary,
                             assert_no_duplicates)
 from .utils import DynamicsQueryer
 from .utils.cloner import (
-    DynamicsExpandAliasDefinition, DynamicsClonerVisitor)
+    DynamicsExpandAliasDefinition, DynamicsCloner)
 from .. import BaseALObject
 
 
@@ -76,6 +76,9 @@ class DynamicsBlock(BaseALObject):
         self._constants = dict((c.name, c) for c in constants)
         self._randomvariables = dict((c.name, c) for c in randomvariables)
         self._piecewises = dict((c.name, c) for c in piecewises)
+
+    def __copy__(self):
+        return DynamicsCloner().visit(self)
 
     def accept_visitor(self, visitor, **kwargs):
         """ |VISITATION| """
@@ -134,7 +137,7 @@ class DynamicsBlock(BaseALObject):
     def piecewises_map(self):
         return self._piecewises
 
-    @property    
+    @property
     def state_variables(self):
         return self._state_variables.itervalues()
 
@@ -238,7 +241,7 @@ class _NamespaceMixin(object):
         if namespace in self.subnodes:
             err = 'Key already exists in namespace: %s' % namespace
             raise NineMLRuntimeError(err)
-        self.subnodes[namespace] = DynamicsClonerVisitor().visit(subnode)
+        self.subnodes[namespace] = DynamicsCloner().visit(subnode)
         self.subnodes[namespace].set_parent_model(self)
 
         self._validate_self()

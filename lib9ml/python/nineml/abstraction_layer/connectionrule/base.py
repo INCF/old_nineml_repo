@@ -14,6 +14,7 @@ docstring goes here
 """
 from .. import BaseALObject
 from ..componentclass import ComponentClass
+from .utils.cloner import ConnectionRuleCloner
 
 
 class ConnectionRuleBlock(BaseALObject):
@@ -40,3 +41,6 @@ class ConnectionRuleClass(ComponentClass):
     def accept_visitor(self, visitor, **kwargs):
         """ |VISITATION| """
         return visitor.visit_componentclass(self, **kwargs)
+
+    def __copy__(self):
+        return ConnectionRuleCloner().visit(self)
