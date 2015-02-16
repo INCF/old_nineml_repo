@@ -22,6 +22,7 @@ from .utils import DynamicsQueryer
 from .utils.cloner import (
     DynamicsExpandAliasDefinition, DynamicsCloner)
 from .. import BaseALObject
+from .utils.modifiers import DynamicsRenameSymbol
 
 
 class DynamicsBlock(BaseALObject):
@@ -76,9 +77,6 @@ class DynamicsBlock(BaseALObject):
         self._constants = dict((c.name, c) for c in constants)
         self._randomvariables = dict((c.name, c) for c in randomvariables)
         self._piecewises = dict((c.name, c) for c in piecewises)
-
-    def __copy__(self):
-        return DynamicsCloner().visit(self)
 
     def accept_visitor(self, visitor, **kwargs):
         """ |VISITATION| """
@@ -438,6 +436,12 @@ class DynamicsClass(ComponentClass, _NamespaceMixin):
         self._validate_self()
 
     # -------------------------- #
+
+    def __copy__(self):
+        return DynamicsCloner().visit(self)
+
+    def rename(self, old_symbol, new_symbol):
+        DynamicsRenameSymbol(self, old_symbol, new_symbol)
 
     def __repr__(self):
         return "<dynamics.DynamicsClass %s>" % self.name

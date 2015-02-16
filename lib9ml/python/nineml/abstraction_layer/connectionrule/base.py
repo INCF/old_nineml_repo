@@ -14,7 +14,6 @@ docstring goes here
 """
 from .. import BaseALObject
 from ..componentclass import ComponentClass
-from .utils.cloner import ConnectionRuleCloner
 
 
 class ConnectionRuleBlock(BaseALObject):
@@ -44,3 +43,9 @@ class ConnectionRuleClass(ComponentClass):
 
     def __copy__(self):
         return ConnectionRuleCloner().visit(self)
+
+    def rename(self, old_symbol, new_symbol):
+        ConnectionRuleRenameSymbol(self, old_symbol, new_symbol)
+
+from .utils.cloner import ConnectionRuleCloner
+from .utils.modifiers import ConnectionRuleRenameSymbol

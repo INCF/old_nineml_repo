@@ -1,6 +1,5 @@
 from .. import BaseALObject
 from ..componentclass import ComponentClass
-from .utils.cloner import DistributionCloner
 
 
 class DistributionBlock(BaseALObject):
@@ -29,3 +28,9 @@ class DistributionClass(ComponentClass):
 
     def __copy__(self):
         return DistributionCloner().visit(self)
+
+    def rename(self, old_symbol, new_symbol):
+        DistributionRenameSymbol(self, old_symbol, new_symbol)
+
+from .utils.cloner import DistributionCloner
+from .utils.modifiers import DistributionRenameSymbol
