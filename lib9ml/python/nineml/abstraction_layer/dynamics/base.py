@@ -648,7 +648,7 @@ class DynamicsClass(ComponentClass, _NamespaceMixin):
 
     @property
     def _assumed_defined(self):
-        return self.dynamics._state_variables.keys()
+        return self.dynamicsblock._state_variables.keys()
 
 
 def inf_check(l1, l2, desc):
