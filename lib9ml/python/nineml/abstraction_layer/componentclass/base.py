@@ -66,8 +66,8 @@ class ComponentClass(BaseALObject, TopLevelObject):
         name of an element can be replaced with a unique integer value (and
         referenced elsewhere in the code).
 
-        WARNING! It is assumed but not checked that the element is part of the
-        component class.
+        The element would typically be part of the component class, but this
+        is not checked for.
         """
         if key is None:
             try:
@@ -130,7 +130,7 @@ class ComponentClass(BaseALObject, TopLevelObject):
     def piecewises_map(self):
         return self._main_block.piecewises_map
 
-    @property    
+    @property
     def dimensions(self):
         return set(a.dimension for a in self.attributes_with_dimension)
 
@@ -171,8 +171,6 @@ class ComponentClass(BaseALObject, TopLevelObject):
                             'ClassXMLLoader')
         return XMLLoader(document).load_componentclass(element)
 
-    # FIXME: Should probably do this via a visitor, which could be specialized
-    #        for each componentclass type.
     def get_dependencies(self, expression):
         """
         Gets lists of required parameters, states, ports, random variables,

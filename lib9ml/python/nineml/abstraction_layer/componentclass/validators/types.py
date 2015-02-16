@@ -29,8 +29,8 @@ class TypesComponentValidator(ComponentActionVisitor):
     def action_constant(self, constant, **kwargs):  # @UnusedVariable
         assert isinstance(constant, Constant)
 
-    def action_randomvariable(self, randomvariable, **kwargs):  # @UnusedVariable
+    def action_randomvariable(self, randomvariable, **kwargs):  # @UnusedVariable @IgnorePep8
         assert isinstance(randomvariable, RandomVariable)
 
     def action_piecewise(self, piecewise, **kwargs):  # @UnusedVariable
-        assert isinstance(piecewise, Piecewise)        
+        assert isinstance(piecewise, Piecewise)

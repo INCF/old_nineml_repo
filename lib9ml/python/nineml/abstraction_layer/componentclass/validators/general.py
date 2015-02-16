@@ -144,8 +144,8 @@ class NoDuplicatedObjectsComponentValidator(PerNamespaceComponentValidator):
     def action_constant(self, constant, **kwargs):  # @UnusedVariable
         self.all_objects.append(constant)
 
-    def action_randomvariable(self, randomvariable, **kwargs):  # @UnusedVariable
-        self.all_objects.append(randomvariable)        
+    def action_randomvariable(self, randomvariable, **kwargs):  # @UnusedVariable @IgnorePep8
+        self.all_objects.append(randomvariable)
 
     def action_piecewise(self, piecewise, **kwargs):  # @UnusedVariable
         self.all_objects.append(piecewise)
@@ -181,8 +181,8 @@ class CheckNoLHSAssignmentsToMathsNamespaceComponentValidator(
     def action_constant(self, constant, **kwargs):  # @UnusedVariable
         self.check_lhssymbol_is_valid(constant.name)
 
-    def action_randomvariable(self, randomvariable, **kwargs):  # @UnusedVariable
+    def action_randomvariable(self, randomvariable, **kwargs):  # @UnusedVariable @IgnorePep8
         self.check_lhssymbol_is_valid(randomvariable.name)
-        
+
     def action_piecewise(self, piecewise, **kwargs):  # @UnusedVariable
         self.check_lhssymbol_is_valid(piecewise.name)
