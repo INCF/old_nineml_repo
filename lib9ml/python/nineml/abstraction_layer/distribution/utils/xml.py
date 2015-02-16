@@ -25,7 +25,8 @@ class DistributionClassXMLLoader(ComponentClassXMLLoader):
 
     @read_annotations
     def load_componentclass(self, element):
-        subblocks = ('Parameter', 'RandomDistribution')
+        subblocks = ('Parameter', 'Distribution', 'PropertySendPort',
+                     'PropertyReceivePort', 'IndexReceivePort')
         children = self._load_blocks(element, blocks=subblocks)
         distributionblock = expect_single(children["RandomDistribution"])
         return DistributionClass(name=element.get('name'),
@@ -41,7 +42,7 @@ class DistributionClassXMLLoader(ComponentClassXMLLoader):
 
     tag_to_loader = {
         "ComponentClass": load_componentclass,
-        "RandomDistribution": load_distributionblock
+        "Distribution": load_distributionblock,
     }
 
 
