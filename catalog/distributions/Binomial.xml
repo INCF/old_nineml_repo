@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<NineML xmlns="http://nineml.net/9ML/1.0">
+  <ComponentClass name="BinomialDistribution">
+    <Parameter name="numberOfTrials"/>
+    <Parameter name="probabilityOfSuccess"/>
+    <PropertySendPort name="weight" dimension="dimensionless"/>
+    <Distribution>
+      <RandomVariable name="weight" dimension="dimensionless">
+        <un:binomial xmlns:un="http://www.uncertml.org/2.0">
+          <un:numberOfTrials>numberOfTrials</un:numberOfTrials>
+          <un:probabilityOfSuccess>probabilityOfSuccess</un:probabilityOfSuccess>
+        </un:binomial>
+      </RandomVariable>
+    </Distribution>
+  </ComponentClass>
+  <Dimension name="dimensionless"/>
+</NineML>
