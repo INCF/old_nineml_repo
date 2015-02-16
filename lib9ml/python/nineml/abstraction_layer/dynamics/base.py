@@ -443,6 +443,9 @@ class DynamicsClass(ComponentClass, _NamespaceMixin):
     def rename(self, old_symbol, new_symbol):
         DynamicsRenameSymbol(self, old_symbol, new_symbol)
 
+    def required_definitions(self, expressions):
+        return DynamicsRequiredDefinitions(self, expressions)
+
     def __repr__(self):
         return "<dynamics.DynamicsClass %s>" % self.name
 
@@ -664,3 +667,4 @@ def inf_check(l1, l2, desc):
 
 from .validators import DynamicsValidator
 from .utils import DynamicsClassInterfaceInferer
+from .utils.visitors import DynamicsRequiredDefinitions

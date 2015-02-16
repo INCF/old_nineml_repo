@@ -32,5 +32,9 @@ class DistributionClass(ComponentClass):
     def rename(self, old_symbol, new_symbol):
         DistributionRenameSymbol(self, old_symbol, new_symbol)
 
+    def required_definitions(self, expressions):
+        return DistributionRequiredDefinitions(self, expressions)
+
 from .utils.cloner import DistributionCloner
 from .utils.modifiers import DistributionRenameSymbol
+from .utils.visitors import DistributionRequiredDefinitions

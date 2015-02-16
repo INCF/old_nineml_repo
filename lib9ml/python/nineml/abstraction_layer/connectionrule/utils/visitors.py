@@ -7,6 +7,7 @@ docstring needed
 
 
 from ...componentclass.utils import ComponentActionVisitor
+from ...componentclass.utils.visitors import ComponentRequiredDefinitions
 
 
 class ConnectionRuleActionVisitor(ComponentActionVisitor):
@@ -24,3 +25,8 @@ class ConnectionRuleActionVisitor(ComponentActionVisitor):
 
     def action_connectionruleblock(self, connectionrule, **kwargs):  # @UnusedVariable @IgnorePep8
         self.check_pass()
+
+
+class ConnectionRuleRequiredDefinitions(ConnectionRuleActionVisitor,
+                                        ComponentRequiredDefinitions):
+    pass
