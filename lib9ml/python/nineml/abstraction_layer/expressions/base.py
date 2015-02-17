@@ -26,11 +26,13 @@ class Expression(object):
         self._rhs = None
         self._rhs_names = None
         self._rhs_funcs = None
-
         self._set_rhs(rhs)
 
     def __eq__(self, other):
         return self._rhs == other._rhs
+
+    def __ne__(self, other):
+        return not self == other
 
     # Subclasses can over-ride this, if need be.
     def _parse_rhs(self, rhs):
