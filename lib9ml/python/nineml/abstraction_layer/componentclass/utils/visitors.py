@@ -86,6 +86,19 @@ class ComponentRequiredDefinitions(object):
         self._componentclass = componentclass
         self.visit(componentclass)
 
+    def __repr__(self):
+        return ("Parameters: {}\nPorts: {}\nConstants: {}\n"
+                "Random-variables: {}\nPiecewises: {}\nAliases:\n{}"
+                .format(', '.join(self.parameter_names),
+                        ', '.join(self.port_names),
+                        ', '.join(self.constant_names),
+                        ', '.join(self.random_variable_names),
+                        ', '.join(e.name for e in self.expressions
+                                  if hasattr(e, 'pieces')),
+                        '\n'.join('{} = {}'.format(e.name, e.rhs)
+                                  for e in self.expressions
+                                  if not hasattr(e, 'pieces'))))
+
     def _push_required_symbols(self, expression):
         required_atoms = set()
         try:
@@ -97,32 +110,32 @@ class ComponentRequiredDefinitions(object):
         required_atoms.difference_update(get_reserved_and_builtin_symbols())
         self._required_stack.append(required_atoms)
 
-    def _is_required(self, name):
-        return name in self._required_stack[-1]
+    def _is_required(self, element):
+        return element.name in self._required_stack[-1]
 
     def action_parameter(self, parameter, **kwargs):  # @UnusedVariable
-        if self._is_required(parameter.name):
+        if self._is_required(parameter):
             self.parameters.add(parameter)
 
     def action_analogreceiveport(self, port, **kwargs):  # @UnusedVariable
-        if self._is_required(port.name):
+        if self._is_required(port):
             self.ports.add(port)
 
     def action_analogreduceport(self, port, **kwargs):  # @UnusedVariable
-        if self._is_required(port.name):
+        if self._is_required(port):
             self.ports.add(port)
 
     def action_constants(self, constant, **kwargs):  # @UnusedVariable
-        if self._is_required(constant.name):
+        if self._is_required(constant):
             self.constants.add(constant)
 
     def action_randomvariable(self, randomvariable, **kwargs):  # @UnusedVariable @IgnorePep8
-        if self._is_required(randomvariable.name):
+        if self._is_required(randomvariable):
             self.random_variables.add(randomvariable)
 
     def action_alias(self, alias, **kwargs):  # @UnusedVariable
-        if (self._is_required(alias.name) and
-                alias.name not in self.expressions):
+        if (self._is_required(alias) and
+                alias.name not in (e.name for e in self.expressions)):
             # Since aliases may be dependent on other aliases/piecewises the
             # order they are executed is important so we make sure their
             # dependencies are added first
@@ -132,7 +145,7 @@ class ComponentRequiredDefinitions(object):
             self.expressions.append(alias)
 
     def action_piecewise(self, piecewise, **kwargs):  # @UnusedVariable
-        if (self._is_required(piecewise.name) and
+        if (self._is_required(piecewise) and
                 piecewise.name not in self.expressions):
             # Since piecewises may be dependent on other aliases/piecewises the
             # order they are executed is important so we make sure their
@@ -157,3 +170,7 @@ class ComponentRequiredDefinitions(object):
     @property
     def random_variable_names(self):
         return (r.name for r in self.random_variables)
+
+    @property
+    def expression_names(self):
+        return (e.name for e in self.expressions)

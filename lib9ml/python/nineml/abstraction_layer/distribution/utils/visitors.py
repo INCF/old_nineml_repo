@@ -28,6 +28,11 @@ class DistributionActionVisitor(ComponentActionVisitor):
         self.check_pass()
 
 
-class DistributionRequiredDefinitions(DistributionActionVisitor,
-                                        ComponentRequiredDefinitions):
-    pass
+class DistributionRequiredDefinitions(ComponentRequiredDefinitions,
+                                      DistributionActionVisitor):
+
+    def __init__(self, componentclass, expressions):
+        DistributionActionVisitor.__init__(self,
+                                           require_explicit_overrides=False)
+        ComponentRequiredDefinitions.__init__(self, componentclass,
+                                              expressions)

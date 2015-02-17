@@ -127,13 +127,19 @@ class DynamicsActionVisitor(ComponentActionVisitor):
         self.check_pass()
 
 
-class DynamicsRequiredDefinitions(DynamicsActionVisitor,
-                                  ComponentRequiredDefinitions):
+class DynamicsRequiredDefinitions(ComponentRequiredDefinitions,
+                                  DynamicsActionVisitor):
 
     def __init__(self, componentclass, expressions):
+        DynamicsActionVisitor.__init__(self, require_explicit_overrides=False)
         self.state_variables = set()
-        super(DynamicsRequiredDefinitions, self).__init__(
-            componentclass, expressions)
+        ComponentRequiredDefinitions.__init__(self, componentclass,
+                                              expressions)
+
+    def __repr__(self):
+        return ("State-variables: {}\n"
+                .format(', '.join(self.state_variable_names)) +
+                super(DynamicsRequiredDefinitions, self).__repr__())
 
     def action_statevariable(self, statevariable, **kwargs):  # @UnusedVariable
         if self._is_required(statevariable):

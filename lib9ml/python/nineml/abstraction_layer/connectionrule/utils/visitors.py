@@ -27,6 +27,11 @@ class ConnectionRuleActionVisitor(ComponentActionVisitor):
         self.check_pass()
 
 
-class ConnectionRuleRequiredDefinitions(ConnectionRuleActionVisitor,
-                                        ComponentRequiredDefinitions):
-    pass
+class ConnectionRuleRequiredDefinitions(ComponentRequiredDefinitions,
+                                        ConnectionRuleActionVisitor):
+
+    def __init__(self, componentclass, expressions):
+        ConnectionRuleActionVisitor.__init__(self,
+                                             require_explicit_overrides=False)
+        ComponentRequiredDefinitions.__init__(self, componentclass,
+                                              expressions)

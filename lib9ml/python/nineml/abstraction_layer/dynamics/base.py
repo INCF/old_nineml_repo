@@ -443,7 +443,7 @@ class DynamicsClass(ComponentClass, _NamespaceMixin):
     def rename(self, old_symbol, new_symbol):
         DynamicsRenameSymbol(self, old_symbol, new_symbol)
 
-    def required_definitions(self, expressions):
+    def required_for(self, expressions):
         return DynamicsRequiredDefinitions(self, expressions)
 
     def __repr__(self):
@@ -593,6 +593,12 @@ class DynamicsClass(ComponentClass, _NamespaceMixin):
     def state_variables(self):
         """Forwarding function to self.dynamicsblock.state_variables"""
         return self.dynamicsblock.state_variables
+
+    def all_time_derivatives(self, state_variable=None):
+        return chain(*((td for td in r.time_derivatives
+                        if (state_variable is None or
+                            td.dependent_variable == state_variable.name))
+                        for r in self.dynamicsblock.regimes))
 
     @property
     def analog_send_ports_map(self):
