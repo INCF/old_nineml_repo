@@ -251,7 +251,7 @@ def _same_content(path, content):
 def _rename_path(path):
     new_name = path + '.OLD.%s' % time.time()
     log.warn('Renaming %s into %s', path, new_name)
-    os.rename(path, new_name)
+    os.rename_symbol(path, new_name)
     return new_name
 
 def _remove_flat_installation(placeholder):
