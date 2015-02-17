@@ -84,11 +84,11 @@ class DynamicsClassXMLLoader(ComponentClassXMLLoader):
         subnodes = self._load_blocks(element, blocks=subblocks)
 
         return DynamicsBlock(regimes=subnodes["Regime"],
-                        aliases=subnodes["Alias"],
-                        state_variables=subnodes["StateVariable"],
-                        constants=subnodes["Constant"],
-                        randomvariables=subnodes["RandomVariable"],
-                        piecewises=subnodes["Piecewise"])
+                             aliases=subnodes["Alias"],
+                             state_variables=subnodes["StateVariable"],
+                             constants=subnodes["Constant"],
+                             random_variables=subnodes["RandomVariable"],
+                             piecewises=subnodes["Piecewise"])
 
     @read_annotations
     def load_regime(self, element):
@@ -190,7 +190,7 @@ class DynamicsClassXMLWriter(ComponentClassXMLWriter):
                     [r.accept_visitor(self) for r in dynamicsblock.regimes] +
                     [b.accept_visitor(self) for b in dynamicsblock.aliases] +
                     [c.accept_visitor(self) for c in dynamicsblock.constants] +
-                    [c.accept_visitor(self) for c in dynamics.randomvariables] +
+                    [c.accept_visitor(self) for c in dynamics.random_variables] +
                     [c.accept_visitor(self) for c in dynamicsblock.piecewises])
         return E('Dynamics', *elements)
 

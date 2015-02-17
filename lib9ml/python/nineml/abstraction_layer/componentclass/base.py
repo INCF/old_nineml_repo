@@ -9,7 +9,7 @@ This module provides the base class for these.
 """
 from abc import ABCMeta
 from itertools import chain
-from collections import namedtuple, defaultdict
+from collections import defaultdict
 from .. import BaseALObject
 import nineml
 from nineml.annotations import read_annotations, annotate_xml
@@ -17,11 +17,6 @@ from nineml.utils import filter_discrete_types, ensure_valid_identifier
 
 from ..units import dimensionless, Dimension
 from nineml import TopLevelObject
-
-
-Dependencies = namedtuple('Dependencies',
-                          ('parameters', 'ports', 'constants',
-                           'randomvariables', 'expressions'))
 
 
 class ComponentClass(BaseALObject, TopLevelObject):
@@ -115,12 +110,12 @@ class ComponentClass(BaseALObject, TopLevelObject):
         return self._main_block.constants_map
 
     @property
-    def randomvariables(self):
-        return self._main_block.randomvariables
+    def random_variables(self):
+        return self._main_block.random_variables
 
     @property
-    def randomvariables_map(self):
-        return self._main_block.randomvariables_map
+    def random_variables_map(self):
+        return self._main_block.random_variables_map
 
     @property
     def piecewises(self):
@@ -140,7 +135,7 @@ class ComponentClass(BaseALObject, TopLevelObject):
 
     @property
     def attributes_with_units(self):
-        return chain(self.constants, self.randomvariables)
+        return chain(self.constants, self.random_variables)
 
     def standardize_unit_dimensions(self, reference_set=None):
         """

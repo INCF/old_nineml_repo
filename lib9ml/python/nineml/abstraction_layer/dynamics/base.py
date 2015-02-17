@@ -35,7 +35,7 @@ class DynamicsBlock(BaseALObject):
     defining_attributes = ('_regimes', '_aliases', '_state_variables')
 
     def __init__(self, regimes=None, aliases=None, state_variables=None,
-                 constants=None, randomvariables=None, piecewises=None):
+                 constants=None, random_variables=None, piecewises=None):
         """DynamicsBlock object constructor
 
            :param aliases: A list of aliases, which must be either |Alias|
@@ -52,7 +52,7 @@ class DynamicsBlock(BaseALObject):
         regimes = normalise_parameter_as_list(regimes)
         state_variables = normalise_parameter_as_list(state_variables)
         constants = normalise_parameter_as_list(constants)
-        randomvariables = normalise_parameter_as_list(randomvariables)
+        random_variables = normalise_parameter_as_list(random_variables)
         piecewises = normalise_parameter_as_list(piecewises)
 
         # Load the aliases as objects or strings:
@@ -75,7 +75,7 @@ class DynamicsBlock(BaseALObject):
         self._aliases = dict((a.lhs, a) for a in aliases)
         self._state_variables = dict((s.name, s) for s in state_variables)
         self._constants = dict((c.name, c) for c in constants)
-        self._randomvariables = dict((c.name, c) for c in randomvariables)
+        self._random_variables = dict((c.name, c) for c in random_variables)
         self._piecewises = dict((c.name, c) for c in piecewises)
 
     def accept_visitor(self, visitor, **kwargs):
@@ -88,7 +88,7 @@ class DynamicsBlock(BaseALObject):
                 .format(len(list(self.regimes)), len(list(self.aliases)),
                         len(list(self.state_variables)),
                         len(list(self.constants)),
-                        len(list(self.randomvariables)),
+                        len(list(self.random_variables)),
                         len(list(self.piecewises))))
 
     @property
@@ -120,12 +120,12 @@ class DynamicsBlock(BaseALObject):
         return self._constants
 
     @property
-    def randomvariables(self):
-        return self._randomvariables.itervalues()
+    def random_variables(self):
+        return self._random_variables.itervalues()
 
     @property
-    def randomvariables_map(self):
-        return self._randomvariables
+    def random_variables_map(self):
+        return self._random_variables
 
     @property
     def piecewises(self):
@@ -288,7 +288,7 @@ class DynamicsClass(ComponentClass, _NamespaceMixin):
                  dynamicsblock=None, subnodes=None,
                  portconnections=None, regimes=None,
                  aliases=None, state_variables=None,
-                 constants=None, randomvariables=None,
+                 constants=None, random_variables=None,
                  piecewises=None):
         """Constructs a DynamicsClass
 
@@ -331,7 +331,7 @@ class DynamicsClass(ComponentClass, _NamespaceMixin):
         # the dynamics class. We check that we do not specify half-and-half:
         if dynamicsblock is not None:
             if (regimes or aliases or state_variables or constants or
-                    randomvariables or piecewises):
+                    random_variables or piecewises):
                 raise NineMLRuntimeError(
                     "Either specify a 'dynamicsblock' parameter, or "
                     "state_variables/regimes/aliases/constants/"
@@ -340,7 +340,7 @@ class DynamicsClass(ComponentClass, _NamespaceMixin):
             dynamicsblock = DynamicsBlock(regimes=regimes, aliases=aliases,
                                           state_variables=state_variables,
                                           constants=constants,
-                                          randomvariables=randomvariables,
+                                          random_variables=random_variables,
                                           piecewises=piecewises)
         ComponentClass.__init__(self, name, parameters,
                                 main_block=dynamicsblock)
