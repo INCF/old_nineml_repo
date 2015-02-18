@@ -28,7 +28,7 @@ class Expression_test(unittest.TestCase):
 
         for rhs, exp_var, exp_func, exp_res, params in valid_rhses:
             e = Expression(rhs)
-            self.assertEquals(set(e.rhs_names), set(exp_var))
+            self.assertEquals(set(e.rhs_symbol_names), set(exp_var))
             self.assertEquals(set(e.rhs_funcs), set(exp_func))
             self.assertAlmostEqual(e.rhs_as_python_func()(**params), exp_res, places=4)
 
@@ -75,7 +75,7 @@ class Expression_test(unittest.TestCase):
 
         for i, (expr, expt_vars, expt_funcs) in enumerate(expr_vars):
             c = Expression(expr)
-            self.assertEqual(set(c.rhs_names), set(expt_vars))
+            self.assertEqual(set(c.rhs_symbol_names), set(expt_vars))
             self.assertEqual(set(c.rhs_funcs), set(expt_funcs))
 
             python_func = c.rhs_as_python_func(namespace=namespace)
@@ -255,15 +255,18 @@ class TimeDerivative_test(unittest.TestCase):
         )
 
     def test_atoms(self):
-        td = TimeDerivative(dependent_variable='X', rhs=' y*f - sin(q*q) + 4*a*exp(Y)')
+        td = TimeDerivative(dependent_variable='X',
+                            rhs=' y * f - sin(q*q) + 4 * a * exp(Y)')
         self.assertEquals(sorted(td.atoms), sorted(
             ['X', 'y', 'f', 'sin', 'exp', 'q', 'a', 'Y', 't']))
         self.assertEquals(sorted(td.lhs_atoms), sorted(['X', 't']))
-        self.assertEquals(sorted(td.rhs_atoms), sorted(['y', 'f', 'sin', 'exp', 'q', 'a', 'Y']))
+        self.assertEquals(sorted(td.rhs_atoms),
+                          sorted(['y', 'f', 'sin', 'exp', 'q', 'a', 'Y']))
 
 #   def test_dependent_variable(self):
     def test_independent_variable(self):
-        td = TimeDerivative(dependent_variable='X', rhs=' y*f - sin(q*q) + 4*a*exp(Y)')
+        td = TimeDerivative(dependent_variable='X',
+                            rhs=' y*f - sin(q*q) + 4*a*exp(Y)')
         self.assertEquals(td.independent_variable, 't')
         self.assertEquals(td.dependent_variable, 'X')
 
@@ -370,12 +373,11 @@ class Piecewise_test(unittest.TestCase):
         )
 
     def test_atoms(self):
-        self.assertEquals(sorted(self.pw.rhs_atoms), sorted(['c', 'k', 'v',
-                                                             'pow']))
+        self.assertEquals(sorted(self.pw.rhs_atoms), sorted(['c', 'k', 'v']))
 
     def test_xml_roundtrip(self):
         writer = XMLWriter()
         xml = self.pw.accept_visitor(writer)
         loader = XMLLoader(Document(mV))
         pw = loader.load_piecewise(xml)
-        self.assertEqual(pw, self.pw, "Piecewise failed xml roundtrip")        
+        self.assertEqual(pw, self.pw, "Piecewise failed xml roundtrip")
