@@ -18,6 +18,7 @@ from nineml.exceptions import NineMLRuntimeError
 import nineml
 from nineml.utils import filter_expect_single, expect_single
 from nineml.abstraction_layer.expressions.utils import MathUtil
+import nineml.abstraction_layer.dynamics.utils
 
 #from jinja2 import Template
 from Cheetah.Template import Template
