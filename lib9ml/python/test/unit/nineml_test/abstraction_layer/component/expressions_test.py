@@ -28,18 +28,22 @@ class Expression_test(unittest.TestCase):
 
         for rhs, exp_var, exp_func, exp_res, params in valid_rhses:
             e = Expression(rhs)
-            self.assertEquals(set(e.rhs_names), set(exp_var))
+            self.assertEquals(set(e.rhs_symbol_names), set(exp_var))
             self.assertEquals(set(e.rhs_funcs), set(exp_func))
-            self.assertAlmostEqual(e.rhs_as_python_func()(**params), exp_res, places=4)
+            self.assertAlmostEqual(e.rhs_as_python_func(**params), exp_res,
+                                   places=4)
 
         import numpy
-        expr_vars = [["-A/tau_r", ("A", "tau_r"), ()],
+        expr_vars = [
+                    ["-A/tau_r", ("A", "tau_r"), ()],
                     ["V*V", ("V",), ()],
                     ["a*(b*V - U)", ("U", "V", "b", "a"), ()],
-                    [" 0.04*V*V + 5.0*V + 1. + 140.0 - U + Isyn", ("V", "U", "Isyn"), ()],
+                    [" 0.04*V*V + 5.0*V + 1. + 140.0 - U + Isyn",
+                     ("V", "U", "Isyn"), ()],
                     ["c", ("c"), ()],
                     ["1", (), ()],
-                    ["atan2(sin(x),cos(y))", ("x", "y"), ("atan2", "sin", "cos")],
+                    ["atan2(sin(x),cos(y))", ("x", "y"),
+                     ("atan2", "sin", "cos")],
                     ["1.*V", ("V"), ()],
                     ["1.0", (), ()],
                     [".1", (), ()],
@@ -47,7 +51,7 @@ class Expression_test(unittest.TestCase):
                         "mg_conc", "eta", "gamma", "V"), ('exp',)],
                     ["1 / ( 1 + mg_conc * eta *  exp( -1 * gamma*V))",
                      ("mg_conc", "eta", "gamma", "V"), ('exp',)],
-                    ["1 / ( 1 + mg_conc * sin(0.5) *  exp ( -1 * gamma*V))",
+                    ["1 / ( 1 + mg_conc * sin(0.5 * V) *  exp ( -1 * gamma*V))",
                      ("mg_conc", "gamma", "V"), ('exp', "sin")],
                     [".1 / ( 1.0 + mg_conc * sin(V) *  exp ( -1.0 * gamma*V))",
                      ("mg_conc", "gamma", "V"), ('exp', "sin")],
@@ -75,10 +79,10 @@ class Expression_test(unittest.TestCase):
 
         for i, (expr, expt_vars, expt_funcs) in enumerate(expr_vars):
             c = Expression(expr)
-            self.assertEqual(set(c.rhs_names), set(expt_vars))
+            self.assertEqual(set(c.rhs_symbol_names), set(expt_vars))
             self.assertEqual(set(c.rhs_funcs), set(expt_funcs))
 
-            python_func = c.rhs_as_python_func(namespace=namespace)
+            python_func = c.rhs_as_python_func
             param_dict = dict([(v, namespace[v]) for v in expt_vars])
 
             v = return_values[i] - python_func(**param_dict)
@@ -88,32 +92,33 @@ class Expression_test(unittest.TestCase):
         # Signature: name(self, name_map)
                 # Replace atoms on the RHS with values in the name_map
 
-        e = Expression("V/(1 + mg_conc*eta*exp(-1*gamma*V*V)) * sin(V)")
+        e = Expression("V*sin(V)/(eta*mg_conc*exp(-V^2*gamma) + 1)")
         e.rhs_name_transform_inplace({'V': 'VNEW'})
-        self.assertEquals(e.rhs, "VNEW/(1 + mg_conc*eta*exp(-1*gamma*VNEW*VNEW)) * sin(VNEW)")
+        self.assertEquals(e.rhs_str,
+                          "VNEW*sin(VNEW)/(eta*mg_conc*exp(-VNEW^2*gamma) + 1)")
 
         # Don't Change builtin function names:
         e.rhs_name_transform_inplace({'sin': 'SIN'})
-        self.assertEquals(e.rhs, "VNEW/(1 + mg_conc*eta*exp(-1*gamma*VNEW*VNEW)) * sin(VNEW)")
+        self.assertEquals(e.rhs_str, "VNEW*sin(VNEW)/(eta*mg_conc*exp(-VNEW^2*gamma) + 1)")
         e.rhs_name_transform_inplace({'exp': 'EXP'})
-        self.assertEquals(e.rhs, "VNEW/(1 + mg_conc*eta*exp(-1*gamma*VNEW*VNEW)) * sin(VNEW)")
+        self.assertEquals(e.rhs_str, "VNEW*sin(VNEW)/(eta*mg_conc*exp(-VNEW^2*gamma) + 1)")
 
         # Check the attributes:
         self.assertEquals(set(e.rhs_atoms), set(
             ['VNEW', 'mg_conc', 'eta', 'gamma', 'exp', 'sin']))
         self.assertEquals(set(e.rhs_funcs), set(['exp', 'sin']))
 
-    def test_rhs_atoms_in_namespace(self):
-        e = Expression("random.randn() + random.randn() + random.randint() / sin(t)")
-        self.assertEquals(
-            set(e.rhs_atoms),
-            set(['t', 'random.randn', 'random.randint', 'sin'])
-        )
-
-        self.assertEquals(
-            set(e.rhs_atoms_in_namespace('random')),
-            set(['randn', 'randint'])
-        )
+#     def test_rhs_atoms_in_namespace(self):
+#         e = Expression("random.randn() + random.randn() + random.randint() / sin(t)")
+#         self.assertEquals(
+#             set(e.rhs_atoms),
+#             set(['t', 'random.randn', 'random.randint', 'sin'])
+#         )
+#
+#         self.assertEquals(
+#             set(e.rhs_atoms_in_namespace('random')),
+#             set(['randn', 'randint'])
+#         )
 
     def test_escape_of_carets(self):
         try:
@@ -255,15 +260,18 @@ class TimeDerivative_test(unittest.TestCase):
         )
 
     def test_atoms(self):
-        td = TimeDerivative(dependent_variable='X', rhs=' y*f - sin(q*q) + 4*a*exp(Y)')
+        td = TimeDerivative(dependent_variable='X',
+                            rhs=' y * f - sin(q*q) + 4 * a * exp(Y)')
         self.assertEquals(sorted(td.atoms), sorted(
             ['X', 'y', 'f', 'sin', 'exp', 'q', 'a', 'Y', 't']))
         self.assertEquals(sorted(td.lhs_atoms), sorted(['X', 't']))
-        self.assertEquals(sorted(td.rhs_atoms), sorted(['y', 'f', 'sin', 'exp', 'q', 'a', 'Y']))
+        self.assertEquals(sorted(td.rhs_atoms),
+                          sorted(['y', 'f', 'sin', 'exp', 'q', 'a', 'Y']))
 
 #   def test_dependent_variable(self):
     def test_independent_variable(self):
-        td = TimeDerivative(dependent_variable='X', rhs=' y*f - sin(q*q) + 4*a*exp(Y)')
+        td = TimeDerivative(dependent_variable='X',
+                            rhs=' y*f - sin(q*q) + 4*a*exp(Y)')
         self.assertEquals(td.independent_variable, 't')
         self.assertEquals(td.dependent_variable, 'X')
 
@@ -315,7 +323,7 @@ class RandomVariable_test(unittest.TestCase):
         xml = self.rv.accept_visitor(writer)
         loader = XMLLoader(Document(S_per_cm2))
         rv = loader.load_randomvariable(xml)
-        self.assertEqual(rv, self.rv, "Random variable failed xml roundtrip")        
+        self.assertEqual(rv, self.rv, "Random variable failed xml roundtrip")
 
 
 class Constant_test(unittest.TestCase):
@@ -370,12 +378,11 @@ class Piecewise_test(unittest.TestCase):
         )
 
     def test_atoms(self):
-        self.assertEquals(sorted(self.pw.rhs_atoms), sorted(['c', 'k', 'v',
-                                                             'pow']))
+        self.assertEquals(sorted(self.pw.rhs_atoms), sorted(['c', 'k', 'v']))
 
     def test_xml_roundtrip(self):
         writer = XMLWriter()
         xml = self.pw.accept_visitor(writer)
         loader = XMLLoader(Document(mV))
         pw = loader.load_piecewise(xml)
-        self.assertEqual(pw, self.pw, "Piecewise failed xml roundtrip")        
+        self.assertEqual(pw, self.pw, "Piecewise failed xml roundtrip")

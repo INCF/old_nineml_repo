@@ -49,7 +49,7 @@ class NestODE(object):
         name_map = parent_component.name_map
         self.dependent_variable = ode.dependent_variable
 
-        rhs = MathUtil.get_rhs_substituted( ode, name_map )
+        rhs = ode.rhs_substituted(name_map)
         self.CODE = name_map[ode.dependent_variable] + " += (" + rhs  + ")*h;"
 
 class NestCondition(object):
@@ -61,7 +61,7 @@ class NestCondition(object):
         name_map = parent_component.name_map
         # code to evaluate the condition
         
-        condition_expr = MathUtil.get_rhs_substituted( condition, name_map )
+        condition_expr = condition.rhs_substituted(name_map))
 
         self.CODE = "transPendingTmp[%d] = (%s)" % (parent_trans.index, condition_expr)
         # where the state of the evaluated condition may be stored
@@ -110,7 +110,7 @@ class NestAssignment(object):
         parent_component = parent_trans.parent_component
         name_map = parent_component.name_map
 
-        rhs = MathUtil.get_rhs_substituted( assignment, name_map )
+        rhs = assignment.rhs_substituted(name_map)
         self.CODE = name_map[assignment.lhs]+" = "+rhs+";"
 
 

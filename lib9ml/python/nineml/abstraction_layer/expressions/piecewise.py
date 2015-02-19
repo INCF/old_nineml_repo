@@ -1,7 +1,6 @@
 from itertools import chain
 from .. import BaseALObject
 from .base import Expression
-from . import parse
 
 
 class Piecewise(BaseALObject):
@@ -95,9 +94,6 @@ class Condition(Expression, BaseALObject):
 
     def __repr__(self):
         return "Condition('{}')".format(self.rhs)
-
-    def _parse_rhs(self, rhs):
-        return parse.cond(rhs)
 
     def accept_visitor(self, visitor, **kwargs):
         """ |VISITATION| """
