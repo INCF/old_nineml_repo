@@ -180,7 +180,7 @@ class ComponentClassXMLWriter(ComponentVisitor):
     @annotate_xml
     def visit_alias(self, alias):
         return E(Alias.element_name,
-                 E("MathInline", alias.rhs),
+                 E("MathInline", alias.rhs_str),
                  name=alias.lhs)
 
     @annotate_xml
@@ -194,18 +194,18 @@ class ComponentClassXMLWriter(ComponentVisitor):
     @annotate_xml
     def visit_piece(self, piece):
         return E(Piece.element_name,
-                 E('MathInline', piece.rhs),
+                 E('MathInline', piece.rhs_str),
                  piece.condition.accept_visitor(self))
 
     @annotate_xml
-    def visit_condition(self, piece):
+    def visit_condition(self, condition):
         return E(Condition.element_name,
-                 E('MathInline', piece.rhs))
+                 E('MathInline', condition.rhs_str))
 
     @annotate_xml
-    def visit_otherwise(self, piece):
+    def visit_otherwise(self, otherwise):
         return E(Otherwise.element_name,
-                 E('MathInline', piece.rhs))
+                 E('MathInline', otherwise.rhs_str))
 
     @annotate_xml
     def visit_constant(self, constant):
