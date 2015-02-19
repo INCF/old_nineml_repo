@@ -200,9 +200,13 @@ class ComponentClass(BaseALObject, TopLevelObject):
     @classmethod
     @read_annotations
     def from_xml(cls, element, document):  # @UnusedVariable
-        XMLLoader = getattr(nineml.abstraction_layer,
-                            ComponentClassXMLLoader.read_class_type(element) +
-                            'ClassXMLLoader')
+        class_type = ComponentClassXMLLoader.read_class_type(element)
+        if class_type == 'KineticDynamics':
+            XMLLoader = (
+                nineml.extensions.kinetics.KineticDynamicsClassXMLLoader)
+        else:
+            XMLLoader = getattr(nineml.abstraction_layer,
+                                 class_type + 'ClassXMLLoader')
         return XMLLoader(document).load_componentclass(element)
 
 
