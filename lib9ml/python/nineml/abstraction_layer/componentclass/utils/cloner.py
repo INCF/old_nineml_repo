@@ -4,7 +4,6 @@ docstring needed
 :copyright: Copyright 2010-2013 by the Python lib9ML team, see AUTHORS.
 :license: BSD-3, see LICENSE for details.
 """
-from nineml.exceptions import NineMLRuntimeError
 from ...expressions.utils import is_builtin_symbol
 from .visitors import ComponentActionVisitor, ComponentVisitor
 
@@ -55,6 +54,9 @@ class ComponentCloner(ComponentVisitor):
         else:
             return prefix + variable
 
+    def visit_componentclass(self, componentclass, **kwargs):  # @UnusedVariable @IgnorePep8
+        componentclass.assign_indices()
+
     def visit_parameter(self, parameter, **kwargs):
         return parameter.__class__(
             name=self.prefix_variable(parameter.name, **kwargs),
@@ -65,24 +67,20 @@ class ComponentCloner(ComponentVisitor):
         name_map = dict([(a, self.prefix_variable(a, **kwargs))
                          for a in new_alias.atoms])
         new_alias.name_transform_inplace(name_map=name_map)
-        # FIXME:? TGC 1/15 Doesn't the LHS need updating too?
         return new_alias
 
     def visit_randomvariable(self, randomvariable, **kwargs):  # @UnusedVariable @IgnorePep8
-        # FIXME: This would be handled better by a copy constructor?? TGC 1/15
         new_randomvariable = randomvariable.__class__(
             name=randomvariable.name, value=randomvariable.value,
             units=randomvariable.units)
         return new_randomvariable
 
     def visit_constant(self, constant, **kwargs):  # @UnusedVariable
-        # FIXME: This would be handled better by a copy constructor?? TGC 1/15
         new_constant = constant.__class__(
             name=constant.name, value=constant.value, units=constant.units)
         return new_constant
 
     def visit_piecewise(self, piecewise, **kwargs):  # @UnusedVariable
-        # FIXME: This would be handled better by a copy constructor?? TGC 1/15
         new_piecewise = piecewise.__class__(
             name=piecewise.name, pieces=piecewise.pieces,
             otherwise=piecewise.otherwise, units=piecewise.units)

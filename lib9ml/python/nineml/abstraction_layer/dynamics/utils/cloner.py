@@ -45,6 +45,7 @@ class DynamicsExpandAliasDefinition(DynamicsActionVisitor,
 class DynamicsCloner(ComponentCloner):
 
     def visit_componentclass(self, componentclass, **kwargs):
+        super(DynamicsCloner, self).visit_componentclass(componentclass)
         ccn = componentclass.__class__(
             name=componentclass.name,
             parameters=[p.accept_visitor(self, **kwargs)
@@ -66,7 +67,8 @@ class DynamicsCloner(ComponentCloner):
             regimes=[r.accept_visitor(self, **kwargs)
                      for r in dynamicsblock.regimes],
             aliases=[
-                a.accept_visitor(self, **kwargs) for a in dynamicsblock.aliases],
+                a.accept_visitor(self, **kwargs)
+                for a in dynamicsblock.aliases],
             state_variables=[s.accept_visitor(self, **kwargs)
                              for s in dynamicsblock.state_variables])
 
@@ -159,12 +161,13 @@ class DynamicsCloner(ComponentCloner):
 
 class DynamicsClonerPrefixNamespace(DynamicsCloner):
 
-    """ A visitor that walks over a hierarchical componentclass, and prefixes every
+    """
+    A visitor that walks over a hierarchical componentclass, and prefixes every
     variable with the namespace that that variable is in. This is preparation
     for flattening
     """
 
-    def visit_componentclass(self, componentclass, **kwargs):  # @UnusedVariable
+    def visit_componentclass(self, componentclass, **kwargs):  # @UnusedVariable @IgnorePep8
         prefix = componentclass.get_node_addr().get_str_prefix()
         if prefix == '_':
             prefix = ''
@@ -205,8 +208,9 @@ class DynamicsClonerPrefixNamespace(DynamicsCloner):
                           for p in componentclass.analog_ports],
             event_ports=[p.accept_visitor(self, **kwargs)
                          for p in componentclass.event_ports],
-            dynamicsblock=(componentclass.dynamicsblock.accept_visitor(self, **kwargs)
-                      if componentclass.dynamicsblock else None),
+            dynamicsblock=(
+                componentclass.dynamicsblock.accept_visitor(self, **kwargs)
+                if componentclass.dynamicsblock else None),
             subnodes=dict([(k, v.accept_visitor(self, **kwargs))
                            for (k, v) in componentclass.subnodes.iteritems()]),
             portconnections=port_connections)
