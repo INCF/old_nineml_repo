@@ -1,3 +1,4 @@
+import sympy
 from lxml import etree
 from lxml.builder import ElementMaker
 from operator import itemgetter
@@ -34,6 +35,9 @@ class RandomVariable(BaseALObject):
         assert self.units == units, \
             "Renaming units with ones that do not match"
         self.units = units
+
+    def _sympy_(self):
+        return sympy.Symbol(self.name)
 
 
 class RandomDistribution(BaseALObject):
