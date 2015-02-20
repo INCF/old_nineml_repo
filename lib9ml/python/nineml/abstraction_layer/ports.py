@@ -38,6 +38,7 @@ class Port(BaseALObject):
 
         `name` -- The name of the port, as a `string`
         """
+        super(Port, self).__init__()
         name = name.strip()
         ensure_valid_identifier(name)
         self._name = name
