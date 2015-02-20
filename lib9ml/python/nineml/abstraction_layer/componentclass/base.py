@@ -11,6 +11,7 @@ from itertools import chain
 from abc import ABCMeta
 from itertools import chain
 from collections import defaultdict
+import sympy
 from .. import BaseALObject
 import nineml
 from nineml.annotations import read_annotations, annotate_xml
@@ -217,5 +218,9 @@ class Parameter(BaseALObject):
     def accept_visitor(self, visitor, **kwargs):
         """ |VISITATION| """
         return visitor.visit_parameter(self, **kwargs)
+
+    def _sympy_(self):
+        return sympy.Symbol(self.name)
+
 
 from .utils.xml import ComponentClassXMLLoader
