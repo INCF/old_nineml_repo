@@ -5,7 +5,7 @@ docstring goes here
 :license: BSD-3, see LICENSE for details.
 """
 from lxml.builder import ElementMaker
-from os import path
+from os import path, environ
 
 nineml_namespace = 'http://nineml.net/9ML/1.0'
 NINEML = '{' + nineml_namespace + '}'
@@ -14,7 +14,7 @@ uncertml_namespace = "http://www.uncertml.org/2.0"
 UNCERTML = '{' + uncertml_namespace + '}'
 
 uncertml_schema_path = path.abspath(path.join(
-    path.dirname(__file__), '..', '..', 'xml', 'NineML-UncertML.xsd'))
+    environ['HOME'], 'git', 'nineml', 'lib9ml', 'xml', 'NineML-UncertML.xsd'))
 
 E = ElementMaker(namespace=nineml_namespace,
                  nsmap={"ni": nineml_namespace})
