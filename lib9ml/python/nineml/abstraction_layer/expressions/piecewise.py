@@ -1,10 +1,10 @@
-import sympy
+from .base import ExpressionSymbol
 from itertools import chain
 from .. import BaseALObject
 from .base import Expression
 
 
-class Piecewise(BaseALObject):
+class Piecewise(BaseALObject, ExpressionSymbol):
 
     element_name = 'Piecewise'
     defining_attributes = ('name', 'pieces', 'otherwise')
@@ -32,9 +32,6 @@ class Piecewise(BaseALObject):
     def rhs_atoms(self):
         return set(chain(*([p.rhs_atoms for p in self.pieces] +
                            [self.otherwise.rhs_atoms])))
-
-    def _sympy_(self):
-        return sympy.Symbol(self.name)
 
 
 class Piece(Expression, BaseALObject):
