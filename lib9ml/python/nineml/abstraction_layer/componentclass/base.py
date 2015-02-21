@@ -11,14 +11,13 @@ from itertools import chain
 from abc import ABCMeta
 from itertools import chain
 from collections import defaultdict
-import sympy
 from .. import BaseALObject
 import nineml
 from nineml.annotations import read_annotations, annotate_xml
 from nineml.utils import filter_discrete_types, ensure_valid_identifier
-
 from ..units import dimensionless, Dimension
 from nineml import TopLevelObject
+from ..expressions import ExpressionSymbol
 
 
 class ComponentClass(BaseALObject, TopLevelObject):
@@ -169,7 +168,7 @@ class ComponentClass(BaseALObject, TopLevelObject):
         return XMLLoader(document).load_componentclass(element)
 
 
-class Parameter(BaseALObject):
+class Parameter(BaseALObject, ExpressionSymbol):
 
     """A class representing a state-variable in a ``ComponentClass``.
 
@@ -218,9 +217,6 @@ class Parameter(BaseALObject):
     def accept_visitor(self, visitor, **kwargs):
         """ |VISITATION| """
         return visitor.visit_parameter(self, **kwargs)
-
-    def _sympy_(self):
-        return sympy.Symbol(self.name)
 
 
 from .utils.xml import ComponentClassXMLLoader

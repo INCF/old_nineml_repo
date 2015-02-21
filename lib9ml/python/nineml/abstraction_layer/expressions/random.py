@@ -1,13 +1,13 @@
-import sympy
 from lxml import etree
 from lxml.builder import ElementMaker
 from operator import itemgetter
 from nineml.abstraction_layer import BaseALObject
 from nineml.exceptions import NineMLRuntimeError
 from nineml.xmlns import uncertml_namespace, UNCERTML, uncertml_schema_path
+from .base import ExpressionSymbol
 
 
-class RandomVariable(BaseALObject):
+class RandomVariable(BaseALObject, ExpressionSymbol):
 
     element_name = 'RandomVariable'
     defining_attributes = ('name', 'distribution', 'units')
@@ -35,9 +35,6 @@ class RandomVariable(BaseALObject):
         assert self.units == units, \
             "Renaming units with ones that do not match"
         self.units = units
-
-    def _sympy_(self):
-        return sympy.Symbol(self.name)
 
 
 class RandomDistribution(BaseALObject):
