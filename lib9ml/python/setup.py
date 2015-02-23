@@ -6,8 +6,7 @@ setup(
     name="9ML",
     version="0.3dev",
     package_data={'nineml': ['examples/AL/demos/*.py',
-                             'examples/AL/sample_components/*.py',
-                             '../../xml/NineML-UncertML.xsd']},
+                             'examples/AL/sample_components/*.py']},
     packages=find_packages(),
     author="Andrew P. Davison, Eilif Muller, Mike Hull, Thomas G. Close",
     # add your name here if you contribute to the code
