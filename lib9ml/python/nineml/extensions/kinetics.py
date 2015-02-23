@@ -26,7 +26,7 @@ from nineml.abstraction_layer.dynamics.validators import DynamicsValidator
 from nineml.abstraction_layer.dynamics.utils import DynamicsClassInterfaceInferer
 from nineml.abstraction_layer.dynamics.base import _NamespaceMixin
 from collections import Counter
-from nineml.abstraction_layer.dynamics.regimes import TimeDerivative
+from nineml.abstraction_layer.dynamics.regimes import TimeDerivative, Regime
 from sympy import symbols
 import sympy
 
@@ -66,7 +66,7 @@ class KineticDynamicsClass(DynamicsClass):
                 constraints=constraints, constants=constants, aliases=aliases)
 
 
-        td_rates = {}#declare a dictionary.
+        td_rates = {} #declare an empty dictionary.
         
         for state in self.kinetic_states:
             td_rates[state.name] = ([],[])  #populate the dictionary with empty 2D lists.
@@ -74,36 +74,45 @@ class KineticDynamicsClass(DynamicsClass):
         
         for reaction in self.reactions:
 
-            td_rates[reaction.from_state][0].append(reaction.forward_rate)
-            td_rates[reaction.from_state][1].append((reaction.reverse_rate, reaction.to_state))
-            td_rates[reaction.from_state][0].append(reaction.forward_rate)
-            td_rates[reaction.from_state][1].append((reaction.reverse_rate, reaction.to_state))
-            td_rates[reaction.to_state][1].append((reaction.forward_rate, reaction.from_state))
-            td_rates[reaction.to_state][0].append(reaction.reverse_rate)
 
-            
+            td_rates[reaction.from_state][0].append(reaction.forward_rate)
+            td_rates[reaction.from_state][1].append((reaction.reverse_rate, reaction.to_state))
+  
+            td_rates[reaction.to_state][0].append(reaction.reverse_rate)
+            td_rates[reaction.to_state][1].append((reaction.forward_rate, reaction.from_state))
+           
+            #Delete the below comments:
+            #td_rates[reaction.to_state][0].append(reaction.reverse_rate)
+            #td_rates[reaction.from_state][0].append(reaction.forward_rate)
+            #td_rates[reaction.from_state][1].append((reaction.reverse_rate, reaction.to_state))
+
+        time_derivatives = []
         for state_name, (outgoing_rates, incoming_rates) in td_rates.iteritems():
-            td = TimeDerivative(dependent_variable=state_name, rhs='0')
-            state = self.kinetic_states_map[state_name]
-            print type(td)
-            assert type(td)
-            for rate in outgoing_rates:
-                td += rate * state._sympy_()
-                #td -= rate * state
-            for rate in incoming_rates:
-                #td -= rate * state
-                #td += 
-                td += rate * state
             
+            td = TimeDerivative(dependent_variable=state_name, rhs='0')
+            #state = self.kinetic_states_map[state_name]
+      
+            for rate in outgoing_rates:
+                outcoming_state = self.kinetic_states_map[state_name]
+                td -= rate * outcoming_state._sympy_()
+                
+                
+            for rate, incoming_state_name in incoming_rates:
+                incoming_state = self.kinetic_states_map[incoming_state_name]
+        
+                td += rate * incoming_state._sympy_()
+            time_derivatives.append(td)
+        regime = Regime(name="default", time_derivatives=time_derivatives)    
             
 
             #state = self.kinetic_states[state_name]
             #state = kinetic_states[state_name]
             #state = self.kineticsdynamicsblock.kinetic_states[state_name]
-                        
+        for td in regime.time_derivatives:
+            print td       
 
         super(KineticDynamicsClass, self).__init__(name=name, parameters=parameters, event_ports=event_ports,
-            analog_ports=analog_ports, dynamicsblock=kineticsblock, regimes=regime_td)
+            analog_ports=analog_ports, dynamicsblock=kineticsblock, regimes=regime)
     
     @property
     def kineticsdynamicsblock(self):
@@ -521,14 +530,12 @@ class KineticDynamicsClassXMLLoader(DynamicsClassXMLLoader):
     #                      rhs=rexpr) 
     @read_annotations 
     def load_forwardrate(self, element):
-        return ReactionRate(ForwardRate)
-     
-        
+        return ForwardRate(element.text)
 
 
     @read_annotations
     def load_reverserate(self, element):
-        return ReactionRate(ReverseRate)
+        return ReverseRate(element.text)
 
  
  
