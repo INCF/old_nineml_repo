@@ -1,6 +1,6 @@
 from nineml.abstraction_layer.dynamics import DynamicsBlock, regimes
 from nineml.abstraction_layer import BaseALObject
-
+from copy import copy
 from nineml.abstraction_layer.expressions import Alias
 
 from nineml.abstraction_layer.dynamics.utils.xml import DynamicsClassXMLLoader, DynamicsClassXMLWriter
@@ -49,8 +49,6 @@ class KineticDynamicsClass(DynamicsClass):
                  event_ports=[], aliases=None, constants=None,
                  kinetic_states=None, reactions=None, constraints=None,
                  kineticsblock=None, main_block=None):
-        self._main_block = kineticsblock
-        #self._main_block = reactions
          
         # We can specify in the componentclass, and they will get forwarded to
         # the dynamics class. We check that we do not specify half-and-half:
@@ -63,57 +61,17 @@ class KineticDynamicsClass(DynamicsClass):
         else:
             kineticsblock = KineticDynamicsBlock(
                 kinetic_states=kinetic_states, reactions=reactions, 
-                constraints=constraints, constants=constants, aliases=aliases)
+                constraints=constraints, constants=constants, aliases=aliases)      
 
+        print name, ': name single item ', type(name)
+        print parameters, ': parameters empty list ', type(parameters)
+        print event_ports, ': event ports ', type(event_ports)
+        print analog_ports, ': analog_ports ', type(analog_ports) 
+        print kineticsblock, ': kineticsblock, it fails here', type(kineticsblock)
+        super(KineticDynamicsClass, self).__init__(
+            name=name, parameters=parameters, event_ports=event_ports,
+            analog_ports=analog_ports, dynamicsblock=kineticsblock)
 
-        td_rates = {} #declare an empty dictionary.
-        
-        for state in self.kinetic_states:
-            td_rates[state.name] = ([],[])  #populate the dictionary with empty 2D lists.
-        
-        
-        for reaction in self.reactions:
-
-
-            td_rates[reaction.from_state][0].append(reaction.forward_rate)
-            td_rates[reaction.from_state][1].append((reaction.reverse_rate, reaction.to_state))
-  
-            td_rates[reaction.to_state][0].append(reaction.reverse_rate)
-            td_rates[reaction.to_state][1].append((reaction.forward_rate, reaction.from_state))
-           
-            #Delete the below comments:
-            #td_rates[reaction.to_state][0].append(reaction.reverse_rate)
-            #td_rates[reaction.from_state][0].append(reaction.forward_rate)
-            #td_rates[reaction.from_state][1].append((reaction.reverse_rate, reaction.to_state))
-
-        time_derivatives = []
-        for state_name, (outgoing_rates, incoming_rates) in td_rates.iteritems():
-            
-            td = TimeDerivative(dependent_variable=state_name, rhs='0')
-            #state = self.kinetic_states_map[state_name]
-      
-            for rate in outgoing_rates:
-                outcoming_state = self.kinetic_states_map[state_name]
-                td -= rate * outcoming_state._sympy_()
-                
-                
-            for rate, incoming_state_name in incoming_rates:
-                incoming_state = self.kinetic_states_map[incoming_state_name]
-        
-                td += rate * incoming_state._sympy_()
-            time_derivatives.append(td)
-        regime = Regime(name="default", time_derivatives=time_derivatives)    
-            
-
-            #state = self.kinetic_states[state_name]
-            #state = kinetic_states[state_name]
-            #state = self.kineticsdynamicsblock.kinetic_states[state_name]
-        for td in regime.time_derivatives:
-            print td       
-
-        super(KineticDynamicsClass, self).__init__(name=name, parameters=parameters, event_ports=event_ports,
-            analog_ports=analog_ports, dynamicsblock=kineticsblock, regimes=regime)
-    
     @property
     def kineticsdynamicsblock(self):
         return self._main_block
@@ -131,9 +89,11 @@ class KineticDynamicsClass(DynamicsClass):
     @property
     def kinetic_states(self):
         return self.kineticsdynamicsblock.kinetic_states
-#   @property
-#    def constraints(self):
-#        return self.kineticsdynamicsblock.constraints
+    
+### Was commented.    
+    @property
+    def constraints(self):
+        return self.kineticsdynamicsblock.constraints
     
 
 
@@ -153,7 +113,8 @@ class KineticDynamicsBlock(DynamicsBlock):
     defining_attributes = ('_regimes', '_aliases', '_state_variables', '_constraints')
 
     def __init__(self, kinetic_states=None, reactions=None, constraints=None,
-                 constants=None, aliases=None): #Note could have kinetic aliases instead of aliases 
+                 constants=None, aliases=None): 
+                 #Note could have kinetic aliases instead of aliases 
                  #but want to inherit instead.
                  # regimes=None, aliases=None, state_variables=None,
                  #constants=None, piecewises=None, randomvariables=None, k
@@ -181,6 +142,9 @@ class KineticDynamicsBlock(DynamicsBlock):
  
 
         # Kinetics specific members
+        # Here a dictionary is created using a list comprehension syntax.
+        # The dictionary is not flexible enough for our needs because 
+        # It always follows the pattern from_state->to_state.
         self._reactions = dict(((r.from_state, r.to_state), r)
                                for r in reactions)
         
@@ -191,21 +155,50 @@ class KineticDynamicsBlock(DynamicsBlock):
            self._aliases[reaction.name + '_forward'] = reaction.forward_rate
            self._aliases[reaction.name + '_reverse'] = reaction.reverse_rate
        
-        
-        
         #Above was commented out.
         self._kinetic_states = dict((a.name, a) for a in kinetic_states)
                
+               
+        #why is contraints defined as a set? Why not dictionary?       
         self._constraints = set(constraint)
-        
-        # DynamicsBlock base class members
-        #self._constants = dict((c.name, c) for c in constants)
-        #self._aliases = dict((a.lhs, a) for a in aliases)
-        
-        
-        
-        
 
+        td_rates = {} #declare an empty dictionary.
+        
+        for state in self.kinetic_states:
+            td_rates[state.name] = ([],[])  #populate the dictionary with empty 2D lists.
+             
+        for reaction in self.reactions:
+            td_rates[reaction.from_state][0].append(reaction.forward_rate)
+            td_rates[reaction.from_state][1].append((reaction.reverse_rate, reaction.to_state))
+            td_rates[reaction.to_state][0].append(reaction.reverse_rate)
+            td_rates[reaction.to_state][1].append((reaction.forward_rate, reaction.from_state))
+
+        time_derivatives = []
+        for state_name, (outgoing_rates, incoming_rates) in td_rates.iteritems():
+            td = TimeDerivative(dependent_variable=state_name, rhs='0')
+
+            for rate in outgoing_rates:
+                outcoming_state = self.kinetic_states_map[state_name]
+                td -= rate * outcoming_state._sympy_()
+                               
+            for rate, incoming_state_name in incoming_rates:
+                incoming_state = self.kinetic_states_map[incoming_state_name]
+                td += rate * incoming_state._sympy_()
+                
+            time_derivatives.append(td)
+        for td in time_derivatives:
+            print td
+        regime = Regime(name="default", time_derivatives=time_derivatives)
+        self._regimes = {regime.name: regime}
+        self._state_variables = copy(self._kinetic_states)
+        #self._constants = dict((c.name, c) for c in constants)
+        self._constants = {}
+
+        self._random_variables = {}
+        self._piecewises ={}
+        ##
+        #
+        
     def accept_visitor(self, visitor, **kwargs):
         """ |VISITATION| """
         return visitor.visit_dynamicsblock(self, **kwargs)
@@ -216,8 +209,7 @@ class KineticDynamicsBlock(DynamicsBlock):
                         len(list(self.state_variables)),
                         len(list(self.reactions)),
                         len(list(self.kinetic_states)),
-                        len(list(self.constraint)),
-                        ))
+                        len(list(self.constraint))))
 
     @property
     def reactions(self):
@@ -240,10 +232,14 @@ class KineticDynamicsBlock(DynamicsBlock):
     @property
     def constraint_map(self):
         return self._constraint
-    
+        #return self._constraints
+
     @property
     def constraint(self):
-        return self._constraint.itervalues()
+        return self._constraints.itervalues()
+        #return self._constraint.itervalues()
+        #was commented out line, however this caused the error, object has not attribute _constraint.
+
 
     @property
     def alias(self):
@@ -268,12 +264,6 @@ class ReactionRate(Alias):
                 "Rate '{}' already belongs to another reaction block"
                 .format(repr(self)))
         self._reaction = reaction
-        
-    @property
-    def name(self):
-        return '{}__from{}_to{}'.format(self.element_name,
-                                           self._reaction.to_state,
-                                           self._reaction.from_state)
 
     @property        
     def lhs(self):
@@ -335,8 +325,6 @@ class Reaction(BaseALObject):
         self._forward_rate = forward_rate
         self._reverse_rate = reverse_rate
         
-        #set_reaction is a method that belongs to the class ReactionRate which extends
-        #the class Alias, does Alias extend the BaseALObject?
         
         #Reaction extends the BaseALObject 
         self._forward_rate.set_reaction(self)
@@ -344,8 +332,8 @@ class Reaction(BaseALObject):
         
     @property
     def name(self):
-        #return (('reaction__from_{}_to{}').format(self._from_state, self._to_state ))
-        return (('__from_{}_to{}').format(self.from_state, self.to_state ))
+        return (('reaction__from_{}_to{}').format(self._from_state, self._to_state ))
+        #return (('__from_{}_to{}').format(self.from_state, self.to_state ))
  
     @property
     def from_state(self):
@@ -363,15 +351,6 @@ class Reaction(BaseALObject):
     def reverse_rate(self):
         return self._reverse_rate
 
-
-#  
-#     @property
-#     def from_state(self):
-#         return self.from_state
-#  
-#     @property
-#     def to_state(self):
-#         return self.to_state
 
     def set_dimension(self, dimension):
         self._dimension = dimension
@@ -432,6 +411,11 @@ class ForwardRate(ReactionRate):
 
     """
     element_name = 'ForwardRate'
+    
+    @property
+    def name(self):
+        return 'ReactionRate__from{}_to{}'.format(self._reaction.from_state,
+                                                  self._reaction.to_state)
 
 
 class ReverseRate(ReactionRate):
@@ -441,9 +425,11 @@ class ReverseRate(ReactionRate):
 
     """
     element_name = 'ReverseRate'
-    
-    
-
+        
+    @property
+    def name(self):
+        return 'ReactionRate__from{}_to{}'.format(self._reaction.to_state,
+                                                 self._reaction.from_state)
 
 
     
@@ -524,10 +510,6 @@ class KineticDynamicsClassXMLLoader(DynamicsClassXMLLoader):
         
 
 
-
-    #Dummy return type replace with a real constraint class, after I have made one.
-    #return TimeDerivative(dependent_variable=variable,
-    #                      rhs=rexpr) 
     @read_annotations 
     def load_forwardrate(self, element):
         return ForwardRate(element.text)
