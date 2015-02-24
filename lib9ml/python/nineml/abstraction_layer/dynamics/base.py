@@ -6,14 +6,15 @@ components definitions of interface and dynamics
 :copyright: Copyright 2010-2013 by the Python lib9ML team, see AUTHORS.
 :license: BSD-3, see LICENSE for details.
 """
-from nineml.exceptions import NineMLRuntimeError
+from nineml.exceptions import (
+    NineMLRuntimeError, NineMLInvalidElementTypeException)
 from nineml.abstraction_layer.componentclass.namespace import NamespaceAddress
 from nineml.utils import normalise_parameter_as_list, filter_discrete_types
 from itertools import chain
 from ..expressions import Alias
 from nineml.abstraction_layer.componentclass import (
     ComponentClass, Parameter, MainBlock)
-from .regimes import StateVariable
+from .regimes import StateVariable, Regime
 from ..ports import (AnalogReceivePort, AnalogSendPort,
                      AnalogReducePort, EventReceivePort,
                      EventSendPort)
@@ -332,6 +333,52 @@ class DynamicsClass(ComponentClass, _NamespaceMixin):
 
     def _validate_self(self):
         DynamicsValidator.validate_componentclass(self)
+
+    def add(self, element):
+        try:
+            super(DynamicsClass, self).add(element)
+        except NineMLInvalidElementTypeException:
+            if isinstance(element, StateVariable):
+                self._main_block.state_variables[element.name] = element
+            elif isinstance(element, Regime):
+                self._main_block.regimes[element.name] = element
+            elif isinstance(element, AnalogSendPort):
+                self._analog_send_ports[element.name] = element
+            elif isinstance(element, AnalogReceivePort):
+                self._analog_receive_ports[element.name] = element
+            elif isinstance(element, AnalogReducePort):
+                self._analog_reduce_ports[element.name] = element
+            elif isinstance(element, EventSendPort):
+                self._event_send_ports[element.name] = element
+            elif isinstance(element, EventReceivePort):
+                self._event_receive_ports[element.name] = element
+            else:
+                raise NineMLInvalidElementTypeException(
+                    "Could not add element of type '{}' to {} class"
+                    .format(element.element_name, self.__class__.__name__))
+
+    def remove(self, element):
+        try:
+            super(DynamicsClass, self).remove(element)
+        except NineMLInvalidElementTypeException:
+            if isinstance(element, StateVariable):
+                self._main_block.state_variables.pop(element.name)
+            elif isinstance(element, Regime):
+                self._main_block.regimes.pop(element.name)
+            elif isinstance(element, AnalogSendPort):
+                self._analog_send_ports.pop(element.name)
+            elif isinstance(element, AnalogReceivePort):
+                self._analog_receive_ports.pop(element.name)
+            elif isinstance(element, AnalogReducePort):
+                self._analog_reduce_ports.pop(element.name)
+            elif isinstance(element, EventSendPort):
+                self._event_send_ports.pop(element.name)
+            elif isinstance(element, EventReceivePort):
+                self._event_receive_ports.pop(element.name)
+            else:
+                raise NineMLInvalidElementTypeException(
+                    "Could not add element of type '{}' to {} class"
+                    .format(element.element_name, self.__class__.__name__))
 
     @property
     def query(self):

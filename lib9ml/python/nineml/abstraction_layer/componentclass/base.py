@@ -16,9 +16,10 @@ from nineml.annotations import read_annotations, annotate_xml
 from nineml.utils import (
     filter_discrete_types, ensure_valid_identifier,
     normalise_parameter_as_list, assert_no_duplicates)
-from ..expressions import Alias
+from ..expressions import Alias, Constant, RandomVariable, Piecewise
 from ..units import dimensionless, Dimension
 from nineml import TopLevelObject
+from nineml.exceptions import NineMLInvalidElementTypeException
 
 
 class ComponentClass(BaseALObject, TopLevelObject):
@@ -76,6 +77,38 @@ class ComponentClass(BaseALObject, TopLevelObject):
             # type.
             self._indices[key] = defaultdict(lambda: len(self._indices[key]))
         return self._indices[key][element]
+
+    def add(self, element):
+        if isinstance(element, Parameter):
+            self._parameters[element.name] = element
+        elif isinstance(element, Alias):
+            self._main_block.aliases[element.name] = element
+        elif isinstance(element, Constant):
+            self._main_block.constants[element.name] = element
+        elif isinstance(element, RandomVariable):
+            self._main_block.aliases[element.name] = element
+        elif isinstance(element, Piecewise):
+            self._main_block.aliases[element.name] = element
+        else:
+            raise NineMLInvalidElementTypeException(
+                "Could not add element of type '{}' to {} class"
+                .format(element.element_name, self.__class__.__name__))
+
+    def remove(self, element):
+        if isinstance(element, Parameter):
+            self._parameters.pop(element.name)
+        elif isinstance(element, Alias):
+            self._main_block.aliases.pop(element.name)
+        elif isinstance(element, Constant):
+            self._main_block.constants.pop(element.name)
+        elif isinstance(element, RandomVariable):
+            self._main_block.aliases.pop(element.name)
+        elif isinstance(element, Piecewise):
+            self._main_block.aliases.pop(element.name)
+        else:
+            raise NineMLInvalidElementTypeException(
+                "Could not add element of type '{}' to {} class"
+                .format(element.element_name, self.__class__.__name__))
 
     @property
     def parameters(self):
