@@ -4,7 +4,6 @@ docstring needed
 :copyright: Copyright 2010-2013 by the Python lib9ML team, see AUTHORS.
 :license: BSD-3, see LICENSE for details.
 """
-from nineml.exceptions import NineMLRuntimeError
 from ...expressions.utils import is_builtin_symbol
 from .visitors import ComponentActionVisitor, ComponentVisitor
 
@@ -54,6 +53,9 @@ class ComponentCloner(ComponentVisitor):
 
         else:
             return prefix + variable
+
+    def visit_componentclass(self, componentclass, **kwargs):  # @UnusedVariable @IgnorePep8
+        componentclass.assign_indices()
 
     def visit_parameter(self, parameter, **kwargs):
         return parameter.__class__(
