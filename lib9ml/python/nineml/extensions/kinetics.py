@@ -63,11 +63,7 @@ class KineticDynamicsClass(DynamicsClass):
                 kinetic_states=kinetic_states, reactions=reactions, 
                 constraints=constraints, constants=constants, aliases=aliases)      
 
-        print name, ': name single item ', type(name)
-        print parameters, ': parameters empty list ', type(parameters)
-        print event_ports, ': event ports ', type(event_ports)
-        print analog_ports, ': analog_ports ', type(analog_ports) 
-        print kineticsblock, ': kineticsblock, it fails here', type(kineticsblock)
+
         super(KineticDynamicsClass, self).__init__(
             name=name, parameters=parameters, event_ports=event_ports,
             analog_ports=analog_ports, dynamicsblock=kineticsblock)
@@ -110,7 +106,7 @@ class KineticDynamicsBlock(DynamicsBlock):
     and state variables
     """
 
-    defining_attributes = ('_regimes', '_aliases', '_state_variables', '_constraints')
+    defining_attributes = ('_regimes', '_aliases', '_state_variables', '_constraints', 'constraints')
 
     def __init__(self, kinetic_states=None, reactions=None, constraints=None,
                  constants=None, aliases=None): 
@@ -134,7 +130,7 @@ class KineticDynamicsBlock(DynamicsBlock):
         aliases = normalise_parameter_as_list(aliases)
         kinetic_states = normalise_parameter_as_list(kinetic_states)
         reactions = normalise_parameter_as_list(reactions)
-        constraint = normalise_parameter_as_list(constraints)
+        constraints = normalise_parameter_as_list(constraints)
 
         # Load the KineticStates  as objects or strings:
         sv_types = (basestring, kinetic_states)
@@ -160,8 +156,23 @@ class KineticDynamicsBlock(DynamicsBlock):
                
                
         #why is contraints defined as a set? Why not dictionary?       
-        self._constraints = set(constraint)
+        self._constraints = constraints
+        
+    
+        
+        reduce_state=self._constraints[0].sympys()
+        constraint_eq=self._constraints[0].sympyl()
+        #print constraint_eq, ' constraint_eq'
+        constraint_eq += reduce_state
+        constraint_eq *= -1
+        
+        constraint_eq1=sympy.simplify(constraint_eq)
+        
+        constraint_eq2=sympy.solve(constraint_eq)
 
+        print constraint_eq1, ' constraint_eq1'
+
+         
         td_rates = {} #declare an empty dictionary.
         
         for state in self.kinetic_states:
@@ -186,13 +197,17 @@ class KineticDynamicsBlock(DynamicsBlock):
                 td += rate * incoming_state._sympy_()
                 
             time_derivatives.append(td)
+            
+            
         for td in time_derivatives:
-            print td
+            if str(td.dependent_variable)==str(reduce_state):
+            
         regime = Regime(name="default", time_derivatives=time_derivatives)
         self._regimes = {regime.name: regime}
-        self._state_variables = copy(self._kinetic_states)
+        #self._state_variables = copy(self._kinetic_states)
         #self._constants = dict((c.name, c) for c in constants)
         self._constants = {}
+        self._state_variables={}
 
         self._random_variables = {}
         self._piecewises ={}
@@ -204,12 +219,12 @@ class KineticDynamicsBlock(DynamicsBlock):
         return visitor.visit_dynamicsblock(self, **kwargs)
 
     def __repr__(self):
-        return ('DynamicsBlock({} regimes, {} aliases, {} state-variables, {} reactions, kinetic_states {}, constraint {})'
+        return ('DynamicsBlock({} regimes, {} aliases, {} state_variables, {} reactions, kinetic_states {}, constraints {})'
                 .format(len(list(self.regimes)), len(list(self.aliases)),
                         len(list(self.state_variables)),
                         len(list(self.reactions)),
                         len(list(self.kinetic_states)),
-                        len(list(self.constraint))))
+                        len(list(self.constraints))))
 
     @property
     def reactions(self):
@@ -229,14 +244,19 @@ class KineticDynamicsBlock(DynamicsBlock):
     def kinetic_states_map(self):
         return self._kinetic_states
 
+    #@property
+    #def constraint_map(self):
+    #    return self._constraints
+        
     @property
-    def constraint_map(self):
-        return self._constraint
-        #return self._constraints
+    def constraints(self):
+        return self._constraints#.itervalues()
+    
 
-    @property
-    def constraint(self):
-        return self._constraints.itervalues()
+    #@property
+    #def constraints(self):
+    #    return self._constraints.itervalues()
+    
         #return self._constraint.itervalues()
         #was commented out line, however this caused the error, object has not attribute _constraint.
 
@@ -251,6 +271,42 @@ class KineticDynamicsBlock(DynamicsBlock):
         return self._aliases
 
 
+class Constraint(Alias):
+
+    defining_attributes = ('_constraint', '_state', '_rhs')
+    #defining_attributes = ('_constraint')
+    def accept_visitor(self, visitor, **kwargs):
+        """ |VISITATION| """
+        return visitor.visit_statevariable(self, **kwargs)
+
+    #constructor for making Constraint object.
+    def __init__(self, expr, state):
+        self._constraint = expr
+        self._lhs = expr
+        self._rhs=None
+        #self._rhs='=0'
+        self._state=state
+
+    def state(self):
+        return self._state
+        
+    def lhs(self):
+        return self._lhs
+
+    def rhs(self):
+        return self._rhs
+    
+    def sympyl_neg(self):
+        eqn=sympy.Symbol(str('-(')+self.lhs()+str(')'))#+sympy.Symbol(self.rhs())
+        return eqn
+    
+    def sympyl(self):
+        eqn=sympy.Symbol(self.lhs())#+sympy.Symbol(self.rhs())
+        return eqn
+        #return sympy.Symbol(eqn)
+        #return sympy.Symbol(self.lhs())
+    def sympys(self):
+        return sympy.Symbol(self.state())
 
 class ReactionRate(Alias):
     
@@ -275,26 +331,6 @@ class ReactionRate(Alias):
 
 
 
-
-class Constraint(Alias):
-
-    defining_attributes = ('_constraint')
-
-    def accept_visitor(self, visitor, **kwargs):
-        """ |VISITATION| """
-        return visitor.visit_statevariable(self, **kwargs)
-
-    #constructor for making Constraint object.
-    def __init__(self, expr):
-        self._constraint = expr
-        self._lhs = expr
-        
-        
-   
-        
-        
-        
-    
 
 
 class Reaction(BaseALObject):
@@ -410,10 +446,15 @@ class ForwardRate(ReactionRate):
     time.
 
     """
-    element_name = 'ForwardRate'
+    defining_attributes = ('_rhs')
+
     
+
+    element_name = 'ForwardRate'
+    #self._rhs = None
     @property
     def name(self):
+        self._rhs=None
         return 'ReactionRate__from{}_to{}'.format(self._reaction.from_state,
                                                   self._reaction.to_state)
 
@@ -424,10 +465,14 @@ class ReverseRate(ReactionRate):
     time.
 
     """
+    defining_attributes = ('_rhs')
+
     element_name = 'ReverseRate'
-        
+    #self._rhs = None    
     @property
     def name(self):
+        self._rhs=None
+
         return 'ReactionRate__from{}_to{}'.format(self._reaction.to_state,
                                                  self._reaction.from_state)
 
@@ -493,10 +538,14 @@ class KineticDynamicsClassXMLLoader(DynamicsClassXMLLoader):
 
     @read_annotations
     def load_Constraint(self, element):
-        variable = element.get("variable")
+        #what to do when there are two elements, one Alias/MathInline, and the other 
+        #state
+        state = element.get("state")
         expr = self.load_single_internmaths_block(element)
         
-        return Constraint(expr)
+        return Constraint(expr,state)
+    
+    
     @read_annotations
     def load_Reaction(self, element):
         from_state = element.get("from")
