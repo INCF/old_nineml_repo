@@ -13,8 +13,10 @@ from collections import defaultdict
 from .. import BaseALObject
 import nineml
 from nineml.annotations import read_annotations, annotate_xml
-from nineml.utils import filter_discrete_types, ensure_valid_identifier
-
+from nineml.utils import (
+    filter_discrete_types, ensure_valid_identifier,
+    normalise_parameter_as_list, assert_no_duplicates)
+from ..expressions import Alias
 from ..units import dimensionless, Dimension
 from nineml import TopLevelObject
 
@@ -81,49 +83,51 @@ class ComponentClass(BaseALObject, TopLevelObject):
         return self._parameters.itervalues()
 
     @property
-    def parameters_map(self):
-        """Returns the underlying parameters dictionary containing the local
-          |Parameter| objects"""
-        return self._parameters
+    def aliases(self):
+        return self._main_block.aliases.itervalues()
+
+    @property
+    def constants(self):
+        return self._main_block.constants.itervalues()
+
+    @property
+    def random_variables(self):
+        return self._main_block.random_variables.itervalues()
+
+    @property
+    def piecewises(self):
+        return self._main_block.piecewises.itervalues()
+
+    def parameter(self, name):
+        return self._parameters[name]
+
+    def alias(self, name):
+        return self._main_block.aliases[name]
+
+    def constant(self, name):
+        return self._main_block.constants[name]
+
+    def random_variable(self, name):
+        return self._main_block.random_variables[name]
+
+    def piecewise(self, name):
+        return self._main_block.piecewises[name]
 
     @property
     def parameter_names(self):
         return self._parameters.iterkeys()
 
-    def parameter(self, name):
-        return self._parameters[name]
+    @property
+    def alias_names(self):
+        return self._main_block.aliases.iterkeys()
 
     @property
-    def aliases(self):
-        return self._main_block.aliases
+    def piecewise_names(self):
+        return self._main_block.piecewises.iterkeys()
 
     @property
-    def aliases_map(self):
-        return self._main_block.aliases_map
-
-    @property
-    def constants(self):
-        return self._main_block.constants
-
-    @property
-    def constants_map(self):
-        return self._main_block.constants_map
-
-    @property
-    def random_variables(self):
-        return self._main_block.random_variables
-
-    @property
-    def random_variables_map(self):
-        return self._main_block.random_variables_map
-
-    @property
-    def piecewises(self):
-        return self._main_block.piecewises
-
-    @property
-    def piecewises_map(self):
-        return self._main_block.piecewises_map
+    def constant_names(self):
+        return self._main_block.constants.iterkeys()
 
     @property
     def dimensions(self):
@@ -165,6 +169,41 @@ class ComponentClass(BaseALObject, TopLevelObject):
                             ComponentClassXMLLoader.read_class_type(element) +
                             'ClassXMLLoader')
         return XMLLoader(document).load_componentclass(element)
+
+
+class MainBlock(BaseALObject):
+
+    """
+    An object, which encapsulates a component's regimes, transitions,
+    and state variables
+    """
+
+    __metaclass__ = ABCMeta  # Abstract base class
+
+    def __init__(self, aliases=None, constants=None, random_variables=None,
+                 piecewises=None):
+        """DynamicsBlock object constructor
+
+           :param aliases: A list of aliases, which must be either |Alias|
+               objects or ``string``s.
+        """
+
+        aliases = normalise_parameter_as_list(aliases)
+        constants = normalise_parameter_as_list(constants)
+        random_variables = normalise_parameter_as_list(random_variables)
+        piecewises = normalise_parameter_as_list(piecewises)
+
+        # Load the aliases as objects or strings:
+        alias_td = filter_discrete_types(aliases, (basestring, Alias))
+        aliases_from_strs = [Alias.from_str(o) for o in alias_td[basestring]]
+        aliases = alias_td[Alias] + aliases_from_strs
+
+        assert_no_duplicates(a.lhs for a in aliases)
+
+        self.aliases = dict((a.lhs, a) for a in aliases)
+        self.constants = dict((c.name, c) for c in constants)
+        self.random_variables = dict((c.name, c) for c in random_variables)
+        self.piecewises = dict((c.name, c) for c in piecewises)
 
 
 class Parameter(BaseALObject):
