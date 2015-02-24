@@ -355,7 +355,8 @@ class DynamicsClass(ComponentClass, _NamespaceMixin):
             else:
                 raise NineMLInvalidElementTypeException(
                     "Could not add element of type '{}' to {} class"
-                    .format(element.element_name, self.__class__.__name__))
+                    .format(element.__class__.__name__,
+                            self.__class__.__name__))
 
     def remove(self, element):
         try:
@@ -378,7 +379,8 @@ class DynamicsClass(ComponentClass, _NamespaceMixin):
             else:
                 raise NineMLInvalidElementTypeException(
                     "Could not remove element of type '{}' to {} class"
-                    .format(element.element_name, self.__class__.__name__))
+                    .format(element.__class__.__name__,
+                            self.__class__.__name__))
 
     @property
     def query(self):
