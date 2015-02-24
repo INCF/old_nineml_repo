@@ -107,7 +107,7 @@ class ComponentClass(BaseALObject, TopLevelObject):
             self._main_block.aliases.pop(element.name)
         else:
             raise NineMLInvalidElementTypeException(
-                "Could not add element of type '{}' to {} class"
+                "Could not remove element of type '{}' to {} class"
                 .format(element.element_name, self.__class__.__name__))
 
     @property
