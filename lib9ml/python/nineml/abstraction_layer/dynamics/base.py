@@ -263,7 +263,7 @@ class DynamicsClass(ComponentClass, _NamespaceMixin):
                                     for n in inferred_struct.parameter_names)
 
         # Check any supplied state_variables match:
-        if state_variables is not None:
+        if list(self.state_variables):
             state_var_names = [p.name for p in self.state_variables]
             inf_check(state_var_names, inferred_struct.state_variable_names,
                       'StateVariables')
@@ -391,11 +391,11 @@ class DynamicsClass(ComponentClass, _NamespaceMixin):
 
     @property
     def num_states(self):
-        return len(self.dynamics.state_variables_map)
+        return len(list(self.dynamics.state_variables))
 
     @property
     def num_regimes(self):
-        return len(self.dynamics.regimes_map)
+        return len(list(self.dynamics.regimes))
 
     @property
     def attributes_with_dimension(self):
