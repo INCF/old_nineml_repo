@@ -163,23 +163,24 @@ class ComponentClass_test(unittest.TestCase):
                 # Forwarding function to self.dynamics.alias_map
 
         self.assertEqual(
-            ComponentClass(name='C1')._main_block.aliases, {}
+            ComponentClass(name='C1')._main_block._aliases, {}
         )
 
         c1 = ComponentClass(name='C1', aliases=['A:=3'])
         self.assertEqual(c1.alias('A').rhs_as_python_func(), 3)
-        self.assertEqual(len(c1._main_block.aliases), 1)
+        self.assertEqual(len(c1._main_block._aliases), 1)
 
         c2 = ComponentClass(name='C1', aliases=['A:=3', 'B:=5'])
+
         self.assertEqual(c2.alias('A').rhs_as_python_func(), 3)
         self.assertEqual(c2.alias('B').rhs_as_python_func(), 5)
-        self.assertEqual(len(c2._main_block.aliases), 2)
+        self.assertEqual(len(c2._main_block._aliases), 2)
 
         c3 = ComponentClass(name='C1', dynamicsblock=DynamicsBlock(aliases=['C:=13', 'Z:=15']))
         self.assertEqual(c3.alias('C').rhs_as_python_func(), 13)
         self.assertEqual(c3.alias('Z').rhs_as_python_func(), 15)
 
-        self.assertEqual(len(c3._main_block.aliases), 2)
+        self.assertEqual(len(c3._main_block._aliases), 2)
 
     def test_analog_ports(self):
         # Signature: name

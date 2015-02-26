@@ -25,7 +25,7 @@ class Regime(BaseALObject):
     """
 
     defining_attributes = ('_time_derivatives', '_on_events', '_on_conditions',
-                           'name')
+                           '_name')
     index_key = 'Regimes'
 
     _n = 0

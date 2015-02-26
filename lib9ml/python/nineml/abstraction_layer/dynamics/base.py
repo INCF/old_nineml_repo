@@ -6,12 +6,11 @@ components definitions of interface and dynamics
 :copyright: Copyright 2010-2013 by the Python lib9ML team, see AUTHORS.
 :license: BSD-3, see LICENSE for details.
 """
-from nineml.exceptions import (
-    NineMLRuntimeError, NineMLInvalidElementTypeException)
+from copy import copy
+from nineml.exceptions import NineMLRuntimeError
 from nineml.abstraction_layer.componentclass.namespace import NamespaceAddress
 from nineml.utils import normalise_parameter_as_list, filter_discrete_types
 from itertools import chain
-from ..expressions import Alias
 from nineml.abstraction_layer.componentclass import (
     ComponentClass, Parameter, MainBlock)
 from .regimes import StateVariable, Regime
@@ -159,10 +158,17 @@ class DynamicsClass(ComponentClass, _NamespaceMixin):
          For more information, see
 
     """
-    defining_attributes = ('name', '_parameters', '_analog_send_ports',
-                           '_analog_receive_ports', '_analog_reduce_ports',
-                           '_event_send_ports', '_event_receive_ports',
-                           '_main_block')
+    defining_attributes = (ComponentClass.defining_attributes +
+                           ('_analog_send_ports', '_analog_receive_ports',
+                            '_analog_reduce_ports', '_event_send_ports',
+                            '_event_receive_ports'))
+    _class_to_member = dict(
+        tuple(ComponentClass._class_to_member.iteritems()) +
+        ((AnalogSendPort, '_analog_send_ports'),
+         (AnalogReceivePort, '_analog_receive_ports'),
+         (AnalogReducePort, '_analog_reduce_ports'),
+         (EventSendPort, '_event_send_ports'),
+         (EventReceivePort, '_event_receive_ports')))
 
     def __init__(self, name, parameters=None, analog_ports=[],
                  event_ports=[],
@@ -263,14 +269,14 @@ class DynamicsClass(ComponentClass, _NamespaceMixin):
                                     for n in inferred_struct.parameter_names)
 
         # Check any supplied state_variables match:
-        if list(self.state_variables):
+        if self.num_state_variables:
             state_var_names = [p.name for p in self.state_variables]
             inf_check(state_var_names, inferred_struct.state_variable_names,
                       'StateVariables')
         else:
             state_vars = dict((n, StateVariable(n)) for n in
                               inferred_struct.state_variable_names)
-            self._main_block.state_variables = state_vars
+            self._main_block._state_variables = state_vars
 
         # Set and check event receive ports match inferred
         self._event_receive_ports = dict(
@@ -331,54 +337,6 @@ class DynamicsClass(ComponentClass, _NamespaceMixin):
     def __repr__(self):
         return "<dynamics.DynamicsClass %s>" % self.name
 
-    def add(self, element):
-        try:
-            super(DynamicsClass, self).add(element)
-        except NineMLInvalidElementTypeException:
-            if isinstance(element, StateVariable):
-                self._main_block.state_variables[element.name] = element
-            elif isinstance(element, Regime):
-                self._main_block.regimes[element.name] = element
-            elif isinstance(element, AnalogSendPort):
-                self._analog_send_ports[element.name] = element
-            elif isinstance(element, AnalogReceivePort):
-                self._analog_receive_ports[element.name] = element
-            elif isinstance(element, AnalogReducePort):
-                self._analog_reduce_ports[element.name] = element
-            elif isinstance(element, EventSendPort):
-                self._event_send_ports[element.name] = element
-            elif isinstance(element, EventReceivePort):
-                self._event_receive_ports[element.name] = element
-            else:
-                raise NineMLInvalidElementTypeException(
-                    "Could not add element of type '{}' to {} class"
-                    .format(element.__class__.__name__,
-                            self.__class__.__name__))
-
-    def remove(self, element):
-        try:
-            super(DynamicsClass, self).remove(element)
-        except NineMLInvalidElementTypeException:
-            if isinstance(element, StateVariable):
-                self._main_block.state_variables.pop(element.name)
-            elif isinstance(element, Regime):
-                self._main_block.regimes.pop(element.name)
-            elif isinstance(element, AnalogSendPort):
-                self._analog_send_ports.pop(element.name)
-            elif isinstance(element, AnalogReceivePort):
-                self._analog_receive_ports.pop(element.name)
-            elif isinstance(element, AnalogReducePort):
-                self._analog_reduce_ports.pop(element.name)
-            elif isinstance(element, EventSendPort):
-                self._event_send_ports.pop(element.name)
-            elif isinstance(element, EventReceivePort):
-                self._event_receive_ports.pop(element.name)
-            else:
-                raise NineMLInvalidElementTypeException(
-                    "Could not remove element of type '{}' to {} class"
-                    .format(element.__class__.__name__,
-                            self.__class__.__name__))
-
     def validate(self):
         DynamicsValidator.validate_componentclass(self)
 
@@ -392,12 +350,12 @@ class DynamicsClass(ComponentClass, _NamespaceMixin):
         return visitor.visit_componentclass(self, **kwargs)
 
     @property
-    def num_states(self):
-        return len(list(self.dynamics.state_variables))
+    def num_state_variables(self):
+        return len(list(self._main_block._state_variables))
 
     @property
     def num_regimes(self):
-        return len(list(self.dynamics.regimes))
+        return len(list(self._main_block._regimes))
 
     @property
     def attributes_with_dimension(self):
@@ -448,19 +406,19 @@ class DynamicsClass(ComponentClass, _NamespaceMixin):
 
     @property
     def regimes(self):
-        """Forwarding function to self._main_block.regimes"""
-        return self._main_block.regimes.itervalues()
+        """Forwarding function to self._main_block._regimes"""
+        return self._main_block._regimes.itervalues()
 
     @property
     def state_variables(self):
-        """Forwarding function to self._main_block.state_variables"""
-        return self._main_block.state_variables.itervalues()
+        """Forwarding function to self._main_block._state_variables"""
+        return self._main_block._state_variables.itervalues()
 
     def regime(self, name):
-        return self._main_block.regimes[name]
+        return self._main_block._regimes[name]
 
     def state_variable(self, name):
-        return self._main_block.state_variables[name]
+        return self._main_block._state_variables[name]
 
     def analog_send_port(self, name):
         return self._analog_send_ports[name]
@@ -479,11 +437,11 @@ class DynamicsClass(ComponentClass, _NamespaceMixin):
 
     @property
     def regime_names(self):
-        return self._main_block.regimes.iterkeys()
+        return self._main_block._regimes.iterkeys()
 
     @property
     def state_variable_names(self):
-        return self._main_block.state_variables.iterkeys()
+        return self._main_block._state_variables.iterkeys()
 
     @property
     def analog_port_names(self):
@@ -609,15 +567,11 @@ class DynamicsClass(ComponentClass, _NamespaceMixin):
         # We only worry about 'target' regimes, since source regimes are taken
         # care of for us by the Regime objects they are attached to.
         for trans in self.all_transitions():
-            if trans.target_regime_name not in self._main_block.regimes:
+            if trans.target_regime_name not in self._main_block._regimes:
                 raise NineMLRuntimeError(
                     "Can't find regime '{}'".format(trans.target_regime_name))
             trans.set_target_regime(
-                self._main_block.regimes[trans.target_regime_name])
-
-    @property
-    def _assumed_defined(self):
-        return self._main_block.state_variables.keys()
+                self._main_block._regimes[trans.target_regime_name])
 
 
 class DynamicsBlock(MainBlock):
@@ -627,7 +581,11 @@ class DynamicsBlock(MainBlock):
     and state variables
     """
 
-    defining_attributes = ('regimes', 'aliases', 'state_variables')
+    defining_attributes = (MainBlock.defining_attributes +
+                           ('_regimes', '_state_variables'))
+    _class_to_member = dict(
+        tuple(MainBlock._class_to_member.iteritems()) +
+        ((Regime, '_regimes'), (StateVariable, '_state_variables')))
 
     def __init__(self, regimes=None, aliases=None, state_variables=None,
                  constants=None, random_variables=None, piecewises=None):
@@ -658,8 +616,8 @@ class DynamicsBlock(MainBlock):
         assert_no_duplicates(r.name for r in regimes)
         assert_no_duplicates(s.name for s in state_variables)
 
-        self.regimes = dict((r.name, r) for r in regimes)
-        self.state_variables = dict((s.name, s) for s in state_variables)
+        self._regimes = dict((r.name, r) for r in regimes)
+        self._state_variables = dict((s.name, s) for s in state_variables)
 
     def accept_visitor(self, visitor, **kwargs):
         """ |VISITATION| """
@@ -668,15 +626,19 @@ class DynamicsBlock(MainBlock):
     def __repr__(self):
         return ('DynamicsBlock({} regimes, {} aliases, {} state-variables, '
                 '{} constants, {} random-variables, {} piecewises)'
-                .format(len(list(self.regimes)), len(list(self.aliases)),
-                        len(list(self.state_variables)),
-                        len(list(self.constants)),
-                        len(list(self.random_variables)),
-                        len(list(self.piecewises))))
+                .format(len(self._regimes), len(self._aliases),
+                        len(self._state_variables),
+                        len(self._constants),
+                        len(self._random_variables),
+                        len(self._piecewises)))
 
     @property
-    def transitions(self):
-        return chain(*(r.transitions for r in self.regimes.itervalues()))
+    def regimes(self):
+        return self._regimes.itervalues()
+
+    @property
+    def state_variables(self):
+        return self._state_variables.itervalues()
 
 
 def inf_check(l1, l2, desc):
