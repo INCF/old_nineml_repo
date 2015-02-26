@@ -136,7 +136,7 @@ class ComponentClass(BaseALObject, TopLevelObject):
                 index = max(self._indices[key].itervalues())
             else:
                 index = 0
-            self._indices[key][element] = index
+            self._indices[key][element] = index + 1
             return index
 
     def add(self, element):
