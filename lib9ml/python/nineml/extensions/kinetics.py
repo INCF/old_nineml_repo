@@ -1,7 +1,8 @@
 from nineml.abstraction_layer.dynamics import DynamicsBlock, regimes
 from nineml.abstraction_layer import BaseALObject
-from copy import copy
-from nineml.abstraction_layer.expressions import Alias
+from copy import copy, deepcopy
+from nineml.abstraction_layer.expressions import (
+    Expression, Alias, ExpressionSymbol)
 
 from nineml.abstraction_layer.dynamics.utils.xml import DynamicsClassXMLLoader, DynamicsClassXMLWriter
 
@@ -26,7 +27,7 @@ from nineml.abstraction_layer.dynamics.validators import DynamicsValidator
 from nineml.abstraction_layer.dynamics.utils import DynamicsClassInterfaceInferer
 from nineml.abstraction_layer.dynamics.base import _NamespaceMixin
 from collections import Counter
-from nineml.abstraction_layer.dynamics.regimes import TimeDerivative, Regime
+from nineml.abstraction_layer.dynamics import TimeDerivative, Regime, StateVariable
 from sympy import symbols
 import sympy
 
@@ -62,16 +63,24 @@ class KineticDynamicsClass(DynamicsClass):
                 kinetic_states=kinetic_states, reactions=reactions,
                 constraints=constraints, constants=constants, aliases=aliases)
 
+        print kineticsblock
+        #super(KineticDynamicsClass, self).__init__(
+        #    name=name, dynamicsblock=kineticsblock)
+
+
+        #what the call to the constructor should be, once all of the correct 
+        #parameters, units and AnalogReceivePort have been declared in the XML file.
         super(KineticDynamicsClass, self).__init__(
             name=name, parameters=parameters, event_ports=event_ports,
             analog_ports=analog_ports, dynamicsblock=kineticsblock)
+
 
     @property
     def reactions(self):
         return self._main_block.reactions.itervalues()
 
     def reaction(self, from_state, to_state):
-        return self._main_block.reactions[sorted((from_state, to_state))]
+        return self._main_block.reactions[tuple(sorted((from_state, to_state)))]
 
     @property
     def kinetic_states(self):
@@ -103,8 +112,8 @@ class KineticDynamicsBlock(DynamicsBlock):
     and state variables
     """
 
-    defining_attributes = ('_regimes', '_aliases', '_state_variables',
-                           '_constraints', 'constraints')
+    defining_attributes = ('kinetic_states', 'aliases', 'reactions',
+                           'constraints', 'constants')
 
     def __init__(self, kinetic_states=None, reactions=None, constraints=None,
                  constants=None, aliases=None):
@@ -134,36 +143,50 @@ class KineticDynamicsBlock(DynamicsBlock):
         sv_types = (basestring, kinetic_states)
 
         # Kinetics specific members
-        # Here a dictionary is created using a list comprehension syntax.
-        # The dictionary is not flexible enough for our needs because 
-        # It always follows the pattern from_state->to_state.
-        self.reactions = dict((sorted((r.from_state, r.to_state)), r)
+     
+        self.reactions = dict((tuple(sorted((r.from_state, r.to_state))), r)
                                for r in reactions)
-
-        # Above was commented out.
         self.kinetic_states = dict((a.name, a) for a in kinetic_states)
-
-        # why is contraints defined as a set? Why not dictionary?
         self.constraints = dict((c.state, c) for c in constraints)
 
-        reduce_state = self._constraints[0].sympys()
-        constraint_eq = self._constraints[0].sympyl()
-        # print constraint_eq, ' constraint_eq'
-        constraint_eq += reduce_state
-        constraint_eq *= -1
 
-        constraint_eq1 = sympy.simplify(constraint_eq)
-        constraint_eq2 = sympy.solve(constraint_eq)
 
-        print constraint_eq1, ' constraint_eq1'
+  
+        # constraints is a dictionary of constraint objects. 
+        # the state attribute is the user defined state variable to use to solve the equation. 
+        # The state attribute should be the same in all constraint objects, so I have
+        # indexed into the first one.
+        #for state in self.kinetic_states:
+
+        
+        #reduce_state = [self.kinetic_states[c.state] for c in self.constraints.itervalues()]
+        #constraint_eq = [c.state for c in self.constraints.itervalues()]
+   
+        reduce_state = self.kinetic_states[constraints[0].state]
+        constraint_eq = self.constraints[constraints[0].state]
+
+        state_subs = deepcopy(constraint_eq.rhs) #clone the object.
+        #such that do not corrupt the contents of the original object.
+        
+        state_subs -= reduce_state
+        
+        state_subs *= -1
+    
+        state_subs.subs(reduce_state, state_subs)
+        print state_subs, ' state_subs'
 
         td_rates = {}  # declare an empty dictionary.
 
+
         for state in self.kinetic_states:
             # populate the dictionary with empty 2D lists.
-            td_rates[state.name] = ([], [])
+            td_rates[state] = ([], [])
 
-        for reaction in self.reactions:
+     
+
+        for reaction in self.reactions.itervalues():
+     
+            # reaction[0] ==from_state, reaction[1]==to_state
             td_rates[reaction.from_state][0].append(reaction.forward_rate)
             td_rates[reaction.from_state][1].append((reaction.reverse_rate,
                                                      reaction.to_state))
@@ -174,20 +197,20 @@ class KineticDynamicsBlock(DynamicsBlock):
         time_derivatives = []
         for state_name, (outgoing_rates, incoming_rates) in td_rates.iteritems():
             td = TimeDerivative(dependent_variable=state_name, rhs='0')
+            if (state_name not in (c.state for c in constraints)):
+                for rate in outgoing_rates:
+                    outcoming_state = self.kinetic_states[state_name]
+                    td -= rate * outcoming_state
+ 
+                    #print type(td), type(rate), type(outcoming_state)
+                    #state_subs
+                for rate, incoming_state_name in incoming_rates:
+                    incoming_state = self.kinetic_states[incoming_state_name]
+                    td += rate * incoming_state
+          
+                td.rhs=td.rhs.subs(reduce_state, state_subs)
+                time_derivatives.append(td)
 
-            for rate in outgoing_rates:
-                outcoming_state = self.kinetic_states_map[state_name]
-                td -= rate * outcoming_state._sympy_()
-
-            for rate, incoming_state_name in incoming_rates:
-                incoming_state = self.kinetic_states_map[incoming_state_name]
-                td += rate * incoming_state._sympy_()
-
-            time_derivatives.append(td)
-
-        for td in time_derivatives:
-            if str(td.dependent_variable) == str(reduce_state):
-                pass
 
         # Construct base class members and pass to base class __init__
         for reaction in reactions:
@@ -196,8 +219,14 @@ class KineticDynamicsBlock(DynamicsBlock):
 
         regimes = [Regime(name="default", time_derivatives=time_derivatives)]
 
+        state_variables = [StateVariable(name=ks.name, dimension=dimensionless)
+                           for ks in self.kinetic_states.itervalues()
+                           if ks.name not in (
+                               c.state for c in self.constraints.itervalues())]
+        
+        
         super(KineticDynamicsBlock, self).__init__(
-            regimes=regimes, aliases=aliases, state_variables = state_variables,
+            regimes=regimes, aliases=aliases, state_variables=state_variables,
             constants=constants)
 
     def accept_visitor(self, visitor, **kwargs):
@@ -214,9 +243,9 @@ class KineticDynamicsBlock(DynamicsBlock):
                         len(list(self.constraints))))
 
 
-class Constraint(Alias):
+class Constraint(Expression, BaseALObject):
 
-    defining_attributes = ('_constraint', '_state', '_rhs')
+    defining_attributes = ('_state', '_rhs')
     #defining_attributes = ('_constraint')
     def accept_visitor(self, visitor, **kwargs):
         """ |VISITATION| """
@@ -224,39 +253,19 @@ class Constraint(Alias):
 
     #constructor for making Constraint object.
     def __init__(self, expr, state):
-        self._constraint = expr
-        self._lhs = expr
-        self._rhs=None
-        #self._rhs='=0'
-        self._state=state
+        BaseALObject.__init__(self)
+        Expression.__init__(self, expr)
+        self._state = state
 
+    @property
     def state(self):
         return self._state
-
-    def lhs(self):
-        return self._lhs
-
-    def rhs(self):
-        return self._rhs
-
-    def sympyl_neg(self):
-        eqn = sympy.Symbol(str('-(')+self.lhs()+str(')'))#+sympy.Symbol(self.rhs())
-        return eqn
-
-    def sympyl(self):
-        eqn = sympy.Symbol(self.lhs())#+sympy.Symbol(self.rhs())
-        return eqn
-        #return sympy.Symbol(eqn)
-        #return sympy.Symbol(self.lhs())
-
-    def sympys(self):
-        return sympy.Symbol(self.state())
 
 
 class ReactionRate(Alias):
 
     def __init__(self, expr):
-        self._lhs = expr
+        self._rhs = expr
         self._reaction = None
 
     def set_reaction(self, reaction):
@@ -330,12 +339,11 @@ class Reaction(BaseALObject):
         self._dimension = dimension
 
     def __repr__(self):
-        return ("StateVariable({}{})"
-                .format(self.name,
-                        ', dimension={}'.format(self.dimension.name)))
+        return ("Reaction(from={}, to={})"
+                .format(self.from_state, self.to_state))
 
 
-class KineticState(BaseALObject):
+class KineticState(BaseALObject, ExpressionSymbol):
 
     """A class representing a state-variable in a ``DynamicsClass``.
 
@@ -387,10 +395,9 @@ class ForwardRate(ReactionRate):
     defining_attributes = ('_rhs')
 
     element_name = 'ForwardRate'
-    #self._rhs = None
+
     @property
     def name(self):
-        self._rhs=None
         return 'ReactionRate__from{}_to{}'.format(self._reaction.from_state,
                                                   self._reaction.to_state)
 
@@ -404,13 +411,11 @@ class ReverseRate(ReactionRate):
     defining_attributes = ('_rhs')
 
     element_name = 'ReverseRate'
-    #self._rhs = None    
+        
     @property
     def name(self):
-        self._rhs=None
-
         return 'ReactionRate__from{}_to{}'.format(self._reaction.to_state,
-                                                 self._reaction.from_state)
+                                                  self._reaction.from_state)
 
 
 class KineticDynamicsClassXMLLoader(DynamicsClassXMLLoader):
@@ -486,17 +491,22 @@ class KineticDynamicsClassXMLLoader(DynamicsClassXMLLoader):
 
     @read_annotations 
     def load_forwardrate(self, element):
-        return ForwardRate(element.text)
+        expr = self.load_single_internmaths_block(element)
+        return ForwardRate(expr)
 
     @read_annotations
     def load_reverserate(self, element):
-        return ReverseRate(element.text)
+        expr = self.load_single_internmaths_block(element)
+        return ReverseRate(expr)
 
     tag_to_loader = {                 
         "KineticDynamics": load_kineticsblock,                
         "Constraint": load_Constraint,
         "Reaction": load_Reaction,
-        "KineticState": load_KineticState,         
+        "KineticState": load_KineticState,
+        "AnalogReceivePort": DynamicsClassXMLLoader.load_analogreceiveport,
+        "AnalogSendPort": DynamicsClassXMLLoader.load_analogsendport,    
+        "AnalogReducePort": DynamicsClassXMLLoader.load_analogreduceport,
         #"ComponentClass": load_componentclass,
 
         #sub blocks
