@@ -128,7 +128,7 @@ class Component(BaseULObject, TopLevelObject):
         if isinstance(definition, basestring):
             definition = Definition(
                 name=path.basename(definition).replace(".xml", ""),
-                document=Document(_url=definition),
+                document=Document(url=definition),
                 url=definition)
         elif not (isinstance(definition, Definition) or
                   isinstance(definition, Prototype)):
@@ -292,7 +292,7 @@ class Component(BaseULObject, TopLevelObject):
                                 "defintion or a prototype")
             definition = Prototype.from_xml(prototype_element, document)
         return cls(name, definition, properties=properties,
-                   initial_values=initial_values)
+                   initial_values=initial_values, url=document.url)
 
     @property
     def used_units(self):

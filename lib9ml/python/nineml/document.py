@@ -24,7 +24,8 @@ class Document(dict, BaseNineMLObject):
     _Unloaded = collections.namedtuple('_Unloaded', 'name xml cls')
 
     def __init__(self, *elements, **kwargs):
-        self.url = kwargs.pop('_url', None)
+        self._url = kwargs.pop('url', None)
+        self._annotations = kwargs.pop('annotations', Annotations())
         assert len(kwargs) == 0, ("Unrecognised kwargs '{}'"
                                   .format("', '".join(kwargs.iterkeys())))
         for element in elements:
@@ -37,33 +38,29 @@ class Document(dict, BaseNineMLObject):
     def url(self):
         return self._url
 
+    @property
+    def annotations(self):
+        return self._annotations
+
     def add(self, element):
-        try:
-            if not isinstance(element, TopLevelObject):
-                raise NineMLRuntimeError(
-                    "Could not add {} as it is not a document level NineML "
-                    "object ('{}') ".format(element.element_name,
-                                            "', '".join(self.top_level_types)))
-            if element.name in self:
-                raise NineMLRuntimeError(
-                    "Could not add element '{}' as an element with that name "
-                    "already exists in the document".format(element.name))
-        except AttributeError:
-            raise NineMLRuntimeError("Could not add {} as it is not a NineML "
-                                     "object".format(element))
+        if not isinstance(element, (TopLevelObject, self._Unloaded)):
+            raise NineMLRuntimeError(
+                "Could not add {} as it is not a document level NineML "
+                "object ('{}') ".format(element.element_name,
+                                        "', '".join(self.top_level_types)))
+        if element.name in self:
+            raise NineMLRuntimeError(
+                "Could not add element '{}' as an element with that name "
+                "already exists in the document".format(element.name))
         self[element.name] = element
 
     def remove(self, element):
-        try:
-            if not isinstance(element, TopLevelObject):
-                raise NineMLRuntimeError(
-                    "Could not remove {} as it is not a document level NineML "
-                    "object ('{}') ".format(element.element_name,
-                                            "', '".join(self.top_level_types)))
-            name = element.name
-        except AttributeError:
-            raise NineMLRuntimeError("Could not remove {} as it is not a "
-                                     "NineML object".format(element))
+        if not isinstance(element, TopLevelObject):
+            raise NineMLRuntimeError(
+                "Could not remove {} as it is not a document level NineML "
+                "object ('{}') ".format(element.element_name,
+                                        "', '".join(self.top_level_types)))
+        name = element.name
         del self[name]
 
     def __eq__(self, other):
@@ -239,7 +236,7 @@ class Document(dict, BaseNineMLObject):
         if element.tag != NINEML + cls.element_name:
             raise Exception("Not a NineML root ('{}')".format(element.tag))
         # Initialise the document
-        elements = {'_url': url}
+        elements = []
         # Loop through child elements, determine the class needed to extract
         # them and add them to the dictionary
         annotations = None
@@ -277,9 +274,8 @@ class Document(dict, BaseNineMLObject):
                     "Duplicate identifier '{ob1}:{name}'in NineML file '{url}'"
                     .format(name=name, ob1=elements[name].cls.element_name,
                             ob2=child_cls.element_name, url=url or ''))
-            elements[name] = cls._Unloaded(name, child, child_cls)
-        document = cls(**elements)
-        document.annotations = annotations
+            elements.append(cls._Unloaded(name, child, child_cls))
+        document = cls(*elements, url=url, annotations=annotations)
         return document
 
 

@@ -237,7 +237,8 @@ class Projection(BaseULObject, TopLevelObject):
                    plasticity=plasticity,
                    connectivity=connectivity,
                    delay=delay,
-                   port_connections=port_connections)
+                   port_connections=port_connections,
+                   url=document.url)
 
 
 class Delay(Quantity):

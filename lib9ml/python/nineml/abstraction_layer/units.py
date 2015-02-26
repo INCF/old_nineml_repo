@@ -27,7 +27,7 @@ class Dimension(BaseALObject, TopLevelObject):
 
     def __init__(self, name, **kwargs):
         BaseALObject.__init__(self)
-        TopLevelObject.__init__(self, kwargs.get('url', None))
+        TopLevelObject.__init__(self, kwargs.pop('url', None))
         self._name = name
         for k in kwargs:
             if k not in self.valid_dims:
@@ -80,10 +80,11 @@ class Dimension(BaseALObject, TopLevelObject):
 
     @classmethod
     @read_annotations
-    def from_xml(cls, element, _):
+    def from_xml(cls, element, document):
         kwargs = dict(element.attrib)
         name = kwargs.pop('name')
         kwargs = dict((k, int(v)) for k, v in kwargs.items())
+        kwargs['url'] = document.url
         return cls(name, **kwargs)
 
 
@@ -172,7 +173,7 @@ class Unit(BaseALObject, TopLevelObject):
         dimension = document[element.attrib['dimension']]
         power = int(element.get('power', 0))
         offset = float(element.attrib.get('name', 0.0))
-        return cls(name, dimension, power, offset=offset)
+        return cls(name, dimension, power, offset=offset, url=document.url)
 
 # Common units and dimensions
 

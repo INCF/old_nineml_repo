@@ -70,7 +70,7 @@ class Selection(BaseULObject, TopLevelObject):
         # The only supported op at this stage
         op = Concatenate.from_xml(
             expect_single(element.findall(NINEML + 'Concatenate')), document)
-        return cls(element.attrib['name'], op)
+        return cls(element.attrib['name'], op, url=document.url)
 
     def evaluate(self):
         assert isinstance(self.operation, Concatenate), \
