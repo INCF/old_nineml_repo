@@ -25,7 +25,7 @@ from nineml.exceptions import (
     NineMLRuntimeError, NineMLInvalidElementTypeException)
 
 
-class Parameter(BaseALObject):
+class Parameter(BaseALObject, ExpressionSymbol):
 
     """A class representing a state-variable in a ``ComponentClass``.
 
@@ -34,7 +34,7 @@ class Parameter(BaseALObject):
     """
 
     element_name = 'Parameter'
-    defining_attributes = ('_name', '_dimension')
+    defining_attributes = ('name', 'dimension')
 
     def __init__(self, name, dimension=None):
         """Parameter Constructor
