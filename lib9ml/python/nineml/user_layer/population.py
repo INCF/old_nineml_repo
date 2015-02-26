@@ -26,8 +26,9 @@ class Population(BaseULObject, TopLevelObject):
     element_name = "Population"
     defining_attributes = ("name", "number", "cell", "positions")
 
-    def __init__(self, name, number, cell, positions=None):
-        super(Population, self).__init__()
+    def __init__(self, name, number, cell, positions=None, url=None):
+        BaseULObject.__init__(self)
+        TopLevelObject.__init__(self, url)
         self.name = name
         self.number = number
         self.cell = cell

@@ -115,13 +115,15 @@ class Component(BaseULObject, TopLevelObject):
 
     # initial_values is temporary, the idea longer-term is to use a separate
     # library such as SEDML
-    def __init__(self, name, definition, properties={}, initial_values={}):
+    def __init__(self, name, definition, properties={}, initial_values={},
+                 url=None):
         """
         Create a new componentclass with the given name, definition and
         properties, or create a prototype to another componentclass that will
         be resolved later.
         """
-        super(Component, self).__init__()
+        BaseULObject.__init__(self)
+        TopLevelObject.__init__(self, url)
         self.name = name
         if isinstance(definition, basestring):
             definition = Definition(
@@ -289,8 +291,8 @@ class Component(BaseULObject, TopLevelObject):
                 raise Exception("A componentclass must contain either a "
                                 "defintion or a prototype")
             definition = Prototype.from_xml(prototype_element, document)
-        return cls(name, definition, properties,
-                       initial_values=initial_values)
+        return cls(name, definition, properties=properties,
+                   initial_values=initial_values)
 
     @property
     def used_units(self):

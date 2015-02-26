@@ -25,12 +25,17 @@ class Document(dict, BaseNineMLObject):
 
     def __init__(self, *elements, **kwargs):
         self.url = kwargs.pop('_url', None)
-        dict.__init__(self, **kwargs)
+        assert len(kwargs) == 0, ("Unrecognised kwargs '{}'"
+                                  .format("', '".join(kwargs.iterkeys())))
         for element in elements:
             self.add(element)
         # Stores the list of elements that are being loaded to check for
         # circular references
         self._loading = []
+
+    @property
+    def url(self):
+        return self._url
 
     def add(self, element):
         try:
@@ -39,14 +44,27 @@ class Document(dict, BaseNineMLObject):
                     "Could not add {} as it is not a document level NineML "
                     "object ('{}') ".format(element.element_name,
                                             "', '".join(self.top_level_types)))
+            if element.name in self:
+                raise NineMLRuntimeError(
+                    "Could not add element '{}' as an element with that name "
+                    "already exists in the document".format(element.name))
         except AttributeError:
             raise NineMLRuntimeError("Could not add {} as it is not a NineML "
                                      "object".format(element))
-        if element.name in self:
-            raise NineMLRuntimeError(
-                "Could not add element '{}' as an element with that name "
-                "already exists in the document".format(element.name))
         self[element.name] = element
+
+    def remove(self, element):
+        try:
+            if not isinstance(element, TopLevelObject):
+                raise NineMLRuntimeError(
+                    "Could not remove {} as it is not a document level NineML "
+                    "object ('{}') ".format(element.element_name,
+                                            "', '".join(self.top_level_types)))
+            name = element.name
+        except AttributeError:
+            raise NineMLRuntimeError("Could not remove {} as it is not a "
+                                     "NineML object".format(element))
+        del self[name]
 
     def __eq__(self, other):
         # Ensure all objects are loaded

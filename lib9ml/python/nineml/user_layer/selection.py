@@ -46,8 +46,9 @@ class Selection(BaseULObject, TopLevelObject):
     element_name = "Selection"
     defining_attributes = ('name', 'operation')
 
-    def __init__(self, name, operation):
-        super(Selection, self).__init__()
+    def __init__(self, name, operation, url=None):
+        BaseULObject.__init__(self)
+        TopLevelObject.__init__(self, url)
         self.name = name
         self.operation = operation
 
