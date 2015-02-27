@@ -125,8 +125,9 @@ class Expression(object):
         if isinstance(rhs, sympy.Basic):
             fnames = self._func_re.findall(str(rhs))
             assert (not fnames or
-                    all(fnames in chain(builtin_functions,
-                                        ('And', 'Or', 'Not')))), \
+                    all(fn in chain(builtin_functions,
+                                        ('And', 'Or', 'Not'))
+                        for fn in fnames)), \
                     ("Invalid functions found in Sympy expression: {}"
                      .format(rhs))
             self._rhs = rhs
@@ -180,7 +181,8 @@ class Expression(object):
             arg2 = cls._unwrap_bool(expr.args[1])
             expr_str = '({}) | ({})'.format(arg1, arg2)
         elif isinstance(expr, sympy.Not):
-            expr_str = '!({})'.format(arg1, arg2)
+            arg = cls._unwrap_bool(expr.args[0])
+            expr_str = '!({})'.format(arg)
         else:
             expr_str = str(expr)
         return expr_str
@@ -311,7 +313,7 @@ class Expression(object):
         return self
 
     def negate(self):
-        self.rhs = sympy.Not(self.rhs)
+        self.rhs = sympy.simplify(sympy.Not(self.rhs))
         return self
 
     def simplify(self):

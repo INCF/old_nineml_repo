@@ -30,7 +30,7 @@ class ComponentClassXMLLoader(object):
 
     """
 
-    class_types = ('Dynamics', 'RandomDistribution', 'ConnectionRule', 'KineticDynamics')
+    class_types = ('Dynamics', 'RandomDistribution', 'ConnectionRule', 'Kinetics')
 
     def __init__(self, document=None):
         if document is None:

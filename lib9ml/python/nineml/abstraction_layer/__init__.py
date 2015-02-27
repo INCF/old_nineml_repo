@@ -44,3 +44,4 @@ from .distribution import (
     DistributionClassXMLWriter as RandomDistributionClassXMLWriter)
 from .connectionrule import (ConnectionRuleClassXMLLoader,
                              ConnectionRuleClassXMLWriter)
+from ..extensions.kinetics import KineticsClassXMLLoader
