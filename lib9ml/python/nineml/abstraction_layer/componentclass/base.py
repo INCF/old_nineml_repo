@@ -133,6 +133,8 @@ class ComponentClass(BaseALObject, TopLevelObject):
         try:
             return self._indices[key][element]
         except KeyError:
+            assert element in self, ("Element '{}' does not belong to "
+                                     "component".format(element.name))
             if self._indices[key]:
                 index = max(self._indices[key].itervalues()) + 1
             else:
@@ -169,19 +171,26 @@ class ComponentClass(BaseALObject, TopLevelObject):
                        .format(name, self.name))
 
     def __contains__(self, element):
+        """
+        Comprehensively checks whether the element belongs to this component
+        class or not. Useful for asserts and unit tests.
+        """
         if isinstance(element, basestring):
             try:
                 self[element]
             except KeyError:
                 return False
         else:
-            dct = self._get_member_dict(element)
             try:
-                found = dct[element.name]
-                assert(found == element)
-                return True
-            except KeyError:
-                return False
+                dct = self._get_member_dict(element)
+                try:
+                    found = dct[element.name]
+                    assert(found == element)
+                    return True
+                except KeyError:
+                    return False
+            except NineMLInvalidElementTypeException:
+                return self._find_element(element)
 
     @property
     def parameters(self):
