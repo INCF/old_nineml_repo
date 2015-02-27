@@ -37,7 +37,7 @@ def inf_check(l1, l2, desc):
                                   desc2='Inferred', ignore=['t'], desc=desc)
 
 
-class KineticsClass(DynamicsClass):
+class KineticClass(DynamicsClass):
     defining_attributes = ('_name', '_parameters', '_analog_send_ports',
                            '_analog_receive_ports', '_analog_reduce_ports',
                            '_event_send_ports', '_event_receive_ports',
@@ -63,7 +63,7 @@ class KineticsClass(DynamicsClass):
                 kinetic_states=kinetic_states, reactions=reactions,
                 constraints=constraints, constants=constants, aliases=aliases)
 
-        super(KineticsClass, self).__init__(
+        super(KineticClass, self).__init__(
             name=name, parameters=parameters, event_ports=event_ports,
             analog_ports=analog_ports, dynamicsblock=kineticsblock)
 
@@ -380,7 +380,7 @@ class ReverseRate(ReactionRate):
                                                   self._reaction.from_state)
 
 
-class KineticsClassXMLLoader(DynamicsClassXMLLoader):
+class KineticClassXMLLoader(DynamicsClassXMLLoader):
 
     """This class is used by XMLReader internally.
 
@@ -400,7 +400,7 @@ class KineticsClassXMLLoader(DynamicsClassXMLLoader):
         subnodes = self._load_blocks(element, blocks=blocks)
         kineticsblock = expect_single(subnodes["KineticDynamics"])
 
-        return KineticsClass(
+        return KineticClass(
             name=element.get('name'),
             parameters=subnodes["Parameter"],
             analog_ports=chain(subnodes["AnalogSendPort"],
