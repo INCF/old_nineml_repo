@@ -15,6 +15,7 @@ class TestComponent(unittest.TestCase):
         document1 = read(test_file)
         xml = document1.to_xml()
         document2 = load(xml, read_from=test_file)
+        print document1.find_mismatch(document2)
         self.assertEquals(document1, document2)
 
     def test_prototype_xml_540degree_roundtrip(self):

@@ -53,6 +53,7 @@ class ComponentRenameSymbol(ComponentActionVisitor):
         for d in dicts:
             # Can't use "pythonic" try/except because I want it to work for
             # defaultdicts (i.e. '_indices' dicts) as well
+            assert isinstance(d, dict)
             if self.old_symbol_name in d:
                 d[self.new_symbol_name] = d.pop(self.old_symbol_name)
 
@@ -66,8 +67,8 @@ class ComponentRenameSymbol(ComponentActionVisitor):
                                   componentclass._indices.itervalues()))
 
     def action_mainblock(self, main_block, **kwargs):  # @UnusedVariable
-        self._update_dicts(main_block.aliases, main_block.piecewises,
-                           main_block.constants, main_block.random_variables)
+        self._update_dicts(main_block._aliases, main_block._piecewises,
+                           main_block._constants, main_block._random_variables)
 
     def action_parameter(self, parameter, **kwargs):  # @UnusedVariable
         if parameter.name == self.old_symbol_name:
