@@ -121,9 +121,6 @@ class ComponentClass(BaseALObject, TopLevelObject):
         This function is meant to be useful during code-generation, where an
         name of an element can be replaced with a unique integer value (and
         referenced elsewhere in the code).
-
-        The element would typically be part of the component class, but this
-        is not checked for.
         """
         if key is None:
             try:
@@ -162,11 +159,11 @@ class ComponentClass(BaseALObject, TopLevelObject):
                     "found in member dictionary".format(element.name))
 
     def __getitem__(self, name):
-        for dct in chain(*([m.itervalues() for m in self._class_to_member] +
-                           [m.itervalues()
-                            for m in self._main_block._class_to_member])):
-            if name in dct:
+        for dct in self._all_member_dicts:
+            try:
                 return dct[name]
+            except KeyError:
+                pass
         raise KeyError("'{}' was not found in '{}' component class"
                        .format(name, self.name))
 
@@ -191,6 +188,16 @@ class ComponentClass(BaseALObject, TopLevelObject):
                     return False
             except NineMLInvalidElementTypeException:
                 return self._find_element(element)
+
+    @property
+    def _all_member_dicts(self):
+        return chain(*([m.itervalues() for m in self._class_to_member] +
+                       [m.itervalues()
+                        for m in self._main_block._class_to_member]))
+
+    @property
+    def elements(self):
+        return chain(*(d.itervalues() for d in self._all_member_dicts))
 
     @property
     def parameters(self):
