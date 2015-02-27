@@ -244,6 +244,7 @@ class ComponentClass(BaseALObject, TopLevelObject):
         self.standardize_unit_dimensions()
         XMLWriter = getattr(nineml.abstraction_layer,
                             self.__class__.__name__ + 'XMLWriter')
+        self.validate()
         return XMLWriter().visit(self)
 
     @classmethod
