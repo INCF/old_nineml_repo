@@ -203,7 +203,7 @@ class ComponentClass(BaseALObject, TopLevelObject):
         class_type = ComponentClassXMLLoader.read_class_type(element)
         if class_type == 'KineticDynamics':
             XMLLoader = (
-                nineml.extensions.kinetics.KineticsClassXMLLoader)
+                nineml.extensions.kinetics.KineticClassXMLLoader)
         else:
             XMLLoader = getattr(nineml.abstraction_layer,
                                  class_type + 'ClassXMLLoader')
