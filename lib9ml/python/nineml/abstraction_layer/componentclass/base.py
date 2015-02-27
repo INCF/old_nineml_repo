@@ -8,7 +8,6 @@ This module provides the base class for these.
 :license: BSD-3, see LICENSE for details.
 """
 from abc import ABCMeta
-from itertools import chain
 from collections import defaultdict
 from .. import BaseALObject
 import nineml
