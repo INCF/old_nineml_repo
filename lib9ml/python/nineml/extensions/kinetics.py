@@ -37,7 +37,7 @@ def inf_check(l1, l2, desc):
                                   desc2='Inferred', ignore=['t'], desc=desc)
 
 
-class KineticDynamicsClass(DynamicsClass):
+class KineticsClass(DynamicsClass):
     defining_attributes = ('_name', '_parameters', '_analog_send_ports',
                            '_analog_receive_ports', '_analog_reduce_ports',
                            '_event_send_ports', '_event_receive_ports',
@@ -59,18 +59,18 @@ class KineticDynamicsClass(DynamicsClass):
                     "Either specify a 'kineticdynamics' parameter, or "
                     "kinetic_states, reactions,constraints, but not both!")
         else:
-            kineticsblock = KineticDynamicsBlock(
+            kineticsblock = KineticsBlock(
                 kinetic_states=kinetic_states, reactions=reactions,
                 constraints=constraints, constants=constants, aliases=aliases)
 
         print kineticsblock
-        #super(KineticDynamicsClass, self).__init__(
+        #super(KineticsClass, self).__init__(
         #    name=name, dynamicsblock=kineticsblock)
 
 
         #what the call to the constructor should be, once all of the correct 
         #parameters, units and AnalogReceivePort have been declared in the XML file.
-        super(KineticDynamicsClass, self).__init__(
+        super(KineticsClass, self).__init__(
             name=name, parameters=parameters, event_ports=event_ports,
             analog_ports=analog_ports, dynamicsblock=kineticsblock)
 
@@ -105,7 +105,7 @@ class KineticDynamicsClass(DynamicsClass):
         return self._main_block.constraints.iterkeys()
 
 
-class KineticDynamicsBlock(DynamicsBlock):
+class KineticsBlock(DynamicsBlock):
 
     """
     An object, which encapsulates a component's regimes, transitions,
@@ -225,7 +225,7 @@ class KineticDynamicsBlock(DynamicsBlock):
                                c.state for c in self.constraints.itervalues())]
         
         
-        super(KineticDynamicsBlock, self).__init__(
+        super(KineticsBlock, self).__init__(
             regimes=regimes, aliases=aliases, state_variables=state_variables,
             constants=constants)
 
@@ -418,7 +418,7 @@ class ReverseRate(ReactionRate):
                                                   self._reaction.from_state)
 
 
-class KineticDynamicsClassXMLLoader(DynamicsClassXMLLoader):
+class KineticsClassXMLLoader(DynamicsClassXMLLoader):
 
     """This class is used by XMLReader internally.
 
@@ -433,12 +433,12 @@ class KineticDynamicsClassXMLLoader(DynamicsClassXMLLoader):
 
         blocks = ('Parameter', 'AnalogSendPort', 'AnalogReceivePort',
                   'EventSendPort', 'EventReceivePort', 'AnalogReducePort',
-                  'KineticDynamics')
+                  'Kinetics')
 
         subnodes = self._load_blocks(element, blocks=blocks)
-        kineticsblock = expect_single(subnodes["KineticDynamics"])
+        kineticsblock = expect_single(subnodes["Kinetics"])
 
-        return KineticDynamicsClass(
+        return KineticsClass(
             name=element.get('name'),
             parameters=subnodes["Parameter"],
             analog_ports=chain(subnodes["AnalogSendPort"],
@@ -455,7 +455,7 @@ class KineticDynamicsClassXMLLoader(DynamicsClassXMLLoader):
                      'ForwardRate', 'ReverseRate','Alias')
         subnodes = self._load_blocks(element, blocks=subblocks)
 
-        return KineticDynamicsBlock(
+        return KineticsBlock(
             kinetic_states=subnodes["KineticState"],
             aliases=subnodes["Alias"],
             reactions=subnodes["Reaction"],
@@ -500,7 +500,7 @@ class KineticDynamicsClassXMLLoader(DynamicsClassXMLLoader):
         return ReverseRate(expr)
 
     tag_to_loader = {                 
-        "KineticDynamics": load_kineticsblock,                
+        "Kinetics": load_kineticsblock,                
         "Constraint": load_Constraint,
         "Reaction": load_Reaction,
         "KineticState": load_KineticState,
