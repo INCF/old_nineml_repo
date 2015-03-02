@@ -13,7 +13,7 @@
     <Parameter name="Cm" dimension="specificCapacitance"/>
     <AnalogReducePort name="iSyn" dimension="current" operator="+"/>
     <AnalogReceivePort name="iExt" dimension="current"/>
-    <AnalogSendPort name="U" dimension="dimensionless"/>
+    <AnalogSendPort name="U" dimension="voltage_cubed"/>
     <AnalogSendPort name="V" dimension="voltage"/>
     <EventSendPort name="spikeOutput" mode="send"/>
     <Dynamics>
