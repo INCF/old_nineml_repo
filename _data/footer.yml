@@ -1,0 +1,16 @@
+# Footer navigation links
+
+- title: Home
+  url: /
+
+- title: About
+  url: /about/
+
+- title: By-laws
+  url: /by-laws/
+  
+- title: Committtee
+  url: /committee/
+  
+- title: Mailing lists
+  url: /mailing-lists/

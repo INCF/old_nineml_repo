@@ -4,3 +4,8 @@
 *.lock
 /spec
 _site
+.DS_Store
+.sass-cache
+*.swp
+Gemfile.lock
+/_site

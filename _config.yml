@@ -1,0 +1,32 @@
+# Site wide configuration
+
+title: NineML
+description: "A model description language for neuroscience"
+logo: site_logo.gif
+teaser: 400x250.gif
+locale: en_US
+url: //127.0.0.1:4000
+
+# Jekyll configuration
+
+sass:
+  sass_dir: _sass
+  style: compressed
+permalink: /:categories/:title/
+markdown: kramdown
+highlighter: pygments
+gems:
+  - jekyll-sitemap
+
+
+# Site owner
+owner:
+  name: NineML Standards Committee
+  web: http://nineml.net
+  email: nineml-users@incf.org
+  twitter: nineml
+  bio: "A committee to develop the 9ML standard"
+  avatar: bio-photo.jpg # 160x160 px image for author byline
+
+
+exclude: ["lib", "config.rb", ".sass-cache", "Capfile", "config", "log", "Rakefile", "Rakefile.rb", "tmp", "*.sublime-project", "*.sublime-workspace", "Gemfile", "Gemfile.lock", "README.md", "LICENSE", "node_modules", "Gruntfile.js", "package.json"]

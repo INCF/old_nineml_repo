@@ -1,0 +1,21 @@
+# Site navigation links
+
+- title: Purpose
+  url: /purpose
+  excerpt: "The purpose of 9ML"
+  image: purpose.png
+
+- title: Specification
+  url: /specification/
+  excerpt: "Details of the 9ML specification"
+  image: specification.png
+
+- title: Software
+  url: /software/
+  excerpt: "Software that supports 9ML"
+  image: software.png
+
+- title: Getting Involved
+  url: /getting-involved/
+  excerpt: "How to get involved in the development of the 9ML standard"
+  image: getting-involved.png
