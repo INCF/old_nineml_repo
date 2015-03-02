@@ -1,6 +1,6 @@
 ---
 layout: article
-title: "Software that supports 9ML"
+title: "Software supporting 9ML"
 excerpt: "Known software that supports 9ML"
 image:
   feature:
@@ -10,6 +10,7 @@ share: false
 ads: false
 ---
 
+* [lib9ml (Python)](http://github.com/INCF/lib9ml)
 * [PyNN (Python)](http://neuralensemble.org/PyNN/)
 * [NeMo (Chicken-scheme)](http://wiki.call-cc.org/eggref/4/nemo)
 * [PyDSTool (Python)](http://www.ni.gsu.edu/~rclewley/PyDSTool/FrontPage.html)

@@ -13,14 +13,12 @@ share: false
 
 There are several different ways you can contribute to the 9ML community.
 
-### Writing components
+## Writing component classes
 
-Adding your component classes to the catalog [https://github.com/INCF/nineml/tree/master/catalog](https://github.com/INCF/nineml/tree/master/catalog). Open a GitHub pull-request to add your new component class.
+If you write a new abstraction layer class Adding your component classes to the catalog [https://github.com/INCF/nineml/tree/master/catalog](https://github.com/INCF/nineml/tree/master/catalog). Open a GitHub pull-request to add your new component class.
 
-### Writing extensions
 
-...
+## Joining the committee
 
-### Joining the committee
+The 9ML Standards Committee accepts applications. However, numbers on the committee are limited and each application needs to be approved by at least 2/3 of the committee (see [by-laws](http://nineml.net/by-laws/)). Please send any inquiries to the committee chair ([erik@oist.jp](mailto:erik@oist.jp)).
 
-We accept invitations to join the committee but positions are limited...
