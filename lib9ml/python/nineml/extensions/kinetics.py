@@ -200,6 +200,7 @@ class Constraint(Expression, BaseALObject):
     """
 
     defining_attributes = ('_state', '_rhs')
+
     def accept_visitor(self, visitor, **kwargs):
         """ |VISITATION| """
         return visitor.visit_statevariable(self, **kwargs)

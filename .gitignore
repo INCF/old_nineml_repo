@@ -37,3 +37,4 @@ nineml_mechanisms
 lib9ml/python/MANIFEST
 lib9ml/python/dist
 /catalog/neurons/*.mod
+.sass-cache/
