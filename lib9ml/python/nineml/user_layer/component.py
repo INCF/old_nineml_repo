@@ -1,6 +1,7 @@
 # encoding: utf-8
 from itertools import chain
 from lxml import etree
+from abc import ABCMeta
 from nineml.reference import BaseReference
 from nineml.exceptions import (
     NineMLUnitMismatchError, NineMLRuntimeError, NineMLMissingElementError)
@@ -16,6 +17,8 @@ from nineml.document import Document
 from nineml import TopLevelObject
 from os import path
 
+# Escape property decorator so it can be used alongside property member
+_property = property
 
 class Reference(BaseReference):
     """
@@ -152,7 +155,7 @@ class Component(BaseULObject, TopLevelObject):
         except AttributeError:  # 'check_initial_values' is only in dynamics
             pass
 
-    @property
+    @_property
     def component_class(self):
         """
         Returns the componentclass class from the definition object or the
@@ -164,7 +167,7 @@ class Component(BaseULObject, TopLevelObject):
             defn = defn.componentclass._definition
         return defn.component_class
 
-    @property
+    @_property
     def properties(self):
         """
         The set of componentclass properties (parameter values).
@@ -184,7 +187,7 @@ class Component(BaseULObject, TopLevelObject):
                 .format(prop.name, self.component_class.name))
         self._properties[prop.name] = prop
 
-    @property
+    @_property
     def initial_values(self):
         """
         The set of initial values for the state variables of the
@@ -198,7 +201,7 @@ class Component(BaseULObject, TopLevelObject):
         vals.update(self._initial_values)
         return vals
 
-    @property
+    @_property
     def attributes_with_units(self):
         return set(p for p in chain(self.properties.values(),
                                     self.initial_values.values())
@@ -299,7 +302,7 @@ class Component(BaseULObject, TopLevelObject):
         return cls(name, definition, properties=properties,
                    initial_values=initial_values, url=document.url)
 
-    @property
+    @_property
     def used_units(self):
         return set(p.units for p in self.properties.itervalues())
 
