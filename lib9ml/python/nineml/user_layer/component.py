@@ -175,9 +175,19 @@ class Component(BaseULObject, TopLevelObject):
         # them with properties defined locally
         props = PropertySet()
         if isinstance(self._definition, Prototype):
-            props.update(self._definition.componentclass.properties)
+            props.update(self._definition.properties)
         props.update(self._properties)
         return props
+
+    def property(self, name):
+        return self.properties[name]
+
+    def set(self, prop):
+        if prop.name not in self.component_class.parameter_names:
+            raise NineMLRuntimeError(
+                "'{}' is not a parameter of components of class '{}'"
+                .format(prop.name, self.component_class.name))
+        self._properties[prop.name] = prop
 
     @property
     def initial_values(self):
