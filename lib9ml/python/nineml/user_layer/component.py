@@ -1,7 +1,6 @@
 # encoding: utf-8
 from itertools import chain
 from lxml import etree
-from abc import ABCMeta
 from nineml.reference import BaseReference
 from nineml.exceptions import (
     NineMLUnitMismatchError, NineMLRuntimeError, NineMLMissingElementError)
@@ -107,7 +106,6 @@ class Component(BaseULObject, TopLevelObject):
             :class:`PropertySet` for the componentclass's state variables.
 
     """
-    __metaclass__ = ABCMeta  # Abstract base class
 
     element_name = "Component"
     defining_attributes = ('name', 'component_class', 'properties')
@@ -178,9 +176,6 @@ class Component(BaseULObject, TopLevelObject):
             props.update(self._definition.properties)
         props.update(self._properties)
         return props
-
-    def property(self, name):
-        return self.properties[name]
 
     def set(self, prop):
         if prop.name not in self.component_class.parameter_names:
@@ -316,6 +311,9 @@ class Component(BaseULObject, TopLevelObject):
         doc = E.NineML(*xml, xmlns=nineml_namespace)
         etree.ElementTree(doc).write(file, encoding="UTF-8", pretty_print=True,
                                      xml_declaration=True)
+
+    def property(self, name):
+        return self.properties[name]
 
 
 class Definition(BaseReference):
