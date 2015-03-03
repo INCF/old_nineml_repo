@@ -314,7 +314,7 @@ class ComponentClass(BaseALObject, TopLevelObject):
                 try:
                     inblock_name = next(
                         d for cls, d in
-                        self._class_to_main_block_member.iteritems()
+                        self._main_block._class_to_member.iteritems()
                         if isinstance(element, cls))
                 except StopIteration:
                     raise NineMLInvalidElementTypeException(
