@@ -45,8 +45,11 @@ class RandomDistribution(BaseALObject):
     defining_attributes = ('name', 'parameters')
 
     # Load UncertML schema from file
-    with open(uncertml_schema_path) as f:
-        uncertml_schema = etree.XMLSchema(etree.parse(f))
+    try:
+        with open(uncertml_schema_path) as f:
+            uncertml_schema = etree.XMLSchema(etree.parse(f))
+    except:
+        uncertml_schema = None
 
     E = ElementMaker(namespace=uncertml_namespace,
                      nsmap={"un": uncertml_namespace})
@@ -105,7 +108,7 @@ class RandomDistribution(BaseALObject):
 
     @classmethod
     def _validate_xml(cls, xml):
-        if not cls.uncertml_schema.validate(xml):
+        if cls.uncertml_schema is not None and not cls.uncertml_schema.validate(xml):
             error = cls.uncertml_schema.error_log.last_error
             raise NineMLRuntimeError(
                 "Invalid UncertML XML in Random distribution: {} - {}\n\n{}"
