@@ -39,3 +39,4 @@ lib9ml/python/dist
 /catalog/neurons/*.mod
 /spec/
 .sass-cache
+/_site
