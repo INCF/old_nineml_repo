@@ -10,6 +10,8 @@ share: false
 toc: false
 ---
 
+The current 9ML standardization committee has 7 active members:
+
 * Thomas G. Close
 * Alex Cope
 * Andrew P. Davison
@@ -17,3 +19,5 @@ toc: false
 * Jochen Eppler
 * Ivan Raikov
 * Paul Richmond
+
+Applications to join the committee are accepted although numbers are limited (see by-laws).

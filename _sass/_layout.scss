@@ -94,7 +94,7 @@
 	}
 	li {
 		a {
-			font-weight: 700;
+			font-weight: 900;
 			@include font-size(16,no);
 			line-height: .5 * $masthead-height; // half the height to center vertically
 			color: #nav-color;
@@ -106,7 +106,8 @@
 	@include clearfix;
 	font-weight: 500;
 	a {
-		color: lighten($black,60);
+		color: lighten($black,25);
+		@include font-size(19,no);
 	}
 }
 
@@ -255,7 +256,7 @@
 		padding: 3em;
 	}
 	h1 {
-		@include font-size(48);
+		@include font-size(16);
 		@include media($medium) {
 			@include font-size(60);
 		}
@@ -264,7 +265,7 @@
 		}
 	}
 	h2 {
-		@include font-size(20);
+		@include font-size(13);
 		@include media($medium) {
 			@include font-size(24);
 		}
