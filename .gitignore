@@ -39,3 +39,5 @@ lib9ml/python/dist
 /catalog/neurons/*.mod
 .sass-cache
 /_site
+/spec/aux_files/
+.texlipse
