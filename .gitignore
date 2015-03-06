@@ -9,3 +9,4 @@ _site
 *.swp
 Gemfile.lock
 /_site
+.texlipse
