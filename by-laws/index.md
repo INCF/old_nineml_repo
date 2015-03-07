@@ -1,7 +1,7 @@
 ---
 layout: article
 title: "By-laws"
-modified: 2014-08-27T15:00:35-04:00
+modified: 2014-10-02
 image:
   feature:
   teaser:

@@ -1,23 +1,30 @@
 ---
 layout: article
-title: "Software supporting 9ML"
+title: "Software Gallery"
 excerpt: "Known software that supports 9ML"
 image:
   feature:
   teaser:
   thumb:
+toc: false
 share: false
 ads: false
 ---
 
-* [lib9ml (Python)](http://github.com/INCF/lib9ml)
-* [PyNN (Python)](http://neuralensemble.org/PyNN/)
-* [NeMo (Chicken-scheme)](http://wiki.call-cc.org/eggref/4/nemo)
-* [PyDSTool (Python)](http://www.ni.gsu.edu/~rclewley/PyDSTool/FrontPage.html)
+Below is a collection of software packages (simulators, analysis tools, etc...) that are known to have support for 9ML. Note that this list is flattened so some of the listed packages depend on other packages on the list for 9ML support.
+
 
 <!-- 
+* 
+* [PyNN (Python)](http://neuralensemble.org/PyNN/)
+* 
+* 
+ -->
+
 <div class="tiles">
-{% for post in site.categories.software %}
+{% for post in site.categories.media %}
   {% include post-grid.html %}
 {% endfor %}
-</div>/.tiles -->
+</div>
+
+<!-- /.tiles -->
