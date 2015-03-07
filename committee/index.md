@@ -1,6 +1,6 @@
 ---
 layout: article
-title: "Committee Members"
+title: "Committee"
 modified: 2014-08-27T15:00:35-04:00
 image:
   feature:
@@ -20,4 +20,4 @@ The current 9ML standardization committee has 7 active members:
 * Ivan Raikov
 * Paul Richmond
 
-Applications to join the committee are accepted although numbers are limited (see by-laws).
+Applications to join the committee are accepted although numbers are limited (see [by-laws]({{site.url}}/by-laws/)).
