@@ -8,7 +8,8 @@ image:
   teaser:
 ---
 
-The current 9ML specification, version 1.0, can be downloaded from [here](http://nineml.net/specification/specification.pdf)
-or the latex source can be accessed via the GitHub repository [http://github.com/INCF/nineml/](http://github.com/INCF/nineml/).
+The current 9ML specification is [version 1.0](http://nineml.net/specification/specification.pdf).
 
-The corresponding 9ML schema can be downloaded from [here (http://nineml.net/9ML/1.0/NineML_v1.0.xsd)](http://nineml.net/9ML/1.0/NineML_v1.0.xsd). However, note that schema only validates the model hierachy and basic types, not all the requirements of valid 9ML descriptions (which are in the specification).
+The corresponding XML schema is located at [http://nineml.net/9ML/1.0/NineML_v1.0.xsd](http://nineml.net/9ML/1.0/NineML_v1.0.xsd). However, note that schema only validates the model hierachy and basic types, i.e. not all the requirements described in the specification.
+
+For full validation of 9ML models, please use the officially supported [lib9ML Python package](http://github.com/INCF/lib9ML). Software written in Python, or with a Python interface, can also take advantage of the convenient lib9ML API in order to add support for 9ML.  
