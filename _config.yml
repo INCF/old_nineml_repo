@@ -5,9 +5,7 @@ description: "A model description language for neuroscience"
 logo: site_logo.png
 teaser: default-teaser.png
 locale: en_US
-url: //127.0.0.1:4000 
-
-#http://tclose.github.io/nineml/
+url: http://tclose.github.io/nineml/
 
 # Jekyll configuration
 
@@ -28,7 +26,7 @@ owner:
   email: nineml-users@incf.org
   twitter: nineml
   bio: ""
-  avatar: site_logo.png # 160x160 px image for author byline
+  avatar: site_logo.png
 
 
 exclude: ["lib", "config.rb", ".sass-cache", "Capfile", "config", "log", "Rakefile", "Rakefile.rb", "tmp", "*.sublime-project", "*.sublime-workspace", "Gemfile", "Gemfile.lock", "README.md", "LICENSE", "node_modules", "Gruntfile.js", "package.json"]
