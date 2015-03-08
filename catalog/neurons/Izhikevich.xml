@@ -3,9 +3,9 @@
   xsi:schemaLocation="http://nineml.net/9ML/1.0/schema/NineML_v1.0.xsd">
   <ComponentClass name="IzhikevichClass">
     <Parameter name="a" dimension="dimensionless"/>
-    <Parameter name="b" dimension="dimensionless"/>
+    <Parameter name="b" dimension="per_voltage3"/>
     <Parameter name="c" dimension="voltage"/>
-    <Parameter name="k" dimension="dimensionless"/>
+    <Parameter name="k" dimension="conductance_per_voltage"/>
     <Parameter name="Vr" dimension="voltage"/>
     <Parameter name="Vt" dimension="voltage"/>
     <Parameter name="Vb" dimension="voltage"/>
@@ -58,22 +58,23 @@
         </OnCondition>
       </Regime>
       <Alias name="dV">
-        <MathInline>(k * (V - Vr) * (V - Vt) - U + iSyn + iExt) / Cm</MathInline>
+        <MathInline>(k * (V - Vr) * (V - Vt) - U * unitI + iSyn + iExt) / Cm</MathInline>
       </Alias>
+      <Constant name="unitI" units="A">1</Constant>
     </Dynamics>
   </ComponentClass>
   <Component name="Izhikevich">
     <Definition>IzhikevichClass</Definition>
-    <Property name="a">
+    <Property name="a" units="none">
       <SingleValue>0.02</SingleValue>
     </Property>
-    <Property name="b">
+    <Property name="b" units="per_V3">
       <SingleValue>0.25</SingleValue>
     </Property>
     <Property name="c" units="mV">
       <SingleValue>-45.0</SingleValue>
     </Property>
-    <Property name="k">
+    <Property name="k" units="S_per_V">
       <SingleValue>1</SingleValue>
     </Property>
     <Property name="Vpeak" units="mV">
@@ -94,9 +95,15 @@
   </Component>
   <Dimension name="dimensionless"/>
   <Dimension name="voltage" m="1" l="2" t="-3" i="-1"/>
+  <Dimension name="per_voltage3" m="-3" l="-6" t="9" i="3"/>
+  <Dimension name="conductance_per_voltage" m="-2" l="-4" t="6" i="3"/>
   <Dimension name="specificCapacitance" m="-1" l="-4" t="4" i="2"/>
   <Dimension name="current" i="1"/>
+  <Unit symbol="none" dimension="dimensionless"/>
   <Unit symbol="mV" dimension="voltage" power="-3"/>
   <Unit symbol="uF" dimension="specificCapacitance" power="-6"/>
   <Unit symbol="pA" dimension="current" power="-12"/>
+  <Unit symbol="A" dimension="current" power="0"/>
+  <Unit symbol="per_V3" dimension="per_voltage3" power="0"/>
+  <Unit symbol="S_per_V" dimension="conductance_per_voltage" power="0"/>
 </NineML>
