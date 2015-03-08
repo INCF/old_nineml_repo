@@ -1,7 +1,6 @@
 ---
-layout: article
+layout: archive
 title: News
-excerpt: "This page describes the aims of 9ML"
 image:
   feature:
   teaser:
@@ -10,3 +9,10 @@ share: false
 ads: false
 ---
 
+All the latest updates and upcoming plans for 9ML:
+
+<div class="tiles">
+{% for post in site.categories.news %}
+  {% include post-list.html %}
+{% endfor %}
+</div><!-- /.tiles -->
