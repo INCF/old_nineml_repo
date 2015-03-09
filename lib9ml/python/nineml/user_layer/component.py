@@ -11,6 +11,7 @@ from nineml.xmlns import NINEML, E
 from nineml.annotations import read_annotations, annotate_xml
 from nineml.utils import expect_single, check_tag, check_units
 from ..abstraction_layer.units import Unit, unitless
+from ..abstraction_layer import ComponentClass
 from .values import SingleValue, ArrayValue, ExternalArrayValue
 from . import BaseULObject
 from nineml.document import Document
@@ -128,6 +129,8 @@ class Component(BaseULObject, TopLevelObject):
                 name=path.basename(definition).replace(".xml", ""),
                 document=Document(_url=definition),
                 url=definition)
+        elif isinstance(definition, ComponentClass):
+            definition = Definition(definition.name, Document(definition))
         elif not (isinstance(definition, Definition) or
                   isinstance(definition, Prototype)):
             raise ValueError("'definition' must be either a 'Definition' or "
