@@ -310,7 +310,7 @@
 .breadcrumbs {
 	@include row;
 	margin-top: $gutter;
-	@include font-size(10,no);
+	@include font-size(14,no);
 	a {
 		display: inline-block;
 		font-family: $alt-font;

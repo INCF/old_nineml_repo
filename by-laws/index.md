@@ -1,5 +1,5 @@
 ---
-layout: article
+layout: by-laws
 title: "By-laws"
 modified: 2014-10-02
 image:

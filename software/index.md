@@ -15,7 +15,7 @@ Below is the collection of software packages (simulators, analysis tools, etc...
 (See these [instructions](add_your_tool.html) to add your 9ML supporting software to this list)
 
 <div class="tiles">
-{% for post in site.categories.software %}
+{% for post in site.categories.software reversed %}
   {% include post-grid.html %}
 {% endfor %}
 </div><!-- /.tiles -->
