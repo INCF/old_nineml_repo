@@ -87,6 +87,62 @@ class Dimension(BaseALObject, TopLevelObject):
         kwargs['url'] = document.url
         return cls(name, **kwargs)
 
+    @property
+    def t(self):
+        return self._dims.get('t', 0)
+
+    @property
+    def k(self):
+        return self._dims.get('k', 0)
+
+    @property
+    def j(self):
+        return self._dims.get('j', 0)
+
+    @property
+    def n(self):
+        return self._dims.get('n', 0)
+
+    @property
+    def m(self):
+        return self._dims.get('m', 0)
+
+    @property
+    def l(self):
+        return self._dims.get('l', 0)
+
+    @property
+    def i(self):
+        return self._dims.get('i', 0)
+
+    @property
+    def time(self):
+        return self.t
+
+    @property
+    def temperature(self):
+        return self.k
+
+    @property
+    def luminous_intensity(self):
+        return self.j
+
+    @property
+    def amount(self):
+        return self.n
+
+    @property
+    def mass(self):
+        return self.m
+
+    @property
+    def length(self):
+        return self.l
+
+    @property
+    def current(self):
+        return self.i
+
 
 class Unit(BaseALObject, TopLevelObject):
     """
