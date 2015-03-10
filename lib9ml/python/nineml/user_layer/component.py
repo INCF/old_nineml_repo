@@ -17,8 +17,6 @@ from nineml.document import Document
 from nineml import TopLevelObject
 from os import path
 
-# Escape property decorator so it can be used alongside property member
-_property = property
 
 class Reference(BaseReference):
     """
@@ -131,6 +129,8 @@ class Component(BaseULObject, TopLevelObject):
                 name=path.basename(definition).replace(".xml", ""),
                 document=Document(url=definition),
                 url=definition)
+        elif isinstance(definition, ComponentClass):
+            definition = Definition(definition.name, Document(definition))
         elif not (isinstance(definition, Definition) or
                   isinstance(definition, Prototype)):
             raise ValueError("'definition' must be either a 'Definition' or "
@@ -155,7 +155,7 @@ class Component(BaseULObject, TopLevelObject):
         except AttributeError:  # 'check_initial_values' is only in dynamics
             pass
 
-    @_property
+    @property
     def component_class(self):
         """
         Returns the componentclass class from the definition object or the
@@ -167,7 +167,7 @@ class Component(BaseULObject, TopLevelObject):
             defn = defn.componentclass._definition
         return defn.component_class
 
-    @_property
+    @property
     def properties(self):
         """
         The set of componentclass properties (parameter values).
@@ -187,7 +187,7 @@ class Component(BaseULObject, TopLevelObject):
                 .format(prop.name, self.component_class.name))
         self._properties[prop.name] = prop
 
-    @_property
+    @property
     def initial_values(self):
         """
         The set of initial values for the state variables of the
@@ -201,7 +201,7 @@ class Component(BaseULObject, TopLevelObject):
         vals.update(self._initial_values)
         return vals
 
-    @_property
+    @property
     def attributes_with_units(self):
         return set(p for p in chain(self.properties.values(),
                                     self.initial_values.values())
@@ -227,9 +227,9 @@ class Component(BaseULObject, TopLevelObject):
         return "\n".join(d)
 
     def get_definition(self):
-        if not self._definition.componentclass:
+        if not self._definition.component_class:
             self._definition.retrieve()
-        return self._definition.componentclass
+        return self._definition.component_class
 
     def check_properties(self):
         # First check the names
@@ -302,7 +302,7 @@ class Component(BaseULObject, TopLevelObject):
         return cls(name, definition, properties=properties,
                    initial_values=initial_values, url=document.url)
 
-    @_property
+    @property
     def used_units(self):
         return set(p.units for p in self.properties.itervalues())
 
