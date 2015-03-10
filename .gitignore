@@ -40,4 +40,4 @@ lib9ml/python/dist
 .sass-cache
 .texlipse
 /_site
-/spec/
+/spec/aux_files/
