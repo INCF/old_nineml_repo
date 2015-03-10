@@ -11,6 +11,7 @@ from nineml.xmlns import NINEML, E
 from nineml.annotations import read_annotations, annotate_xml
 from nineml.utils import expect_single, check_tag, check_units
 from ..abstraction_layer.units import Unit, unitless
+from ..abstraction_layer import ComponentClass
 from .values import SingleValue, ArrayValue, ExternalArrayValue
 from . import BaseULObject
 from nineml.document import Document
@@ -164,7 +165,7 @@ class Component(BaseULObject, TopLevelObject):
         """
         defn = self._definition
         while not isinstance(defn, Definition):
-            defn = defn.componentclass._definition
+            defn = defn.component_class._definition
         return defn.component_class
 
     @property
