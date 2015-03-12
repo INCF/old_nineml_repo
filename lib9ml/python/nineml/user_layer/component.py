@@ -498,8 +498,11 @@ class Quantity(BaseULObject):
             units = document[units_str]
         except KeyError:
             raise NineMLMissingElementError(
-                "Did not find definition of '{}' units in the current document."
-                .format(units_str))
+                "Did not find definition of '{}' units in the current document"
+                " '{}'.".format(
+                    units_str,
+                    path.normpath(document.url)
+                    if document.url is not None else '<generated>'))
         return cls(value=value, units=units)
 
 

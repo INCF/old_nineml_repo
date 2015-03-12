@@ -23,7 +23,8 @@ import distribution
 import distribution as randomdistribution
 import units
 import ports
-from .componentclass import Parameter, ComponentClass, NamespaceAddress
+from .componentclass import (
+    Parameter, ComponentClass, NamespaceAddress)
 from .expressions import Alias, Expression
 from .dynamics import (DynamicsClass, Regime,
                        OutputEvent, StateAssignment, TimeDerivative,
