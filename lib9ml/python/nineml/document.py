@@ -19,6 +19,7 @@ class Document(dict, BaseNineMLObject):
     """
 
     element_name = 'NineML'
+    defining_attributes = ('elements',)
 
     # A tuple to hold the unresolved elements
     _Unloaded = collections.namedtuple('_Unloaded', 'name xml cls')
@@ -91,6 +92,10 @@ class Document(dict, BaseNineMLObject):
         if isinstance(elem, self._Unloaded):
             elem = self._load_elem_from_xml(elem)
         return elem
+
+    @property
+    def elements(self):
+        return dict(self.iteritems())
 
     def itervalues(self):
         for v in super(Document, self).itervalues():

@@ -111,7 +111,7 @@ class Component(BaseULObject, TopLevelObject):
     """
 
     element_name = "Component"
-    defining_attributes = ('name', 'component_class', 'properties')
+    defining_attributes = ('name', 'component_class', 'property_set')
     children = ("Property", "Definition", 'Prototype')
 
     # initial_values is temporary, the idea longer-term is to use a separate
@@ -230,13 +230,13 @@ class Component(BaseULObject, TopLevelObject):
         # updates them with properties defined locally
         vals = InitialValueSet()
         if isinstance(self.definition, Prototype):
-            vals.update(self.definition.componentclass.initial_values)
+            vals.update(self.definition.component.initial_values)
         vals.update(self._initial_values)
         return vals
 
     @property
     def attributes_with_units(self):
-        return set(p for p in chain(self.properties.values(),
+        return set(p for p in chain(self.properties,
                                     self.initial_values.values())
                    if p.units is not None)
 
