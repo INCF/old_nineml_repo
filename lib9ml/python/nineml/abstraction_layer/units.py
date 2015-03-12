@@ -36,7 +36,8 @@ class Dimension(BaseALObject, TopLevelObject):
         self._dims = kwargs
 
     def __eq__(self, other):
-        assert isinstance(other, Dimension)
+        if not isinstance(other, Dimension):
+            return False
         return all(self.power(d) == other.power(d) for d in self.valid_dims)
 
     def __hash__(self):
@@ -163,9 +164,8 @@ class Unit(BaseALObject, TopLevelObject):
     def __eq__(self, other):
         if not isinstance(other, Unit):
             return False
-        else:
-            return (self.power == other.power and self.offset == other.offset
-                    and self.dimension == other.dimension)
+        return (self.power == other.power and self.offset == other.offset and
+                self.dimension == other.dimension)
 
     def __hash__(self):
         return hash((self.power, self.offset, self.dimension))

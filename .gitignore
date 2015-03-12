@@ -41,3 +41,4 @@ lib9ml/python/dist
 .texlipse
 /_site
 /spec/aux_files/
+/spec/
