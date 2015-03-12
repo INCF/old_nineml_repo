@@ -1,14 +1,18 @@
 from copy import copy
+from collections import defaultdict
 from nineml.xmlns import E, NINEML
 from nineml import TopLevelObject
 
 
-class Annotations(dict, TopLevelObject):
+class Annotations(defaultdict, TopLevelObject):
     """
     Defines the dimension used for quantity units
     """
 
     element_name = 'Annotations'
+
+    def __init__(self, *args, **kwargs):
+        super(Annotations, self).__init__(dict, *args, **kwargs)
 
     def __repr__(self):
         return ("Annotations({})"
