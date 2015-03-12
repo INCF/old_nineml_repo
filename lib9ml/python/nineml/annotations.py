@@ -11,8 +11,13 @@ class Annotations(defaultdict, TopLevelObject):
 
     element_name = 'Annotations'
 
+    @classmethod
+    def _dict_tree(cls):
+        return defaultdict(cls._dict_tree)
+
     def __init__(self, *args, **kwargs):
-        super(Annotations, self).__init__(dict, *args, **kwargs)
+        # Create an infinite (on request) tree of defaultdicts
+        super(Annotations, self).__init__(self._dict_tree, *args, **kwargs)
 
     def __repr__(self):
         return ("Annotations({})"
