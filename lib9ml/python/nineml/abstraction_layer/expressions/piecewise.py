@@ -10,6 +10,7 @@ class Piecewise(BaseALObject):
     defining_attributes = ('name', 'pieces', 'otherwise')
 
     def __init__(self, name, pieces, otherwise):
+        super(Piecewise, self).__init__()
         self.name = name
         self.pieces = pieces
         self.otherwise = otherwise
@@ -40,7 +41,8 @@ class Piece(Expression, BaseALObject):
     defining_attributes = ('_rhs', 'condition')
 
     def __init__(self, expr, condition):
-        super(Piece, self).__init__(expr)
+        BaseALObject.__init__(self)
+        Expression.__init__(self, expr)
         if isinstance(condition, basestring):
             condition = Condition(condition)
         self.condition = condition
@@ -75,6 +77,10 @@ class Otherwise(Expression, BaseALObject):
 
     element_name = "Otherwise"
 
+    def __init__(self, expr):
+        BaseALObject.__init__(self)
+        Expression.__init__(self, expr)
+
     def __repr__(self):
         return "Otherwise(expr='{}')".format(self.rhs)
 
@@ -89,6 +95,10 @@ class Otherwise(Expression, BaseALObject):
 class Condition(Expression, BaseALObject):
 
     element_name = "Condition"
+
+    def __init__(self, rhs):
+        BaseALObject.__init__(self)
+        Expression.__init__(self, rhs)
 
     def __str__(self):
         return self.rhs
