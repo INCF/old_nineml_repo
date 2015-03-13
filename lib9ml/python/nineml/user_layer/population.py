@@ -124,6 +124,7 @@ class PositionList(BaseULObject, TopLevelObject):
         `structure` should be a Structure componentclass.
         """
         super(PositionList, self).__init__()
+        BaseULObject.__init__(self)
         TopLevelObject.__init__(self, url=url)
         if positions and structure:
             raise Exception("Please provide either positions or structure, "

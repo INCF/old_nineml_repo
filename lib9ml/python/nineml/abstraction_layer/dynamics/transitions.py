@@ -47,6 +47,7 @@ class Transition(BaseALObject):
             here: XXXXXXX
 
         """
+        super(Transition, self).__init__()
         if target_regime_name:
             assert isinstance(target_regime_name, basestring)
 
@@ -281,13 +282,14 @@ class OnCondition(Transition):
         return self.trigger.rhs
 
 
-class Trigger(Expression):
+class Trigger(BaseALObject, Expression):
 
     def accept_visitor(self, visitor, **kwargs):
         """ |VISITATION| """
         return visitor.visit_trigger(self, **kwargs)
 
     def __init__(self, rhs):
+        BaseALObject.__init__(self)
         Expression.__init__(self, rhs)
 
     def __repr__(self):
@@ -373,6 +375,7 @@ class OutputEvent(BaseALObject):
             ``NineMLRuntimeException`` will be raised.
 
         """
+        super(OutputEvent, self).__init__()
         self._port_name = port_name.strip()
         ensure_valid_identifier(self._port_name)
 

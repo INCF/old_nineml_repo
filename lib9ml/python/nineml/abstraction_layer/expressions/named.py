@@ -59,6 +59,7 @@ class Alias(BaseALObject, ExpressionWithSimpleLHS):
             Component.
 
         """
+        BaseALObject.__init__(self)
         ExpressionWithSimpleLHS.__init__(self, lhs, rhs)
 
     def __repr__(self):
@@ -99,6 +100,7 @@ class Constant(BaseALObject, ExpressionSymbol):
     defining_attributes = ('name', 'value', 'units')
 
     def __init__(self, name, value, units):
+        super(Constant, self).__init__()
         self._name = name
         self._value = value
         self._units = units

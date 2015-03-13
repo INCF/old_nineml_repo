@@ -13,6 +13,7 @@ class RandomVariable(BaseALObject, ExpressionSymbol):
     defining_attributes = ('name', 'distribution', 'units')
 
     def __init__(self, name, distribution, units):
+        super(RandomVariable, self).__init__()
         self.name = name
         self.distribution = distribution
         self.units = units
@@ -70,6 +71,7 @@ class RandomDistribution(BaseALObject):
                         'Uniform': ('minimum', 'maximum', 'numberOfClasses')}
 
     def __init__(self, name, parameters, validate=True):
+        super(RandomDistribution, self).__init__()
         self.name = name
         self.parameters = parameters
         # Convert to xml and check against UncertML schema

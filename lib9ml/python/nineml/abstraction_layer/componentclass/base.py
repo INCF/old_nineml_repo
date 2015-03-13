@@ -40,6 +40,7 @@ class Parameter(BaseALObject, ExpressionSymbol):
 
         `name` -- The name of the parameter.
         """
+        super(Parameter, self).__init__()
         name = name.strip()
         ensure_valid_identifier(name)
 
@@ -353,7 +354,7 @@ class MainBlock(BaseALObject):
            :param aliases: A list of aliases, which must be either |Alias|
                objects or ``string``s.
         """
-
+        super(MainBlock, self).__init__()
         aliases = normalise_parameter_as_list(aliases)
         constants = normalise_parameter_as_list(constants)
         random_variables = normalise_parameter_as_list(random_variables)
