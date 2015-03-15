@@ -21,7 +21,7 @@ Don't be shy, there are no stupid questions! Each query on the mailing list impr
 
 ## Raise an issue
 
-Find a problem with the specification or want to suggest an enhancement? Please file an issue in the [9ML issue tracker](https://github.com/INCF/nineml/issues). But before you do please search through the existing issues to see whether a similar issue has already been raised.
+Find a problem with the specification or want to suggest an enhancement? Please file an issue in the [9ML issue tracker](https://github.com/INCF/nineml/issues). But before you do please search through the existing issues to see whether a similar issue has already been raised, and if so, add your comment there instead. 
 
 ## Write a component class
 
