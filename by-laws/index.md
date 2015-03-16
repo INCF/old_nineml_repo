@@ -1,7 +1,7 @@
 ---
 layout: by-laws
 title: "By-laws"
-modified: 2014-10-02
+modified: 2014-03-25
 image:
   feature:
   teaser:
