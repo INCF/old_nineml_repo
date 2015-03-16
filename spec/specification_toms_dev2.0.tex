@@ -110,7 +110,7 @@
 \newcommand{\SubComponent}{\defRef{\textbf{\class{SubComponent}}\xspace}{sec:SubComponent}}
 \newcommand{\PortExposure}{\defRef{\textbf{\class{PortExposure}}\xspace}{sec:PortExposure}}
 \newcommand{\MetaParameter}{\defRef{\textbf{\class{MetaParameter}}\xspace}{sec:MetaParameter}}
-\newcommand{\ReceiveConnection}{\defRef{\textbf{\class{ReceiveConnection}}\xspace}{sec:ReceiveConnection}}
+\newcommand{\PortConnection}{\defRef{\textbf{\class{PortConnection}}\xspace}{sec:PortConnection}}
 \newcommand{\FromSister}{\defRef{\textbf{\class{FromSister}}\xspace}{sec:FromSister}}
 \newcommand{\FromDomainID}{\defRef{\textbf{\class{FromDomainID}}\xspace}{sec:FromDomainID}}
 \newcommand{\MultiComponent}{\defRef{\textbf{\class{MultiComponent}}\xspace}{sec:MultiComponent}}
@@ -1592,7 +1592,7 @@ Which subset to select from the provisional connections is determined by the \Ma
     \Definition | \Prototype & singleton & yes \\ 
     \Property & set & no\\
     \DerivedProperty & set & no\\
-    \ReceiveConnection & set & no\\    
+    \PortConnection & set & no\\    
     \bottomrule
   \end{edtable}
 \end{table}
@@ -1653,7 +1653,7 @@ The name of the \ComponentClass to be referenced \ComponentClass needs to be pro
   \end{edtable}
 \end{table}
 
-\draftnote{This would be a bit nicer if we split the user layer into composition and parameterisation layers as then \Prototype{}s could be in the parameterisation layer and not have any \ReceiveConnection{}s, which don't really make sense in a prototype.}
+\draftnote{This would be a bit nicer if we split the user layer into composition and parameterisation layers as then \Prototype{}s could be in the parameterisation layer and not have any \PortConnection{}s, which don't really make sense in a prototype.}
 
 The \Prototype element establishes a link to an existing User Layer \Component, which defines the \ComponentClass and default properties of the \Component.  The reference \Component can be located either in the current
 document or in another file if a \textit{url} attribute is provided. Selected properties provided by the \Prototype\pointto\Component are then overridden by the referencing \Component.
@@ -1863,13 +1863,13 @@ Each \ExternalArrayValue must have a \textit{columnName} attribute, which refers
 
 \section{Port Connections}
 
-\subsection{ReceiveConnection}
-\label{sec:ReceiveConnection}
+\subsection{PortConnection}
+\label{sec:PortConnection}
 
 \begin{table}[H]
   \begin{edtable}{tabular}{llr}
     \toprule
-    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{ReceiveConnection Structure}}}\\
+    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{PortConnection Structure}}}\\
     \toprule
     \em{Attribute name} & \em{Type/Format} & \em{Required} \\
     \midrule \relax
@@ -1882,10 +1882,10 @@ Each \ExternalArrayValue must have a \textit{columnName} attribute, which refers
   \end{edtable}
 \end{table}
 
-The \ReceiveConnection element specifies a receive port which will receive a connection from a port of a remote component or container. Depending on the type of the \Component{}\withelem{}\ComponentClass the source of remote port to be connected can vary and are specified by different ``port source'' objects, e.g. \FromSource, \FromDestination and \FromSynapse  in \Projection containers.
+The \PortConnection element specifies a receive port which will receive a connection from a port of a remote component or container. Depending on the type of the \Component{}\withelem{}\ComponentClass the source of remote port to be connected can vary and are specified by different ``port source'' objects, e.g. \FromSource, \FromDestination and \FromSynapse  in \Projection containers.
 
 \subsubsection{Port attribute}
-Each \ReceiveConnection element requires a \textit{port} attribute. This should refer to the name of a port in the class definition of the component.
+Each \PortConnection element requires a \textit{port} attribute. This should refer to the name of a port in the class definition of the component.
 
 \subsection{FromDistribution}
 \label{sec:FromDistribution}
@@ -1955,7 +1955,7 @@ The \textit{of} attribute specifies which index should be supplied. Within a \Po
 The \FromSource element specifies a port connection to the projection component (either the destination cell, post-synaptic response or plasticity dynamics) inside which it is inserted from the source cell dynamics. The delay on transmission of the port connection is specified by a \Delay element. If a \Delay element is not provided the delay is zero.
 
 \subsubsection{port attribute}
-Each \FromSource element requires a \textit{port} attribute. This should refer to the name of a \AnalogSendPort or \EventSendPort in the \Source\withelem\Cell{}\withelem\Component{}\withelem\ComponentClass. The transmission mode of the port (i.e. \lq\lq{}analog\rq\rq{} or \lq\lq{}event\rq\rq{}) should match that of the port referenced by the enclosing \ReceiveConnection element.
+Each \FromSource element requires a \textit{port} attribute. This should refer to the name of a \AnalogSendPort or \EventSendPort in the \Source\withelem\Cell{}\withelem\Component{}\withelem\ComponentClass. The transmission mode of the port (i.e. \lq\lq{}analog\rq\rq{} or \lq\lq{}event\rq\rq{}) should match that of the port referenced by the enclosing \PortConnection element.
 
 \subsection{FromDestination}
 \label{sec:FromDestination}
@@ -1979,7 +1979,7 @@ Each \FromSource element requires a \textit{port} attribute. This should refer t
 The \FromDestination element specifies a port connection to the projection component (either the source cell, post-synaptic response or plasticity dynamics) inside which it is inserted from the destination cell dynamics. The delay on transmission of the port connection is specified by a \Delay element. If a \Delay element is not provided the delay is zero.
 
 \subsubsection{port attribute}
-Each \FromDestination element requires a \textit{port} attribute. This should refer to the name of a \AnalogSendPort or \EventSendPort in the \Destination\withelem\Cell\withelem\Component{}\withelem\ComponentClass. The transmission mode of the port (i.e. \lq\lq{}analog\rq\rq{} or \lq\lq{}event\rq\rq{}) should match that of the port referenced by the enclosing \ReceiveConnection element.
+Each \FromDestination element requires a \textit{port} attribute. This should refer to the name of a \AnalogSendPort or \EventSendPort in the \Destination\withelem\Cell\withelem\Component{}\withelem\ComponentClass. The transmission mode of the port (i.e. \lq\lq{}analog\rq\rq{} or \lq\lq{}event\rq\rq{}) should match that of the port referenced by the enclosing \PortConnection element.
 
 
 \subsection{FromSynapse}
@@ -2004,7 +2004,7 @@ Each \FromDestination element requires a \textit{port} attribute. This should re
 The \FromSynapse element specifies a port connection to the source or destination cell component from the \Synapse element. The delay on transmission of the port connection is specified by a \Delay element. If a \Delay element is not provided the delay is zero.
 
 \subsubsection{port attribute}
-Each \FromSynapse element requires a \textit{port} attribute. This should refer to the name of a \AnalogSendPort or \EventSendPort in the \Synapse\withelem\ComponentClass. The transmission mode of the port (i.e. \lq\lq{}analog\rq\rq{} or \lq\lq{}event\rq\rq{}) should match that of the port referenced by the enclosing \ReceiveConnection element.
+Each \FromSynapse element requires a \textit{port} attribute. This should refer to the name of a \AnalogSendPort or \EventSendPort in the \Synapse\withelem\ComponentClass. The transmission mode of the port (i.e. \lq\lq{}analog\rq\rq{} or \lq\lq{}event\rq\rq{}) should match that of the port referenced by the enclosing \PortConnection element.
 
 \subsection{Delay}
 \label{sec:Delay}
@@ -2177,7 +2177,7 @@ Each \Projection requires a \textit{name} attribute, which should be a valid \id
     \em{Element type} & \em{Multiplicity} & \em{Required} \\
     \midrule
     \Reference{}\pointto\Population | \Reference{}\pointto\Selection & singleton & yes \\
-    \ReceiveConnection & set & no\\
+    \PortConnection & set & no\\
     \bottomrule
   \end{edtable}
 \end{table}
@@ -2195,7 +2195,7 @@ The \Source element specifies the pre-synaptic population or selection (see \Sel
     \em{Element type} & \em{Multiplicity} & \em{Required} \\
     \midrule
     \Reference{}\pointto\Population | \Reference{}\pointto\Selection & singleton & yes \\
-    \ReceiveConnection & set & yes\\
+    \PortConnection & set & yes\\
     \bottomrule
   \end{edtable}
 \end{table}
@@ -2373,12 +2373,12 @@ Each \ComponentClass requires a \textit{name} attribute, which should be a valid
     \em{Element type} & Multiplicity & \em{Required} \\
     \midrule \relax
     \Component\withelem\Dynamics | \Reference{}\pointto\Component\withelem\Dynamics & singleton & yes\\
-    \ReceiveConnection & set & yes\\
+    \PortConnection & set & yes\\
     \bottomrule
   \end{edtable}
 \end{table}
 
-\SubComponent elements can refer to any \ComponentClass\withelem\Dynamics class. They elements are explicitly connected to other \SubComponent elements via ports specified by \ReceiveConnection\withelem{}\FromSister elements. Apart from accepting \ReceiveConnection elements, \SubComponent elements are the defined the same as \Component elements.
+\SubComponent elements can refer to any \ComponentClass\withelem\Dynamics class. They elements are explicitly connected to other \SubComponent elements via ports specified by \PortConnection\withelem{}\FromSister elements. Apart from accepting \PortConnection elements, \SubComponent elements are the defined the same as \Component elements.
 
 \subsubsection{Name attribute}
 Each \MultiComponent requires a \textit{name} attribute, which should be a valid \identifier and uniquely identify the {\MultiComponent} in the global scope.
@@ -2520,7 +2520,7 @@ The mapping array is a list of indices corresponding to the \Domain{}@index attr
     \em{Element type} & Multiplicity & \em{Required} \\
     \midrule \relax
     \Component\withelem\Dynamics | \Reference{}\pointto\Component\withelem\Dynamics & singleton & yes\\
-    \ReceiveConnection & set & yes\\
+    \PortConnection & set & yes\\
     \bottomrule
   \end{edtable}
 \end{table}
@@ -2605,7 +2605,7 @@ Each \FromProximal requires a \textit{port} attribute, which should refer to the
   \end{edtable}
 \end{table}
 
-\FromDistal elements without a component attribute accept ports from any compartments that are connected to it (assumes ports have the same name in different domains). With a name attribute they are only connected if the compartment is of the corresponding domain. \ReceiveConnection elements with \FromDistal child elements must be able to handle multiple port connections, i.e. they must be either \EventReceivePort, \AnalogReducePort or \AnalogArrayPort elements.
+\FromDistal elements without a component attribute accept ports from any compartments that are connected to it (assumes ports have the same name in different domains). With a name attribute they are only connected if the compartment is of the corresponding domain. \PortConnection elements with \FromDistal child elements must be able to handle multiple port connections, i.e. they must be either \EventReceivePort, \AnalogReducePort or \AnalogArrayPort elements.
 
 \subsubsection{Domain attribute}
 Each \FromProximal can define a \textit{domain} attribute. If present the \textit{domain} attribute should refer to a \Domain within the \MultiCompartmental scope.
@@ -3057,9 +3057,9 @@ in this simulation}
           <SingleValue>0.0025</SingleValue>
         </Property>
       </Component>
-      <ReceiveConnection port="V">
+      <PortConnection port="V">
         <FromSister component="membrane" port="V"/>
-      </ReceiveConnection>
+      </PortConnection>
     </SubComponent>
     <SubComponent name="K">
       <Component>
@@ -3068,9 +3068,9 @@ in this simulation}
           <SingleValue>0.0036</SingleValue>
         </Property>
       </Component>
-      <ReceiveConnection port="V">
+      <PortConnection port="V">
         <FromSister component="membrane" port="V"/>
-      </ReceiveConnection>
+      </PortConnection>
     </SubComponent>
     <SubComponent name="leak">
       <Component>
@@ -3082,9 +3082,9 @@ in this simulation}
           <SingleValue>-21</SingleValue>
         </Property>
       </Component>
-      <ReceiveConnection port="V">
+      <PortConnection port="V">
         <FromSister component="membrane" port="V"/>
-      </ReceiveConnection>
+      </PortConnection>
     </SubComponent>
     <SubComponent name="membrane">
       <Component>
@@ -3103,11 +3103,11 @@ in this simulation}
           <SingleValue>1.0</SingleValue>
         </Property>
       </Component>
-      <ReceiveConnection port="i">
+      <PortConnection port="i">
         <FromSister component="Na" name="i"/>
         <FromSister component="K" name="i"/>
         <FromSister component="leak" name="i"/>
-      </ReceiveConnection>
+      </PortConnection>
     </SubComponent>
     <PortExposure name="membraneVoltage" component="membrane" port="V"/>
     <PortExposure name="membraneCurrent" component="membrane" port="i">
@@ -3154,9 +3154,9 @@ in this simulation}
               <SingleValue>0.0036</SingleValue>
             </Property>
           </Component>
-          <ReceiveConnection port="V">
+          <PortConnection port="V">
             <FromSister component="membrane" port="V"/>
-          </ReceiveConnection>
+          </PortConnection>
         </SubComponent>
         <SubComponent name="PyramidalK">
           <Component>
@@ -3166,9 +3166,9 @@ in this simulation}
               <SingleValue>0.0025</SingleValue>
             </Property>
           </Component>
-          <ReceiveConnection port="V">
+          <PortConnection port="V">
             <FromSister component="membrane" port="V"/>
-          </ReceiveConnection>
+          </PortConnection>
         </SubComponent>
         <SubComponent name="Kv4">
           <Component>
@@ -3178,9 +3178,9 @@ in this simulation}
               <SingleValue>0.0025</SingleValue>
             </Property>
           </Component>
-          <ReceiveConnection port="V">
+          <PortConnection port="V">
             <FromSister component="membrane" port="V"/>
-          </ReceiveConnection>
+          </PortConnection>
         </SubComponent>
         <SubComponent name="leak">
           <Component>
@@ -3193,9 +3193,9 @@ in this simulation}
               <SingleValue>-21</SingleValue>
             </Property>
           </Component>
-          <ReceiveConnection port="V">
+          <PortConnection port="V">
             <FromSister component="membrane" port="V"/>
-          </ReceiveConnection>
+          </PortConnection>
         </SubComponent>
         <SubComponent name="membrane">
           <Component>
@@ -3214,34 +3214,34 @@ in this simulation}
               <SingleValue>1.0</SingleValue>
             </Property>
           </Component>
-          <ReceiveConnection port="i">
+          <PortConnection port="i">
             <FromSister component="Na" name="i"/>
             <FromSister component="K" name="i"/>
             <FromSister component="leak" name="i"/>
-          </ReceiveConnection>
+          </PortConnection>
         </SubComponent>
         <PortExposure name="proximalVoltage" component="membrane" port="proximalV"/>
         <PortExposure name="distalVoltage" component="membrane" port="distalV"/>
       </MultiComponent>
-      <ReceiveConnection port="proximalVoltage">
+      <PortConnection port="proximalVoltage">
         <FromProximal port="voltage"/>
-      </ReceiveConnection>
-      <ReceiveConnection port="distalVoltage">
+      </PortConnection>
+      <PortConnection port="distalVoltage">
         <FromDistal port="voltage"/>
-      </ReceiveConnection>
+      </PortConnection>
     </Domain>
     <Domain name="dendrites">
       <Reference>DendriteDynamics</Reference>
-      <ReceiveConnection port="proximalVoltage">
+      <PortConnection port="proximalVoltage">
         <FromProximal port="voltage"/>
-      </ReceiveConnection>
-      <ReceiveConnection port="distalVoltage">
+      </PortConnection>
+      <PortConnection port="distalVoltage">
         <FromDistal port="voltage"/>
-      </ReceiveConnection>
-      <ReceiveConnection port="withinDendritesReducePort">
+      </PortConnection>
+      <PortConnection port="withinDendritesReducePort">
         <FromProximal domain="dendrites" port="withinDendritesSendPort"/>
         <FromDistal domain="dendrites" port="withinDendritesSendPort"/>
-      </ReceiveConnection>
+      </PortConnection>
     </Domain>
      <Property name="xCoords">
       <ExternalArrayValue url="./example_compartments.txt"
