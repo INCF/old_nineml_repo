@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<ConnectionRuleClass name="SmallWorld">
+  <Parameter name="k" dimension="dimensionless"/>  
+  <Parameter name="mu1" dimension="dimensionless" container="source"/>
+  <Parameter name="sigma1" dimension="dimensionless" container="source"/>
+  <Parameter name="mu2" dimension="dimensionless" container="source"/>
+  <Parameter name="sigma2" dimension="dimensionless" container="source"/>
+  <PropertyReceivePort name="src_x_dist" container="source" dimension="length"/>
+  <PropertyReceivePort name="dest_x_dist" container="destination" dimension="length"/>
+  <ConnectCondition stage="0" action="add">
+    <MathInline>abs(i - j) &lt; k</MathInline>
+  </ConnectCondition>
+  <SelectConnections stage="1" action="remove" perspective="source">
+    <Number>
+      <MathInline>round(r)</MathInline><!-- Below zero is counted as 0 or make sure users provide positive value? -->
+    </Number>
+    <Preference order="ascending">
+      <MathInline>removePreference</MathInline>
+    </Preference>
+    <Replace order="ascending" execute="after">
+      <MathInline>abs(src_x_dist - src_y_dist) &lt; abs(replacePreference)</MathInline>
+    </Replace>
+  </SelectConnections>
+  <RandomVariable name="r" units="none">
+    <un:NormalDistribution xmlns:un="http://www.uncertml.org">
+      <un:mean>mu1</un:mean>
+      <un:variance>sigma1</un:variance>
+    </un:NormalDistribution>
+  </RandomVariable>
+  <RandomVariable name="removePreference" units="none">
+    <un:UniformDistribution xmlns:un="http://www.uncertml.org">
+      <un:low>0</un:low>
+      <un:high>1</un:high>
+    </un:UniformDistribution>
+  </RandomVariable>
+  <RandomVariable name="replacePreference" units="none">
+    <un:NormalDistribution xmlns:un="http://www.uncertml.org">
+      <un:mean>mu2</un:mean>
+      <un:variance>sigma2</un:variance>
+    </un:NormalDistribution>
+  </RandomVariable>
+</ConnectionRuleClass>
