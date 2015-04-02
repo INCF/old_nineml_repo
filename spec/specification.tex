@@ -20,7 +20,7 @@
 \newcommand{\NineML}{\defRef{\textbf{\class{NineML}}\xspace}{sec:NineML}}
 \newcommand{\Unit}{\defRef{\textbf{\class{Unit}}\xspace}{sec:Unit}}
 \newcommand{\Dimension}{\defRef{\textbf{\class{Dimension}}\xspace}{sec:Dimension}}
-\newcommand{\ComponentClass}{\defRef{\textbf{\class{ComponentClass}}\xspace}{sec:ComponentClass}}
+\newcommand{\DynamicsClass}{\defRef{\textbf{\class{DynamicsClass}}\xspace}{sec:DynamicsClass}}
 \newcommand{\Dynamics}{\defRef{\defRef{\textbf{\class{Dynamics}}\xspace}{sec:Dynamics}}{sec:Dynamics}}
 \newcommand{\RandomDistribution}{\defRef{\textbf{\class{RandomDistribution}}\xspace}{sec:RandomDistribution}}
 \newcommand{\BuiltInDistribution}{\defRef{\textbf{\class{BuiltInDistribution}}\xspace}{sec:BuiltInDistribution}}
@@ -298,8 +298,8 @@ NineML documents must be enclosed within an \NineML element, which should be in 
     \midrule
     \em{Child elements} & \em{Multiplicity} & \em{Required} \\
     \midrule
-    \Component & set & no \\ 
-    \ComponentClass & set & no \\
+    \Dynamics & set & no \\ 
+    \DynamicsClass & set & no \\
     \Unit & set & no \\
     \Dimension & set & no \\
     \Population & set & no \\
@@ -309,7 +309,7 @@ NineML documents must be enclosed within an \NineML element, which should be in 
   \end{edtable}
 \end{table}
 
-Seven \emph{document-level} elements are allowed to reside directly within \NineML elements: \Component, \ComponentClass, \Unit, \Dimension, \Population, \Projection and \Selection. Each element should be uniquely identified by its \textit{name} attribute within the scope of the document (see \identifier). 
+Seven \emph{document-level} elements are allowed to reside directly within \NineML elements: \Component, component class, \Unit, \Dimension, \Population, \Projection and \Selection. Each element should be uniquely identified by its \textit{name} attribute within the scope of the document (see \identifier). 
 
 \Unit \notice and \Dimension elements must be defined within the document they are referenced, whereas the remaining element types can also be referenced from other NineML documents (see \Reference and \Definition).
 
@@ -429,21 +429,17 @@ If omitted, the offset is zero.
 
 \clearpage
 \part{Abstraction Layer}
-\section{Component Classes and Parameters}
 
-The main building block of the Abstraction Layer is the \ComponentClass.
-The \ComponentClass is intended to package together a collection of
+\section{Introduction}
+
+The main building block of the Abstraction Layer is the component class.
+The component class is intended to package together a collection of
 objects that relate to the definition of a model (e.g. cells, synapses, synaptic
 plasticity rules, random spike trains, inputs).
 All equations and event declarations that are part of particular entity
-model, such as neuron model, belong in a single \ComponentClass.
-A \ComponentClass can be used to represent either a specific model of a neuron or a
+model, such as neuron model, belong in a single component class.
+A component class can be used to represent either a specific model of a neuron or a
 composite model, including synaptic mechanisms.
-
-The interface is the \emph{external} view of the \ComponentClass that defines
-what inputs and outputs the component exposes to other {\ComponentClass} elements and the
-parameters that can be set for the \ComponentClass. The interface consists of
-instances of ports and \Parameter (see \ref{fig:component_class_overview}).
 
 \begin{figure}[htb]
 \center
@@ -452,44 +448,11 @@ instances of ports and \Parameter (see \ref{fig:component_class_overview}).
 \label{fig:component_class_overview}
 \end{figure}
 
-As well as being able to specify the communication of continuous values,
-{\ComponentClass} elements are also able to specify the emission and the reception
-of events. Events are discrete notifications
-that are transmitted over event ports. Since
-Event ports have names, saying that we transmit `event1' for example
-would mean transmitting an event on the EventPort called `event1'. Events
-can be used for example to signal action potential firing.
-
-\subsection{ComponentClass}
-\label{sec:ComponentClass}
-
-\begin{table}[H]
-  \begin{edtable}{tabular}{llr}
-    \toprule
-    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{ComponentClass Structure}}}\\
-    \toprule
-    \em{Attribute name} & \em{Type/Format} & \em{Required} \\
-    \midrule
-    name & \identifier & yes\\
-    \midrule
-    \em{Child elements} & \em{Multiplicity} & \em{Required} \\
-    \midrule
-    \Parameter & set & no \\ 
-    \AnalogSendPort & set & no\\
-    \AnalogReceivePort & set & no\\
-    \AnalogReducePort & set & no \\ 
-    \EventSendPort & set & no\\    
-    \EventReceivePort & set & no\\    
-    \Dynamics | \ConnectionRule | \RandomDistribution & singleton & yes \\
-    \bottomrule
-  \end{edtable}
-\end{table}
-
-A \ComponentClass is composed of:
+A component class is composed of:
 \begin{itemize}
-\item {\Parameter} objects for the \ComponentClass, which specify which values are required to be provided in the User Layer.
+\item {\Parameter} objects for the component class, which specify which values are required to be provided in the User Layer.
 \item An unordered collection of port objects, which either publish or read state variables or derived values published from other components in the case of analog send and receive ports, or emit events or listen for events emitted from components. \EventSendPort and \EventReceivePort objects raise and listen for events passed between dynamic components.
-\item {A `main' block, which specifies the nature of the component class:
+\item {A collection of specific and generic elements that describe the behaviour of the component:
 \begin{itemize} 
 \item \Dynamics, the component class defines a dynamic element such as neutron or post-synaptic response.
 \item \ConnectionRule, the component class defines a rule by which populations are connected in projections.
@@ -497,8 +460,21 @@ A \ComponentClass is composed of:
 \end{itemize}}
 \end{itemize}
 
-\subsubsection{Name attribute}
-Each \ComponentClass requires a \textit{name} attribute, which should be a valid \identifier and uniquely identify the {\ComponentClass} in the document scope.
+
+\section{Parameters and Ports}
+
+The interface is the \emph{external} view of the component class that defines
+what inputs and outputs the component exposes to other {component class} elements and the
+parameters that can be set for the component class. The interface consists of
+instances of ports and \Parameter (see \ref{fig:component_class_overview}).
+
+As well as being able to specify the communication of continuous values,
+{component class} elements are also able to specify the emission and the reception
+of events. Events are discrete notifications
+that are transmitted over event ports. Since
+Event ports have names, saying that we transmit `event1' for example
+would mean transmitting an event on the EventPort called `event1'. Events
+can be used for example to signal action potential firing.
 
 \subsection{Parameter}
 \label{sec:Parameter}
@@ -516,17 +492,163 @@ Each \ComponentClass requires a \textit{name} attribute, which should be a valid
   \end{edtable}
 \end{table}
 
-\Parameter objects are placeholders for numerical values within a \ComponentClass.
+\Parameter objects are placeholders for numerical values within a component class.
 They define particular qualities of the model,
 such as the firing threshold, reset voltage or the
 decay time constant of a synapse model. By definition, Parameters are set at the
 start of the simulation, and remain constant throughout.
 
 \subsubsection{Name attribute}
-Each \Parameter requires a \textit{name} attribute, which is a valid \identifier and uniquely identifies the \Parameter within the \ComponentClass.
+Each \Parameter requires a \textit{name} attribute, which is a valid \identifier and uniquely identifies the \Parameter within the component class.
 
 \subsubsection{Dimension attribute}
 \Parameter elements must have a \textit{dimension} attribute. This attribute specifies the dimension of the units of the quantity that is expected to be passed to the \Parameter and should refer to the name of a \Dimension element in the document scope. For a dimensionless parameters a \Dimension with all attributes of power 0 can be used.
+
+
+Ports allow components to communicate with each
+other during a simulation. Ports can either transmit discrete events or continuous streams of analog data. Events are typically used to transmit and receive spikes between neutron model, whereas analog ports can be used to model injected current and gap junctions between neuron models. 
+
+Ports are divided into sending, \EventSendPort and \AnalogSendPort, and receiving objects, \EventReceivePort, \AnalogReceivePort and \AnalogReducePort. With the exception of \AnalogReducePort objects, each receive port must be connected to exactly one matching (i.e. analog$\to$analog, event$\to$event) send port, where as a send port can be connected any number of receive ports. \AnalogReducePort objects can be connected to any number of \AnalogSendPort objects; the values of the connected ports are then ``reduced'' to a single data stream using the \textit{operator} provided to the \AnalogReducePort.
+
+\subsection{AnalogSendPort}
+\label{sec:AnalogSendPort}
+
+\begin{table}[H]
+  \begin{edtable}{tabular}{llr}
+    \toprule
+    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{AnalogSendPort Structure}}}\\
+    \toprule
+    \em{Attribute name} & \em{Type/Format} & \em{Required} \\
+    \midrule
+    name & [\StateVariable | \Alias{}]@name & yes\\
+    dimension & \Dimension{}@name & yes\\
+    \bottomrule
+  \end{edtable}
+\end{table}
+
+{\AnalogSendPort} objects allow variables from the current component to be published externally so they can be read by other {component class} objects. Each {\AnalogSendPort} can be connected to multiple {\AnalogReceivePort} and {\AnalogReducePort} objects.
+
+\subsubsection{Name attribute}
+Each \AnalogSendPort requires a \textit{name} attribute, which should refer to a \StateVariable or \Alias within the current component class.
+
+\subsubsection{Dimension attribute}
+Each \AnalogSendPort requires a \textit{dimension} attribute. This attribute specifies the dimension of the units of the quantity that is expected to be passed through the \AnalogSendPort and should refer to the name of a \Dimension element in the document scope.
+\note{"Dimensionless" parameters can be defined by referring to an empty \Dimension object, i.e. one without any \textit{power} or \textit{offset} attributes} 
+
+\subsection{AnalogReceivePort}
+\label{sec:AnalogReceivePort}
+
+\begin{table}[H]
+  \begin{edtable}{tabular}{llr}
+    \toprule
+    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{AnalogReceivePort Structure}}}\\
+    \toprule
+    \em{Attribute name} & \em{Type/Format} & \em{Required} \\
+    \midrule
+    name & \identifier & yes\\
+    dimension & \Dimension{}@name & yes\\
+    \bottomrule
+  \end{edtable}
+\end{table}
+
+{\AnalogReceivePort}s allow variables that have been published externally to be used within the current component. Each \AnalogReceivePort must be connected to exactly \emph{one} \AnalogSendPort.
+
+\subsubsection{Name attribute}
+Each \AnalogReceivePort requires a \textit{name} attribute, which is a valid \identifier and uniquely identifies the \AnalogReceivePort from all other elements in the component class.
+
+\subsubsection{Dimension attribute}
+Each \AnalogReceivePort requires a \textit{dimension} attribute. This attribute specifies the dimension of the units of the quantity that is expected to be passed through the \AnalogReceivePort and should refer to the name of a \Dimension element in the document scope.
+
+
+\subsection{AnalogReducePort}
+\label{sec:AnalogReducePort}
+
+\begin{table}[H]
+  \begin{edtable}{tabular}{llr}
+    \toprule
+    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{AnalogReducePort Structure}}}\\
+    \toprule
+    \em{Attribute name} & \em{Type/Format} & \em{Required} \\
+    \midrule
+    name & \identifier & yes\\
+    dimension & \Dimension{}@name & yes\\
+    operator & \textit{+} & yes \\
+    \bottomrule
+  \end{edtable}
+\end{table}
+
+Reduce ports can receive data from any number of {\AnalogSendPort} objects (including none).  An \AnalogReducePort takes an additional operator compared to an \AnalogReceivePort,
+{\tt operator}, which specifies how the data from multiple analog send ports
+should be combined to produce a single value. Currently, the
+only supported operation is \lq\lq{}$+$\rq\rq{}, which calculates the sum of the incoming port values.
+
+The motivation for \AnalogReducePort is that it allows us to make our
+component class definitions more general. For example, if we are defining a
+neuron, we would define an \AnalogReducePort called \emph{InjectedCurrent}.
+This allows us to write the membrane equation for that neuron as
+$\mathrm{d}V/\mathrm{d}t = (1/C) * InjectedCurrent$.
+
+Then, when we connect this neuron to synapses, current-clamps, etc, we
+simply need to connect the send ports containing the currents of these
+{component class}es to the \emph{InjectedCurrent} reduce port, without having
+to change our original component class definitions.
+
+\subsubsection{Name attribute}
+Each \AnalogReducePort requires a \textit{name} attribute, which is a valid \identifier and uniquely identifies the \AnalogReducePort from all other elements in the component class.
+
+\subsubsection{Dimension attribute}
+Each \AnalogReducePort requires a \textit{dimension} attribute. This attribute specifies the dimension of the units of the quantity that is expected to be communicated through the \AnalogReducePort and should refer to the name of a \Dimension element in the document scope.
+
+\subsubsection{Operator attribute}
+Each \AnalogReducePort requires an \textit{operator} attribute. The operator \lq\lq{}reduces\rq\rq{} the connected inputs to a single value at each time point. For example the following port,
+
+\begin{lstlisting}
+<AnalogReducePort name="total_membrane_current" dimension="current" operator="+"/>
+\end{lstlisting}
+
+will take all of the electrical currents that have been connected to it via {\AnalogSendPort}s and sum them to get the total current passing through the membrane.
+
+
+\subsection{EventSendPort}
+\label{sec:EventSendPort}
+
+\begin{table}[H]
+  \begin{edtable}{tabular}{llr}
+    \toprule
+    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{EventSendPort Structure}}}\\
+    \toprule
+    \em{Attribute name} & \em{Type/Format} & \em{Required} \\
+    \midrule
+    name & \identifier & yes\\
+    \bottomrule
+  \end{edtable}
+\end{table}
+
+An \EventSendPort specifies a channel over which events can be transmitted from a component. Each \EventSendPort can be connected any number of \EventReceivePort objects.
+
+\subsubsection{Name attribute}
+Each \EventSendPort requires a \textit{name} attribute, which is a valid \identifier and uniquely identifies the \EventSendPort from all other elements in the component class.
+
+
+\subsection{EventReceivePort}
+\label{sec:EventReceivePort}
+
+\begin{table}[H]
+  \begin{edtable}{tabular}{llr}
+    \toprule
+    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{EventReceivePort Structure}}}\\
+    \toprule
+    \em{Attribute name} & \em{Type/Format} & \em{Required} \\
+    \midrule
+    name & \identifier & yes\\
+    \bottomrule
+  \end{edtable}
+\end{table}
+
+An \EventReceivePort specifies a channel over which events can be received by a component. Each \EventReceivePort must be connected to exactly \emph{one} \EventSendPort.
+
+\subsubsection{Name attribute}
+Each \EventReceivePort requires a \textit{name} attribute, which is a valid \identifier and uniquely identifies the \EventReceivePort from all other elements in the component class.
 
 \section{Mathematical Expressions}
 
@@ -658,7 +780,7 @@ description out to eliminate these intermediate {\Alias} objects, but the expres
 would be very long and difficult to read.
 
 \item {\bf Accessing intermediate variables}: if we would like to communicate a
-value other than a simple \StateVariable to another \ComponentClass. For
+value other than a simple \StateVariable to another component class. For
 example, if we have a component representing a
 neuron, which has an internal \StateVariable, `V', we may be interested in
 transmitting a current, for example $i=g*(E-V)$.
@@ -667,7 +789,7 @@ transmitting a current, for example $i=g*(E-V)$.
 
 
 \subsubsection{Name attribute}
-Each \Alias requires a \textit{name} attribute, which is a valid \identifier and uniquely identifies the \Alias from all other elements in the \ComponentClass.
+Each \Alias requires a \textit{name} attribute, which is a valid \identifier and uniquely identifies the \Alias from all other elements in the component class.
 
 \subsection{Constant}
 \label{sec:Constant}
@@ -702,156 +824,8 @@ Each \Constant requires a \textit{units} attribute. The \textit{units} attribute
 \subsubsection{Body}
 Any valid numeric value, including shorthand scientific notation e.g. 1e-5 ($1\times10^{-5}$).
 
-\section{Ports}
-\label{sec:Ports}
-
-Ports allow components to communicate with each
-other during a simulation. Ports can either transmit discrete events or continuous streams of analog data. Events are typically used to transmit and receive spikes between neutron model, whereas analog ports can be used to model injected current and gap junctions between neuron models. 
-
-Ports are divided into sending, \EventSendPort and \AnalogSendPort, and receiving objects, \EventReceivePort, \AnalogReceivePort and \AnalogReducePort. With the exception of \AnalogReducePort objects, each receive port must be connected to exactly one matching (i.e. analog$\to$analog, event$\to$event) send port, where as a send port can be connected any number of receive ports. \AnalogReducePort objects can be connected to any number of \AnalogSendPort objects; the values of the connected ports are then ``reduced'' to a single data stream using the \textit{operator} provided to the \AnalogReducePort.
-
-
-\subsection{AnalogSendPort}
-\label{sec:AnalogSendPort}
-
-\begin{table}[H]
-  \begin{edtable}{tabular}{llr}
-    \toprule
-    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{AnalogSendPort Structure}}}\\
-    \toprule
-    \em{Attribute name} & \em{Type/Format} & \em{Required} \\
-    \midrule
-    name & [\StateVariable | \Alias{}]@name & yes\\
-    dimension & \Dimension{}@name & yes\\
-    \bottomrule
-  \end{edtable}
-\end{table}
-
-{\AnalogSendPort} objects allow variables from the current component to be published externally so they can be read by other {\ComponentClass} objects. Each {\AnalogSendPort} can be connected to multiple {\AnalogReceivePort} and {\AnalogReducePort} objects.
-
-\subsubsection{Name attribute}
-Each \AnalogSendPort requires a \textit{name} attribute, which should refer to a \StateVariable or \Alias within the current \ComponentClass.
-
-\subsubsection{Dimension attribute}
-Each \AnalogSendPort requires a \textit{dimension} attribute. This attribute specifies the dimension of the units of the quantity that is expected to be passed through the \AnalogSendPort and should refer to the name of a \Dimension element in the document scope.
-\note{"Dimensionless" parameters can be defined by referring to an empty \Dimension object, i.e. one without any \textit{power} or \textit{offset} attributes} 
-
-\subsection{AnalogReceivePort}
-\label{sec:AnalogReceivePort}
-
-\begin{table}[H]
-  \begin{edtable}{tabular}{llr}
-    \toprule
-    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{AnalogReceivePort Structure}}}\\
-    \toprule
-    \em{Attribute name} & \em{Type/Format} & \em{Required} \\
-    \midrule
-    name & \identifier & yes\\
-    dimension & \Dimension{}@name & yes\\
-    \bottomrule
-  \end{edtable}
-\end{table}
-
-{\AnalogReceivePort}s allow variables that have been published externally to be used within the current component. Each \AnalogReceivePort must be connected to exactly \emph{one} \AnalogSendPort.
-
-\subsubsection{Name attribute}
-Each \AnalogReceivePort requires a \textit{name} attribute, which is a valid \identifier and uniquely identifies the \AnalogReceivePort from all other elements in the \ComponentClass.
-
-\subsubsection{Dimension attribute}
-Each \AnalogReceivePort requires a \textit{dimension} attribute. This attribute specifies the dimension of the units of the quantity that is expected to be passed through the \AnalogReceivePort and should refer to the name of a \Dimension element in the document scope.
-
-
-\subsection{AnalogReducePort}
-\label{sec:AnalogReducePort}
-
-\begin{table}[H]
-  \begin{edtable}{tabular}{llr}
-    \toprule
-    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{AnalogReducePort Structure}}}\\
-    \toprule
-    \em{Attribute name} & \em{Type/Format} & \em{Required} \\
-    \midrule
-    name & \identifier & yes\\
-    dimension & \Dimension{}@name & yes\\
-    operator & \textit{+} & yes \\
-    \bottomrule
-  \end{edtable}
-\end{table}
-
-Reduce ports can receive data from any number of {\AnalogSendPort} objects (including none).  An \AnalogReducePort takes an additional operator compared to an \AnalogReceivePort,
-{\tt operator}, which specifies how the data from multiple analog send ports
-should be combined to produce a single value. Currently, the
-only supported operation is \lq\lq{}$+$\rq\rq{}, which calculates the sum of the incoming port values.
-
-The motivation for \AnalogReducePort is that it allows us to make our
-\ComponentClass definitions more general. For example, if we are defining a
-neuron, we would define an \AnalogReducePort called \emph{InjectedCurrent}.
-This allows us to write the membrane equation for that neuron as
-$\mathrm{d}V/\mathrm{d}t = (1/C) * InjectedCurrent$.
-
-Then, when we connect this neuron to synapses, current-clamps, etc, we
-simply need to connect the send ports containing the currents of these
-{\ComponentClass}es to the \emph{InjectedCurrent} reduce port, without having
-to change our original \ComponentClass definitions.
-
-\subsubsection{Name attribute}
-Each \AnalogReducePort requires a \textit{name} attribute, which is a valid \identifier and uniquely identifies the \AnalogReducePort from all other elements in the \ComponentClass.
-
-\subsubsection{Dimension attribute}
-Each \AnalogReducePort requires a \textit{dimension} attribute. This attribute specifies the dimension of the units of the quantity that is expected to be communicated through the \AnalogReducePort and should refer to the name of a \Dimension element in the document scope.
-
-\subsubsection{Operator attribute}
-Each \AnalogReducePort requires an \textit{operator} attribute. The operator \lq\lq{}reduces\rq\rq{} the connected inputs to a single value at each time point. For example the following port,
-
-\begin{lstlisting}
-<AnalogReducePort name="total_membrane_current" dimension="current" operator="+"/>
-\end{lstlisting}
-
-will take all of the electrical currents that have been connected to it via {\AnalogSendPort}s and sum them to get the total current passing through the membrane.
-
-
-\subsection{EventSendPort}
-\label{sec:EventSendPort}
-
-\begin{table}[H]
-  \begin{edtable}{tabular}{llr}
-    \toprule
-    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{EventSendPort Structure}}}\\
-    \toprule
-    \em{Attribute name} & \em{Type/Format} & \em{Required} \\
-    \midrule
-    name & \identifier & yes\\
-    \bottomrule
-  \end{edtable}
-\end{table}
-
-An \EventSendPort specifies a channel over which events can be transmitted from a component. Each \EventSendPort can be connected any number of \EventReceivePort objects.
-
-\subsubsection{Name attribute}
-Each \EventSendPort requires a \textit{name} attribute, which is a valid \identifier and uniquely identifies the \EventSendPort from all other elements in the \ComponentClass.
-
-
-\subsection{EventReceivePort}
-\label{sec:EventReceivePort}
-
-\begin{table}[H]
-  \begin{edtable}{tabular}{llr}
-    \toprule
-    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{EventReceivePort Structure}}}\\
-    \toprule
-    \em{Attribute name} & \em{Type/Format} & \em{Required} \\
-    \midrule
-    name & \identifier & yes\\
-    \bottomrule
-  \end{edtable}
-\end{table}
-
-An \EventReceivePort specifies a channel over which events can be received by a component. Each \EventReceivePort must be connected to exactly \emph{one} \EventSendPort.
-
-\subsubsection{Name attribute}
-Each \EventReceivePort requires a \textit{name} attribute, which is a valid \identifier and uniquely identifies the \EventReceivePort from all other elements in the \ComponentClass.
-
-\section{Dynamic Regimes}
+\section{Dynamics}
+\label{sec:dynamics}
 
 Dynamics blocks define the dynamic equations of models such as
 neurons, post-synaptic responses or plasticity of synaptic
@@ -872,8 +846,36 @@ evaluates to true, the transition must occur.
 \label{fig:simple_regime_graph}
 \end{figure}
 
-\subsection{Dynamics}
-\label{sec:Dynamics}
+\subsection{DynamicsClass}
+\label{sec:DynamicsClass}
+
+\begin{table}[H]
+  \begin{edtable}{tabular}{llr}
+    \toprule
+    \multicolumn{3}{c}{\parbox{0.55\linewidth}{\center\textbf{ComponentClass Structure}}}\\
+    \toprule
+    \em{Attribute name} & \em{Type/Format} & \em{Required} \\
+    \midrule
+    name & \identifier & yes\\
+    \midrule
+    \em{Child elements} & \em{Multiplicity} & \em{Required} \\
+    \midrule
+    \Parameter & set & no \\ 
+    \AnalogSendPort & set & no\\
+    \AnalogReceivePort & set & no\\
+    \AnalogReducePort & set & no \\ 
+    \EventSendPort & set & no\\    
+    \EventReceivePort & set & no\\    
+    \StateVariable & set & no \\ 
+    \Regime & set & yes\\
+    \Alias & set & no\\
+    \Constant & set & no\\    
+    \bottomrule
+  \end{edtable}
+\end{table}
+
+\subsubsection{Name attribute}
+Each component class requires a \textit{name} attribute, which should be a valid \identifier and uniquely identify the {component class} in the document scope.
 
 \begin{table}[H]
   \begin{edtable}{tabular}{llr}
@@ -882,10 +884,6 @@ evaluates to true, the transition must occur.
     \toprule
     \em{Child elements} & \em{Multiplicity} & \em{Required} \\
     \midrule
-    \StateVariable & set & no \\ 
-    \Regime & set & yes\\
-    \Alias & set & no\\
-    \Constant & set & no\\    
     \bottomrule
   \end{edtable}
 \end{table}
@@ -926,7 +924,7 @@ which make discrete changes to a \StateVariable value, e.g. $X = X + 1$.
 \end{quote}
 
 \subsubsection{Name attribute}
-Each \StateVariable requires a \textit{name} attribute, which is a valid \identifier and uniquely identifies the \StateVariable from all other elements in the \ComponentClass.
+Each \StateVariable requires a \textit{name} attribute, which is a valid \identifier and uniquely identifies the \StateVariable from all other elements in the component class.
 
 \subsubsection{Dimension attribute}
 Each \StateVariable requires a \textit{dimension} attribute. This attribute specifies the dimension of the units of the quantities that \StateVariable is expected to be initialised and updated with and should refer to the name of a \Dimension element in the document scope.
@@ -961,7 +959,7 @@ the \Regime is complete, it should have defined the following
 properties:
 
 \subsubsection{Name attribute}
-Each \Regime requires a \textit{name} attribute, which is a valid \identifier and uniquely identifies the \Regime from all other elements in the \ComponentClass.
+Each \Regime requires a \textit{name} attribute, which is a valid \identifier and uniquely identifies the \Regime from all other elements in the component class.
 
 
 \subsection{TimeDerivative}
@@ -990,7 +988,7 @@ Each \Regime requires a \textit{name} attribute, which is a valid \identifier an
 which can contain of references to any combination of \StateVariable, \Parameter, \AnalogReceivePort, \AnalogReducePort and \Alias elements with the exception of aliases that are derived from \RandomDistribution components. Therefore, only one \TimeDerivative element is allowed per \StateVariable per \Regime. If a {\TimeDerivative} for a \StateVariable is not defined in a \Regime, it is assumed to be zero.
 
 \subsubsection{Variable attribute}
-Each \TimeDerivative requires a \textit{variable} attribute. This should refer to the name of a \StateVariable in the \ComponentClass. Only one \TimeDerivative is allowed per \textit{variable} in each \Regime.
+Each \TimeDerivative requires a \textit{variable} attribute. This should refer to the name of a \StateVariable in the component class. Only one \TimeDerivative is allowed per \textit{variable} in each \Regime.
 
 
 \section{Transitions}
@@ -1045,7 +1043,7 @@ Implementations should emit a warning when they are detected.
 \OnCondition blocks are activated when the mathematical expression in the \Trigger block becomes true. They are typically used to model spikes in spiking neuron models, potentially emitting spike events and/or transitioning to an explicit refractory regime.
 
 \subsubsection{TargetRegime attribute}
-An \OnEvent can have a \textit{targetRegime} attribute, which should refer to the name of a \Regime element in the \ComponentClass that the dynamics block will transition to when the trigger condition is met.  If the \textit{targetRegime} attribute is omitted the regime will transition to itself.
+An \OnEvent can have a \textit{targetRegime} attribute, which should refer to the name of a \Regime element in the component class that the dynamics block will transition to when the trigger condition is met.  If the \textit{targetRegime} attribute is omitted the regime will transition to itself.
 
 
 \subsection{OnEvent}
@@ -1080,10 +1078,10 @@ a given number of recursive cascades of zero delay (say 1000) to prevent infinit
 loops, but such limits should be modifiable by the user.
 
 \subsubsection{Port attribute}
-Each \OnEvent requires a \textit{port} attribute. This should refer to the name of an \EventReceivePort  in the \ComponentClass interface.
+Each \OnEvent requires a \textit{port} attribute. This should refer to the name of an \EventReceivePort  in the component class interface.
 
 \subsubsection{TargetRegime attribute}
-\OnEvent can have a \textit{targetRegime} attribute, which should refer to the name of a \Regime element in the \ComponentClass that the dynamics block will transition to when the \OnEvent block is triggered by an incoming event. If the \textit{targetRegime} attribute is omitted the regime will transition to itself.
+\OnEvent can have a \textit{targetRegime} attribute, which should refer to the name of a \Regime element in the component class that the dynamics block will transition to when the \OnEvent block is triggered by an incoming event. If the \textit{targetRegime} attribute is omitted the regime will transition to itself.
 
 \subsection{Trigger}
 \label{sec:Trigger}
@@ -1132,7 +1130,7 @@ derived from random distributions. The \OnCondition block is triggered when the 
 elements derived from random distributions. State assignments are typically used to reset the membrane voltage after an outgoing spike event or update post-synaptic response states after an incoming spike event.
 
 \subsubsection{Variable attribute}
-Each \StateAssignment requires a \textit{variable} attribute. This should refer to the name of a \StateVariable in the \ComponentClass. Only one \StateAssignment is allow per \textit{variable} in each \OnEvent or \OnCondition block.
+Each \StateAssignment requires a \textit{variable} attribute. This should refer to the name of a \StateVariable in the component class. Only one \StateAssignment is allow per \textit{variable} in each \OnEvent or \OnCondition block.
 
 \subsection{OutputEvent}
 \label{sec:OutputEvent}
@@ -1152,11 +1150,11 @@ Each \StateAssignment requires a \textit{variable} attribute. This should refer 
 \OutputEvent elements specify events to be raised during a transition. They are typically used to raise spike events from within \OnCondition elements.
 
 \subsubsection{Port attribute}
-Each \OutputEvent requires a \textit{port} attribute. This should refer to the name of an \EventSendPort in the \ComponentClass interface.
+Each \OutputEvent requires a \textit{port} attribute. This should refer to the name of an \EventSendPort in the component class interface.
 
 \section{Random Distributions}
 
-Values for a property across all elements in a container (e.g. cells in a population, post-synaptic responses, plasticity rules or delays in a projection) can be defined as a random distribution by a \Component within a \RandomValue element. A random distribution component must parameterize a {\ComponentClass} with a \RandomDistribution block; the component class defines the random distribution family (e.g. normal, cauchy, gamma, etc...). As of version 1.0, the only random distributions available to the user are those defined in the standard library, however, derived distributions are planned for future versions.
+Values for a property across all elements in a container (e.g. cells in a population, post-synaptic responses, plasticity rules or delays in a projection) can be defined as a random distribution by a \Component within a \RandomValue element. A random distribution component must parameterize a {component class} with a \RandomDistribution block; the component class defines the random distribution family (e.g. normal, cauchy, gamma, etc...). As of version 1.0, the only random distributions available to the user are those defined in the standard library, however, derived distributions are planned for future versions.
 
 \subsection{RandomDistribution}
 \label{sec:RandomDistribution}
@@ -1212,7 +1210,7 @@ The \textit{standardLibrary} attribute is required and should point to a \URL in
 
 \section{Network Connectivity}
 
-The connection rule for cells in the source and destination populations of a \Projection (i.e. the rule that determines which source cells are connected to which destination cells) is defined by a connection-rule component within the \Connectivity element of the \Projection.  This component must parameterize a {\ComponentClass} with a \ConnectionRule block, which describes the connection algorithm. As of version 1.0, the only connection rules available to the user are those defined in the standard library (e.g. all-to-all, one-to-one, probabilistic, etc...), however, custom connectivity rules are planned for future versions.
+The connection rule for cells in the source and destination populations of a \Projection (i.e. the rule that determines which source cells are connected to which destination cells) is defined by a connection-rule component within the \Connectivity element of the \Projection.  This component must parameterize a {component class} with a \ConnectionRule block, which describes the connection algorithm. As of version 1.0, the only connection rules available to the user are those defined in the standard library (e.g. all-to-all, one-to-one, probabilistic, etc...), however, custom connectivity rules are planned for future versions.
 
 \subsection{ConnectionRule}
 \label{sec:ConnectionRule}
@@ -1294,9 +1292,9 @@ Each cell in the destination population is connected to a fixed number of random
 \end{table}
 
 \Component elements instantiate Abstraction Layer component classes by providing properties 
-for each of the parameters defined the class. Each \Component is linked to a \ComponentClass
+for each of the parameters defined the class. Each \Component is linked to a component class
 class by a \Definition element, which locates the component class. A \Component 
-that instantiates a \ComponentClass directly must supply matching \Property elements for each \Parameter in the \ComponentClass. Alternatively, a \Component can inherit a \ComponentClass and set of \Property elements from an existing component by substituting the \Definition for a \Prototype element, which locates the reference \Component. In this case, only the properties that differ from the reference component need to be specified.
+that instantiates a component class directly must supply matching \Property elements for each \Parameter in the component class. Alternatively, a \Component can inherit a component class and set of \Property elements from an existing component by substituting the \Definition for a \Prototype element, which locates the reference \Component. In this case, only the properties that differ from the reference component need to be specified.
 
 \subsubsection{Name attribute}
 Each \Component requires a \textit{name} attribute, which should be a valid \identifier and uniquely identify the {\Component} from all other elements in the document scope.
@@ -1315,20 +1313,20 @@ Each \Component requires a \textit{name} attribute, which should be a valid \ide
     \midrule
     \em{Body} & \; & \em{Required} \\
     \midrule
-    \ComponentClass{}@name & \; & yes \\ 
+    component class{}@name & \; & yes \\ 
     \bottomrule
   \end{edtable}
 \end{table}
 
 The \Definition element establishes a link between a User Layer component and Abstraction Layer
-\ComponentClass. This \ComponentClass can be located either in the current
+component class. This component class can be located either in the current
 document or in another file if a \textit{url} attribute is provided.
 
 \subsubsection{Url attribute}
-If the \ComponentClass referenced by the definition element is defined outside the current document, the \textit{url} attribute specifies a \URL for the file which contains the \ComponentClass definition. \notice If the \textit{url} attribute is omitted the \ComponentClass is referenced from the current document.
+If the component class referenced by the definition element is defined outside the current document, the \textit{url} attribute specifies a \URL for the file which contains the component class definition. \notice If the \textit{url} attribute is omitted the component class is referenced from the current document.
 
 \subsubsection{Body}
-The name of the \ComponentClass to be referenced \ComponentClass needs to be provided in the body of the \Definition element.
+The name of the component class to be referenced component class needs to be provided in the body of the \Definition element.
 
 \subsection{Prototype}
 \label{sec:Prototype}
@@ -1349,7 +1347,7 @@ The name of the \ComponentClass to be referenced \ComponentClass needs to be pro
   \end{edtable}
 \end{table}
 
-The \Prototype element establishes a link to an existing User Layer \Component, which defines the \ComponentClass and default properties of the \Component.  The reference \Component can be located either in the current
+The \Prototype element establishes a link to an existing User Layer \Component, which defines the component class and default properties of the \Component.  The reference \Component can be located either in the current
 document or in another file if a \textit{url} attribute is provided.
 
 \subsubsection{Url attribute}
@@ -1378,11 +1376,11 @@ The name of the \Component to be referenced \Component needs to be provided in t
   \end{edtable}
 \end{table}
 
-\Property elements provide values for the parameters defined in the \ComponentClass
-of the \Component. Their \textit{name} attribute should match the name of the corresponding \Parameter element in the \ComponentClass. The \Property should be provided units that match the dimensionality of the corresponding \Parameter definition.
+\Property elements provide values for the parameters defined in the component class
+of the \Component. Their \textit{name} attribute should match the name of the corresponding \Parameter element in the component class. The \Property should be provided units that match the dimensionality of the corresponding \Parameter definition.
 
 \subsubsection{Name attribute}
-Each \Property requires a \textit{name} attribute. This should refer to the name of a \Parameter in the corresponding \ComponentClass of the \Component.
+Each \Property requires a \textit{name} attribute. This should refer to the name of a \Parameter in the corresponding component class of the \Component.
 
 \subsubsection{Units attribute}
 Each \Property element requires a \emph{units} attribute. The \textit{units} attribute specifies the units of the quantity and should refer to the name of a \Unit element in the document scope. For a dimensionless units a \Unit\withelem\Dimension with no SI dimensions can be used. The SI dimensions of the \Unit\withelem\Dimension should match the SI dimensions of the corresponding \Parameter\withelem\Dimension.
@@ -1771,10 +1769,10 @@ The plasticity dynamics can receive incoming port connections from the post-syna
 The \FromSource element specifies a port connection to the projection component (either the destination cell, post-synaptic response or plasticity dynamics) inside which it is inserted from the source cell dynamics.
 
 \subsubsection{Sender attribute}
-Each \FromSource element requires a \textit{sender} attribute. This should refer to the name of a \AnalogSendPort or \EventSendPort in the \Cell{}\withelem\Component{}\withelem\ComponentClass of the source population. The transmission mode of the port (i.e. \lq\lq{}analog\rq\rq{} or \lq\lq{}event\rq\rq{}) should match that of the port referenced by the \textit{receiver} attribute.
+Each \FromSource element requires a \textit{sender} attribute. This should refer to the name of a \AnalogSendPort or \EventSendPort in the \Cell{}\withelem\Dynamics component class of the source population. The transmission mode of the port (i.e. \lq\lq{}analog\rq\rq{} or \lq\lq{}event\rq\rq{}) should match that of the port referenced by the \textit{receiver} attribute.
 
 \subsubsection{Receiver attribute}
-Each \FromSource element requires a \textit{receiver} attribute. This should refer to the name of a \AnalogReceivePort, \EventReceivePort or \AnalogReducePort in the \Component{}\withelem\ComponentClass in the enclosing \\
+Each \FromSource element requires a \textit{receiver} attribute. This should refer to the name of a \AnalogReceivePort, \EventReceivePort or \AnalogReducePort in the \Dynamics component class in the enclosing \\
 \Source/\Destination/\Plasticity/\Response element.  The transmission mode of the port (i.e. \lq\lq{}analog\rq\rq{} or \lq\lq{}event\rq\rq{}) should match that of the port referenced by the \textit{sender} attribute.
 
 \subsection{FromDestination}
@@ -1796,10 +1794,10 @@ Each \FromSource element requires a \textit{receiver} attribute. This should ref
 The \FromDestination element specifies a port connection to the projection component (either the source cell, post-synaptic response or plasticity dynamics) inside which it is inserted from the destination cell dynamics.
 
 \subsubsection{Sender attribute}
-Each \FromDestination element requires a \textit{sender} attribute. This should refer to the name of a \AnalogSendPort or \EventSendPort in the \Cell\withelem\Component{}\withelem\ComponentClass of the source population. The transmission mode of the port (i.e. \lq\lq{}analog\rq\rq{} or \lq\lq{}event\rq\rq{}) should match that of the port referenced by the \textit{receiver} attribute.
+Each \FromDestination element requires a \textit{sender} attribute. This should refer to the name of a \AnalogSendPort or \EventSendPort in the \Cell\withelem\Dynamics of the source population. The transmission mode of the port (i.e. \lq\lq{}analog\rq\rq{} or \lq\lq{}event\rq\rq{}) should match that of the port referenced by the \textit{receiver} attribute.
 
 \subsubsection{Receiver attribute}
-Each \FromDestination element requires a \textit{receiver} attribute. This should refer to the name of a \AnalogReceivePort, \EventReceivePort or \AnalogReducePort in the \Component{}\withelem\ComponentClass in the enclosing \\
+Each \FromDestination element requires a \textit{receiver} attribute. This should refer to the name of a \AnalogReceivePort, \EventReceivePort or \AnalogReducePort in the \Dynamics in the enclosing \\
 \Source/\Destination/\Plasticity/\Response element.  The transmission mode of the port (i.e. \lq\lq{}analog\rq\rq{} or \lq\lq{}event\rq\rq{}) should match that of the port referenced by the \textit{sender} attribute.
 
 
@@ -1822,10 +1820,10 @@ Each \FromDestination element requires a \textit{receiver} attribute. This shoul
 The \FromPlasticity element specifies a port connection to the projection component (either the source cell, destination cell or post-synaptic response dynamics) inside which it is inserted from the plasticity dynamics.
 
 \subsubsection{Sender attribute}
-Each \FromPlasticity element requires a \textit{sender} attribute. This should refer to the name of a \AnalogSendPort or \EventSendPort in the \Cell->\Component{}\withelem\ComponentClass of the source population. The transmission mode of the port (i.e. \lq\lq{}analog\rq\rq{} or \lq\lq{}event\rq\rq{}) should match that of the port referenced by the \textit{receiver} attribute.
+Each \FromPlasticity element requires a \textit{sender} attribute. This should refer to the name of a \AnalogSendPort or \EventSendPort in the \Cell->\Dynamics of the source population. The transmission mode of the port (i.e. \lq\lq{}analog\rq\rq{} or \lq\lq{}event\rq\rq{}) should match that of the port referenced by the \textit{receiver} attribute.
 
 \subsubsection{Receiver attribute}
-Each \FromPlasticity element requires a \textit{receiver} attribute. This should refer to the name of a \AnalogReceivePort, \EventReceivePort or \AnalogReducePort in the \Component{}\withelem\ComponentClass in the enclosing \Source/\Destination/
+Each \FromPlasticity element requires a \textit{receiver} attribute. This should refer to the name of a \AnalogReceivePort, \EventReceivePort or \AnalogReducePort in the \Dynamics in the enclosing \Source/\Destination/
 \Plasticity/\Response element.  The transmission mode of the port (i.e. \lq\lq{}analog\rq\rq{} or \lq\lq{}event\rq\rq{}) should match that of the port referenced by the \textit{sender} attribute.
 
 \subsection{FromResponse}
@@ -1847,10 +1845,10 @@ Each \FromPlasticity element requires a \textit{receiver} attribute. This should
 The \FromResponse element specifies a port connection to the projection component (either the source cell, destination cell or plasticity dynamics) inside which it is inserted from the post-synaptic response dynamics.
 
 \subsubsection{Sender attribute}
-Each \FromResponse element requires a \textit{sender} attribute. This should refer to the name of a \AnalogSendPort or \EventSendPort in the \Cell->\Component{}\withelem\ComponentClass of the source population. The transmission mode of the port (i.e. \lq\lq{}analog\rq\rq{} or \lq\lq{}event\rq\rq{}) should match that of the port referenced by the \textit{receiver} attribute.
+Each \FromResponse element requires a \textit{sender} attribute. This should refer to the name of a \AnalogSendPort or \EventSendPort in the \Cell->\Dynamics of the source population. The transmission mode of the port (i.e. \lq\lq{}analog\rq\rq{} or \lq\lq{}event\rq\rq{}) should match that of the port referenced by the \textit{receiver} attribute.
 
 \subsubsection{Receiver attribute}
-Each \FromResponse element requires a \textit{receiver} attribute. This should refer to the name of a \AnalogReceivePort, \EventReceivePort or \AnalogReducePort in the \Component{}\withelem\ComponentClass in the enclosing \Source/\Destination/\\
+Each \FromResponse element requires a \textit{receiver} attribute. This should refer to the name of a \AnalogReceivePort, \EventReceivePort or \AnalogReducePort in the \Dynamics in the enclosing \Source/\Destination/\\
 \Plasticity/\Response element.  The transmission mode of the port (i.e. \lq\lq{}analog\rq\rq{} or \lq\lq{}event\rq\rq{}) should match that of the port referenced by the \textit{sender} attribute.
 
 \subsection{Delay}
@@ -1987,7 +1985,7 @@ The \Annotations element is the top-level of the annotations attached to a NineM
 
 \noindent
 In this first example, we are describing how to represent the Izhikevich model in NineML \cite{Izhikevich2003}.
-The model is composed of single \ComponentClass, containing a single \Regime, \emph{subthresholdRegime}, and two
+The model is composed of single component class, containing a single \Regime, \emph{subthresholdRegime}, and two
 state variables, $U$ \& $V$.
 
 \noindent
@@ -1999,7 +1997,7 @@ The ODEs defined for the Regime are:
 \end{align}
 
 \noindent
-The \ComponentClass has a single \OnCondition transition, is triggered when $V>theta$. When
+The component class has a single \OnCondition transition, is triggered when $V>theta$. When
 triggered, It causes an Event called  \emph{spikeOutput} to be emitted, and two
 {\StateAssignment}s to be made:
 \begin{align}
@@ -2341,7 +2339,7 @@ in this simulation}
 
 This example is an implementation of \emph{Benchmark 1} from \cite{Brette2009}, which consists of a network of an excitatory and inhibitory IAF populations randomly connected with COBA synapses \citep{Vogels2005}. The excitatory and inhibitory \Population elements are created with 3,200 and 800 cells respectively. Both populations are then concatenated into a single \Selection element, ``AllNeurons'', which is used to randomly connect both populations to every other neuron in the network with a 2\% probability.
 
-The abstraction layer description of the IAF input neuron \ComponentClass{}\withelem\Dynamics is:
+The abstraction layer description of the IAF input neuron component class{}\withelem\Dynamics is:
 \begin{lstlisting}[style=XML]
 <?xml version='1.0' encoding='UTF-8'?>
 <NineML xmlns="http://nineml.net/9ML/1.0"
@@ -2398,7 +2396,7 @@ The abstraction layer description of the IAF input neuron \ComponentClass{}\with
 
 ~
 
-and the description of the COBA \ComponentClass{}\withelem\Dynamics is:
+and the description of the COBA component class{}\withelem\Dynamics is:
 \begin{lstlisting}[style=XML]
 <?xml version='1.0' encoding='UTF-8'?>
 <NineML xmlns="http://nineml.net/9ML/1.0"
