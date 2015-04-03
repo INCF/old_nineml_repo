@@ -1,0 +1,99 @@
+<?xml version="1.0"?>
+<NineML>
+  <ConnectionRuleClass name="SmallWorld">
+    <Parameter name="k" dimension="dimensionless"/>
+    <Parameter name="beta" dimension="dimensionless" container="source"/>
+    <PropertyReceivePort name="src_x_dist" container="source" dimension="length"/>
+    <PropertyReceivePort name="dest_x_dist" container="destination" dimension="length"/>
+    <ConnectCondition stage="0" action="add">
+      <MathInline>abs(i - j) &lt; k</MathInline>
+    </ConnectCondition>
+    <ConnectCondition stage="1" action="remove">
+      <MathInline>r1 &lt; beta</MathInline>
+      <Replace order="ascending">
+        <MathInline>r2 &lt; 0.5</MathInline>
+      </Replace>
+      <Operation>
+        <Remove number="1">
+          <From>
+            <Me/>
+          </From>
+        </Remove>
+        <Add number="1">
+          <From>
+            <And>
+              <NotConnected/>
+              <NotSelf/>
+            </And>
+          </From>
+        </Add>
+      </Operation>
+      
+      <Parameter name="p" dimension="dimensionless" container="connection"/>
+      <Parameter name="local" dimension="dimensionless" container="connection"/>
+      <Parameter name="myself" dimension="dimensionless" container="connection"/>
+      <StateAssignment variable="p"><Mathinline>r1 &lt; beta</Mathinline></StateAssignment>
+      <StateAssignment variable="myself"><Mathinline>i == j</Mathinline></StateAssignment>
+      <StateAssignment variable="local"><Mathinline>abs(i - j) &lt; k</Mathinline></StateAssignment>
+      
+      <ConnectCondition action="add">
+        <MathInline>local and not(myself)</MathInline>
+        <ConnectCondition action="remove">
+          <MathInline>p</MathInline>
+        </ConnectCondition>
+      </ConnectCondition>
+      <ConnectCondition action="add">
+        <StateAssignment variable="j"><Mathinline>rand_j</Mathinline></StateAssignment>
+        <MathInline>not(p)</MathInline> <!-- assuming parameters use orginal  j (could be called y) and the j is used for output -->
+      </ConnectCondition>
+      
+      
+      
+    </ConnectCondition>
+    <RandomVariable name="r1" units="none">
+      <un:UniformDistribution xmlns:un="http://www.uncertml.org">
+        <un:low>0</un:low>
+        <un:high>1</un:high>
+      </un:UniformDistribution>
+    </RandomVariable>
+    <RandomVariable name="r2" units="none">
+      <un:UniformDistribution xmlns:un="http://www.uncertml.org">
+        <un:low>0</un:low>
+        <un:high>1</un:high>
+      </un:UniformDistribution>
+    </RandomVariable>
+  </ConnectionRuleClass>
+  
+  <ConnectionRuleClass name="smallWorld">
+    <Parameter name="k" dimension="dimensionless"/>
+    <Parameter name="beta" dimension="dimensionless" container="source"/>
+    <Stage index="0" action="add">
+      <Decide>
+        <MathInline>abs(i - j) &lt; k &amp;&amp; i != j</MathInline>
+      </Decide>
+    </Stage>
+    <Stage index="1" action="remove">
+      <Decide>
+        <MathInline>r &lt; beta</MathInline>
+      </Decide>
+      <RandomVariable name="r" units="none">
+        <un:UniformDistribution xmlns:un="www.uncertml.org/distributions">
+          <un:low>0</un:low>
+          <un:high>1</un:high>
+        </un:UniformDistribution>
+      </RandomVariable>
+    </Stage>
+    <Stage index="2" action="add">      
+      <Pick perspective="source">
+        <Number>
+          <MathInline>numRemoved</MathInline>
+        </Number>
+        <Preference order="ascending">
+          <MathInline>wasRemoved ? 0 : 1</MathInline><!-- In this case the previously selected connections could be selected again but only if all the other ones were picked first -->
+        </Preference>
+      </Pick>
+    </Stage>
+    <NumberSelectedInStage name="numRemoved" stage="1" perspective="source"/>
+    <SelectedInStage name="wasRemoved" stage="1"/>
+  </ConnectionRuleClass>
+</NineML>

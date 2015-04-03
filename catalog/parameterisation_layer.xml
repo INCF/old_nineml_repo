@@ -1,0 +1,40 @@
+<NineML>
+    <DynamicsProperties name="compProps">
+        <Reference>comp</Reference>
+        <Property name="blah" units="ms">
+            <SingleValue>1.0</SingleValue>
+        </Property>
+        ...
+    </DynamicsProperties>
+    
+    <PopulationProperties name="pop1Props">
+        <Reference>pop1</Reference>
+        <Property name="blah" units="ms">
+            <SingleValue>1.0</SingleValue>
+        </Property>
+        ...
+    </PopulationProperties>
+    
+    <PopulationProperties name="pop2Props">
+        <Reference>pop2</Reference>
+        <Property name="blah" units="ms">
+            <SingleValue>1.0</SingleValue>
+        </Property>
+        ...
+    </PopulationProperties>
+    
+    <ProjectionProperties name="projProps">
+        <SynapseProperties>
+          ...
+        </SynapseProperties>
+        <ConnectivityProperties>
+          ...
+        </ConnectivityProperties>
+    </ProjectionProperties>
+        
+    <NetworkProperties name="myNetwork">
+        <Reference>pop1Props</Reference>
+        <Reference>pop2Props</Reference>
+        <Reference>projProps</Reference>
+    </NetworkProperties>
+</NineML>
