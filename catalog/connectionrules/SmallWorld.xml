@@ -64,36 +64,167 @@
     </RandomVariable>
   </ConnectionRuleClass>
   
+  <ConnectionRuleClass name="AllToAll">
+    <Select action="add"/>
+  </ConnectionRuleClass>
+  
+  <ConnectionRuleClass name="OneToOne">
+    <Select action="add">
+      <Mask>
+        <MathInline>i == j</MathInline>
+      </Mask>
+    </Select>
+  </ConnectionRuleClass>
+  
+  <ConnectionRuleClass name="Explicit">
+    <Parameter name="list" dimension="dimensionless"/>
+    <Select action="add">
+      <Mask>
+        <MathInline>list != 0</MathInline>
+      </Mask>
+    </Select>
+  </ConnectionRuleClass>
+  
+  <ConnectionRuleClass name="Probabilistic">
+    <Parameter name="p" dimension="dimensionless"/>
+    <Select action="add">
+      <Mask>
+        <MathInline>r &lt; p</MathInline>
+      </Mask>
+      <RandomVariable name="r" units="none">
+        <un:UniformDistribution xmlns:un="http://www.uncertml.org/1.0">
+          <un:low>0</un:low>
+          <un:high>1</un:high>
+        </un:UniformDistribution>
+      </RandomVariable>
+    </Select>
+  </ConnectionRuleClass>
+  
+  <ConnectionRuleClass name="RandomFanOut">
+    <Parameter name="number" dimension="dimensionless"/>
+    <Select action="add">
+      <Number perspective="source">
+        <MathInline>number</MathInline>
+      </Number>
+      <!-- If a Preference element is not provided all connections are given
+        equal preference, and are therefore randomly selected from -->
+    </Select>
+  </ConnectionRuleClass>
+  
+  <ConnectionRuleClass name="RandomFanIn">
+    <Parameter name="number" dimension="dimensionless"/>
+    <Select action="add">
+      <Number perspective="destination">
+        <MathInline>number</MathInline>
+      </Number>
+    </Select>
+  </ConnectionRuleClass>
+  
   <ConnectionRuleClass name="smallWorld">
     <Parameter name="k" dimension="dimensionless"/>
     <Parameter name="beta" dimension="dimensionless" container="source"/>
-    <Stage index="0" action="add">
-      <Decide>
+    <Select action="add">
+      <Mask>
+        <!-- Connect each cell with all cells within k inidices on either side.
+        --> 
         <MathInline>abs(i - j) &lt; k &amp;&amp; i != j</MathInline>
-      </Decide>
-    </Stage>
-    <Stage index="1" action="remove">
-      <Decide>
-        <MathInline>r &lt; beta</MathInline>
-      </Decide>
+      </Mask>
+      <Select action="remove">
+        <Mask>
+          <!-- Randomly select cells from the provisionally connected set to
+            remove. --> 
+          <MathInline>r &lt; beta</MathInline>
+        </Mask>
+        <RandomVariable name="r" units="none">
+          <un:UniformDistribution xmlns:un="www.uncertml.org/distributions">
+            <un:low>0</un:low>
+            <un:high>1</un:high>
+          </un:UniformDistribution>
+        </RandomVariable>
+        <!-- 'scope' can either be 'current' to specify only the selections in 
+          the current scope (i.e. connections to be connected if action="add" 
+          or connections to be removed if action="remove"), or 'all' to 
+          represent all connections that have been connected -->
+        <SelectionMask name="wasRemoved" scope="current"/>
+        <!-- Not sure whether the 'perspective' attribute can be omitted here
+          and just inferred from the 'select' clause it is referred to or not-->
+        <SelectionSize name="numRemoved" perspective="source" scope="current"/>
+        <Select action="add">      
+          <Number perspective="source">
+            <MathInline>numRemoved</MathInline>
+          </Number>
+          <!-- If you want to guarantee that the removed connections are not
+            chosen again. If there are not enough connections in the mask then
+            the full mask is returned. -->
+          <Mask>
+            <MathInline>!wasRemoved</MathInline>
+          </Mask>
+          
+          or
+          
+          <!-- If you would prefer that the removed connections are not
+            chosen again but the number of connections overrides it -->
+          <Preference>
+            <MathInline>wasRemoved ? 0 : 1</MathInline>
+          </Preference>
+          
+          or
+          
+          <!-- If it doesn't matter if the removed connections are added back
+            in you can just omit the Mask and Preference tags -->
+          
+        </Select>
+      </Select>
+    </Select>
+  </ConnectionRuleClass>
+  
+  <!-- Mock selection rule using recursion. Randomly assigns connections with
+     probability 'a' then iteratively removes a connection from each source
+     cell until the total number of connections is less than or equal to 'b' -->
+  <ConnectionRuleClass name="RecursingConnectionRule">
+    <Parameter name="a" dimension="dimensionless"/>
+    <Parameter name="b" dimension="dimensionless" container="single"/>
+    <Select action="add">
+      <Mask>
+        <MathInline>r &lt; a</MathInline>
+      </Mask>
       <RandomVariable name="r" units="none">
         <un:UniformDistribution xmlns:un="www.uncertml.org/distributions">
           <un:low>0</un:low>
           <un:high>1</un:high>
         </un:UniformDistribution>
       </RandomVariable>
-    </Stage>
-    <Stage index="2" action="add">      
-      <Pick perspective="source">
-        <Number>
-          <MathInline>numRemoved</MathInline>
+      <Select action="remove">
+        <Number perspective="source">
+          <MathInline>1</MathInline>
         </Number>
-        <Preference order="ascending">
-          <MathInline>wasRemoved ? 0 : 1</MathInline><!-- In this case the previously selected connections could be selected again but only if all the other ones were picked first -->
-        </Preference>
-      </Pick>
-    </Stage>
-    <NumberSelectedInStage name="numRemoved" stage="1" perspective="source"/>
-    <SelectedInStage name="wasRemoved" stage="1"/>
+        <SelectionSize name="totalNumSelections" scope="all"/>
+        <Recurse>
+          <LevelsUp>
+            <MathInline>totalNumSelections &gt; b ? 1 : 0</MathInline>
+          </LevelsUp>
+        </Recurse>
+      </Select>
+    </Select>
   </ConnectionRuleClass>
+  
+  <!-- Redraw random variable(s) if a reject condition is met. Uniform sampling
+    on a disc. -->
+  <Redraw>
+    <RandomVariable name="x" units="none">
+      <un:UniformDistribution xmlns:un="www.uncertml.org/distributions">
+        <un:low>0</un:low>
+        <un:high>1</un:high>
+      </un:UniformDistribution>
+    </RandomVariable>
+    <RandomVariable name="y" units="none">
+      <un:UniformDistribution xmlns:un="www.uncertml.org/distributions">
+        <un:low>0</un:low>
+        <un:high>1</un:high>
+      </un:UniformDistribution>
+    </RandomVariable>
+    <Reject>
+      <MathInline>x * x + y * y &lt; 1.0</MathInline>
+    </Reject>
+  </Redraw>
 </NineML>
