@@ -64,6 +64,8 @@
     </RandomVariable>
   </ConnectionRuleClass>
   
+  <!-- New Syntax examples -->
+  
   <ConnectionRuleClass name="AllToAll">
     <Select action="add"/>
   </ConnectionRuleClass>
@@ -80,7 +82,7 @@
     <Parameter name="list" dimension="dimensionless"/>
     <Select action="add">
       <Mask>
-        <MathInline>list != 0</MathInline>
+        <MathInline>list != 0</MathInline><!-- Could use just list if non-zero integers are interpreted as true as they are in C/C++/Python/etc.. -->
       </Mask>
     </Select>
   </ConnectionRuleClass>
