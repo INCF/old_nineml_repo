@@ -9,6 +9,7 @@ x86_64
 *.blg
 *.out
 *.pdf
+*.bak
 *.komodoproject
 .idea
 *.synctex.gz*
