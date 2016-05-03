@@ -1,3 +1,8 @@
+**Deprecation Warning**
+
+This is an inactive repository that is being left for historical purposed.
+Please see the [current NineML repository](https://github.com/INCF/nineml) for the latest developments. 
+
 NineML
 ======
 
